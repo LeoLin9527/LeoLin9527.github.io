@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.1.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"yoursite.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="网页分析进行XHR断点，Call stack 调试找到如下位置，e.passwd &amp;&amp; (e.passwd &#x3D; r.rsaFun(e.passwd))，得到公钥和偏移量t,a，继续追踪getKeyPair函数，即可发现生成函数。 1234567rsaFun: function(e) &amp;#123;	var t &#x3D; &quot;ab86b6371b5318aaa1d3c9e612a9f">
+<meta property="og:type" content="article">
+<meta property="og:title" content="JsCrack 爱奇艺登录">
+<meta property="og:url" content="http://yoursite.com/2019/10/06/JsCrack%20%E7%88%B1%E5%A5%87%E8%89%BA%E7%99%BB%E5%BD%95/index.html">
+<meta property="og:site_name" content="江湖の林九">
+<meta property="og:description" content="网页分析进行XHR断点，Call stack 调试找到如下位置，e.passwd &amp;&amp; (e.passwd &#x3D; r.rsaFun(e.passwd))，得到公钥和偏移量t,a，继续追踪getKeyPair函数，即可发现生成函数。 1234567rsaFun: function(e) &amp;#123;	var t &#x3D; &quot;ab86b6371b5318aaa1d3c9e612a9f">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2019-10-06T14:30:00.000Z">
+<meta property="article:modified_time" content="2020-04-23T13:24:55.484Z">
+<meta property="article:author" content="Leo Lin">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://yoursite.com/2019/10/06/JsCrack%20%E7%88%B1%E5%A5%87%E8%89%BA%E7%99%BB%E5%BD%95/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>JsCrack 爱奇艺登录 | 江湖の林九</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">江湖の林九</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">相逢何必曾相识！</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/10/06/JsCrack%20%E7%88%B1%E5%A5%87%E8%89%BA%E7%99%BB%E5%BD%95/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Leo Lin">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="江湖の林九">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          JsCrack 爱奇艺登录
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-10-06 22:30:00" itemprop="dateCreated datePublished" datetime="2019-10-06T22:30:00+08:00">2019-10-06</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-04-23 21:24:55" itemprop="dateModified" datetime="2020-04-23T21:24:55+08:00">2020-04-23</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%BD%91%E7%BB%9C%E7%88%AC%E8%99%AB/" itemprop="url" rel="index"><span itemprop="name">网络爬虫</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="网页分析"><a href="#网页分析" class="headerlink" title="网页分析"></a>网页分析</h2><p>进行XHR断点，Call stack 调试找到如下位置，e.passwd &amp;&amp; (e.passwd = r.rsaFun(e.passwd))，得到公钥和偏移量t,a，继续追踪getKeyPair函数，即可发现生成函数。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">rsaFun: <span class="function"><span class="keyword">function</span>(<span class="params">e</span>) </span>&#123;</span><br><span class="line">	<span class="keyword">var</span> t = <span class="string">&quot;ab86b6371b5318aaa1d3c9e612a9f1264f372323c8c0f19875b5fc3b3fd3afcc1e5bec527aa94bfa85bffc157e4245aebda05389a5357b75115ac94f074aefcd&quot;</span></span><br><span class="line">	  , a = <span class="string">&quot;10001&quot;</span></span><br><span class="line">	  , n = Q.crypto.rsa.RSAUtils.getKeyPair(a, <span class="string">&quot;&quot;</span>, t)</span><br><span class="line">	  , i = Q.crypto.rsa.RSAUtils.encryptedString(n, <span class="built_in">encodeURIComponent</span>(e)).replace(<span class="regexp">/\s/g</span>, <span class="string">&quot;-&quot;</span>);</span><br><span class="line">	<span class="keyword">return</span> i</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="代码实现"><a href="#代码实现" class="headerlink" title="代码实现"></a>代码实现</h2><p>未删减直接将整个对象内容取出来。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br><span class="line">205</span><br><span class="line">206</span><br><span class="line">207</span><br><span class="line">208</span><br><span class="line">209</span><br><span class="line">210</span><br><span class="line">211</span><br><span class="line">212</span><br><span class="line">213</span><br><span class="line">214</span><br><span class="line">215</span><br><span class="line">216</span><br><span class="line">217</span><br><span class="line">218</span><br><span class="line">219</span><br><span class="line">220</span><br><span class="line">221</span><br><span class="line">222</span><br><span class="line">223</span><br><span class="line">224</span><br><span class="line">225</span><br><span class="line">226</span><br><span class="line">227</span><br><span class="line">228</span><br><span class="line">229</span><br><span class="line">230</span><br><span class="line">231</span><br><span class="line">232</span><br><span class="line">233</span><br><span class="line">234</span><br><span class="line">235</span><br><span class="line">236</span><br><span class="line">237</span><br><span class="line">238</span><br><span class="line">239</span><br><span class="line">240</span><br><span class="line">241</span><br><span class="line">242</span><br><span class="line">243</span><br><span class="line">244</span><br><span class="line">245</span><br><span class="line">246</span><br><span class="line">247</span><br><span class="line">248</span><br><span class="line">249</span><br><span class="line">250</span><br><span class="line">251</span><br><span class="line">252</span><br><span class="line">253</span><br><span class="line">254</span><br><span class="line">255</span><br><span class="line">256</span><br><span class="line">257</span><br><span class="line">258</span><br><span class="line">259</span><br><span class="line">260</span><br><span class="line">261</span><br><span class="line">262</span><br><span class="line">263</span><br><span class="line">264</span><br><span class="line">265</span><br><span class="line">266</span><br><span class="line">267</span><br><span class="line">268</span><br><span class="line">269</span><br><span class="line">270</span><br><span class="line">271</span><br><span class="line">272</span><br><span class="line">273</span><br><span class="line">274</span><br><span class="line">275</span><br><span class="line">276</span><br><span class="line">277</span><br><span class="line">278</span><br><span class="line">279</span><br><span class="line">280</span><br><span class="line">281</span><br><span class="line">282</span><br><span class="line">283</span><br><span class="line">284</span><br><span class="line">285</span><br><span class="line">286</span><br><span class="line">287</span><br><span class="line">288</span><br><span class="line">289</span><br><span class="line">290</span><br><span class="line">291</span><br><span class="line">292</span><br><span class="line">293</span><br><span class="line">294</span><br><span class="line">295</span><br><span class="line">296</span><br><span class="line">297</span><br><span class="line">298</span><br><span class="line">299</span><br><span class="line">300</span><br><span class="line">301</span><br><span class="line">302</span><br><span class="line">303</span><br><span class="line">304</span><br><span class="line">305</span><br><span class="line">306</span><br><span class="line">307</span><br><span class="line">308</span><br><span class="line">309</span><br><span class="line">310</span><br><span class="line">311</span><br><span class="line">312</span><br><span class="line">313</span><br><span class="line">314</span><br><span class="line">315</span><br><span class="line">316</span><br><span class="line">317</span><br><span class="line">318</span><br><span class="line">319</span><br><span class="line">320</span><br><span class="line">321</span><br><span class="line">322</span><br><span class="line">323</span><br><span class="line">324</span><br><span class="line">325</span><br><span class="line">326</span><br><span class="line">327</span><br><span class="line">328</span><br><span class="line">329</span><br><span class="line">330</span><br><span class="line">331</span><br><span class="line">332</span><br><span class="line">333</span><br><span class="line">334</span><br><span class="line">335</span><br><span class="line">336</span><br><span class="line">337</span><br><span class="line">338</span><br><span class="line">339</span><br><span class="line">340</span><br><span class="line">341</span><br><span class="line">342</span><br><span class="line">343</span><br><span class="line">344</span><br><span class="line">345</span><br><span class="line">346</span><br><span class="line">347</span><br><span class="line">348</span><br><span class="line">349</span><br><span class="line">350</span><br><span class="line">351</span><br><span class="line">352</span><br><span class="line">353</span><br><span class="line">354</span><br><span class="line">355</span><br><span class="line">356</span><br><span class="line">357</span><br><span class="line">358</span><br><span class="line">359</span><br><span class="line">360</span><br><span class="line">361</span><br><span class="line">362</span><br><span class="line">363</span><br><span class="line">364</span><br><span class="line">365</span><br><span class="line">366</span><br><span class="line">367</span><br><span class="line">368</span><br><span class="line">369</span><br><span class="line">370</span><br><span class="line">371</span><br><span class="line">372</span><br><span class="line">373</span><br><span class="line">374</span><br><span class="line">375</span><br><span class="line">376</span><br><span class="line">377</span><br><span class="line">378</span><br><span class="line">379</span><br><span class="line">380</span><br><span class="line">381</span><br><span class="line">382</span><br><span class="line">383</span><br><span class="line">384</span><br><span class="line">385</span><br><span class="line">386</span><br><span class="line">387</span><br><span class="line">388</span><br><span class="line">389</span><br><span class="line">390</span><br><span class="line">391</span><br><span class="line">392</span><br><span class="line">393</span><br><span class="line">394</span><br><span class="line">395</span><br><span class="line">396</span><br><span class="line">397</span><br><span class="line">398</span><br><span class="line">399</span><br><span class="line">400</span><br><span class="line">401</span><br><span class="line">402</span><br><span class="line">403</span><br><span class="line">404</span><br><span class="line">405</span><br><span class="line">406</span><br><span class="line">407</span><br><span class="line">408</span><br><span class="line">409</span><br><span class="line">410</span><br><span class="line">411</span><br><span class="line">412</span><br><span class="line">413</span><br><span class="line">414</span><br><span class="line">415</span><br><span class="line">416</span><br><span class="line">417</span><br><span class="line">418</span><br><span class="line">419</span><br><span class="line">420</span><br><span class="line">421</span><br><span class="line">422</span><br><span class="line">423</span><br><span class="line">424</span><br><span class="line">425</span><br><span class="line">426</span><br><span class="line">427</span><br><span class="line">428</span><br><span class="line">429</span><br><span class="line">430</span><br><span class="line">431</span><br><span class="line">432</span><br><span class="line">433</span><br><span class="line">434</span><br><span class="line">435</span><br><span class="line">436</span><br><span class="line">437</span><br><span class="line">438</span><br><span class="line">439</span><br><span class="line">440</span><br><span class="line">441</span><br><span class="line">442</span><br><span class="line">443</span><br><span class="line">444</span><br><span class="line">445</span><br><span class="line">446</span><br><span class="line">447</span><br><span class="line">448</span><br><span class="line">449</span><br><span class="line">450</span><br><span class="line">451</span><br><span class="line">452</span><br><span class="line">453</span><br><span class="line">454</span><br><span class="line">455</span><br><span class="line">456</span><br><span class="line">457</span><br><span class="line">458</span><br><span class="line">459</span><br><span class="line">460</span><br><span class="line">461</span><br><span class="line">462</span><br><span class="line">463</span><br><span class="line">464</span><br><span class="line">465</span><br><span class="line">466</span><br><span class="line">467</span><br><span class="line">468</span><br><span class="line">469</span><br><span class="line">470</span><br><span class="line">471</span><br><span class="line">472</span><br><span class="line">473</span><br><span class="line">474</span><br><span class="line">475</span><br><span class="line">476</span><br></pre></td><td class="code"><pre><span class="line">a = &#123;&#125;;b=&#123;&#125;</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">c</span>(<span class="params">a</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> b = f</span><br><span class="line">        , c = b.biDivideByRadixPower(a, <span class="built_in">this</span>.k - <span class="number">1</span>)</span><br><span class="line">        , d = b.biMultiply(c, <span class="built_in">this</span>.mu)</span><br><span class="line">        , e = b.biDivideByRadixPower(d, <span class="built_in">this</span>.k + <span class="number">1</span>)</span><br><span class="line">        , g = b.biModuloByRadixPower(a, <span class="built_in">this</span>.k + <span class="number">1</span>)</span><br><span class="line">        , h = b.biMultiply(e, <span class="built_in">this</span>.modulus)</span><br><span class="line">        , i = b.biModuloByRadixPower(h, <span class="built_in">this</span>.k + <span class="number">1</span>)</span><br><span class="line">        , j = b.biSubtract(g, i);</span><br><span class="line">    j.isNeg &amp;&amp; (j = b.biAdd(j, <span class="built_in">this</span>.bkplus1));</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">var</span> k = b.biCompare(j, <span class="built_in">this</span>.modulus) &gt;= <span class="number">0</span>; k; )</span><br><span class="line">        j = b.biSubtract(j, <span class="built_in">this</span>.modulus),</span><br><span class="line">            k = b.biCompare(j, <span class="built_in">this</span>.modulus) &gt;= <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">return</span> j</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">d</span>(<span class="params">a, b</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> c = f.biMultiply(a, b);</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">this</span>.modulo(c)</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">e</span>(<span class="params">a, b</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> c = <span class="keyword">new</span> t;</span><br><span class="line">    c.digits[<span class="number">0</span>] = <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">var</span> d = a, e = b; ; ) &#123;</span><br><span class="line">        <span class="keyword">if</span> (<span class="number">0</span> != (<span class="number">1</span> &amp; e.digits[<span class="number">0</span>]) &amp;&amp; (c = <span class="built_in">this</span>.multiplyMod(c, d)),</span><br><span class="line">            e = f.biShiftRight(e, <span class="number">1</span>),</span><br><span class="line">        <span class="number">0</span> == e.digits[<span class="number">0</span>] &amp;&amp; <span class="number">0</span> == f.biHighIndex(e))</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        d = <span class="built_in">this</span>.multiplyMod(d, d)</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> c</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">var</span> f, g = &#123;&#125;;</span><br><span class="line"><span class="string">&quot;undefined&quot;</span> == <span class="keyword">typeof</span> g.RSAUtils &amp;&amp; (f = g.RSAUtils = &#123;&#125;);</span><br><span class="line"><span class="keyword">var</span> h, k, l, m, n = <span class="number">16</span>, o = n, p = <span class="number">65536</span>, q = p &gt;&gt;&gt; <span class="number">1</span>, r = p * p, s = p - <span class="number">1</span>, t = g.BigInt = <span class="function"><span class="keyword">function</span>(<span class="params">a</span>) </span>&#123;</span><br><span class="line">        <span class="built_in">this</span>.digits = <span class="string">&quot;boolean&quot;</span> == <span class="keyword">typeof</span> a &amp;&amp; a === !<span class="number">0</span> ? <span class="literal">null</span> : k.slice(<span class="number">0</span>),</span><br><span class="line">            <span class="built_in">this</span>.isNeg = !<span class="number">1</span></span><br><span class="line">    &#125;</span><br><span class="line">;</span><br><span class="line">f.setMaxDigits = <span class="function"><span class="keyword">function</span>(<span class="params">a</span>) </span>&#123;</span><br><span class="line">    h = a,</span><br><span class="line">        k = <span class="keyword">new</span> <span class="built_in">Array</span>(h);</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">var</span> b = <span class="number">0</span>; b &lt; k.length; b++)</span><br><span class="line">        k[b] = <span class="number">0</span>;</span><br><span class="line">    l = <span class="keyword">new</span> t,</span><br><span class="line">        m = <span class="keyword">new</span> t,</span><br><span class="line">        m.digits[<span class="number">0</span>] = <span class="number">1</span></span><br><span class="line">&#125;</span><br><span class="line">    ,</span><br><span class="line">    f.setMaxDigits(<span class="number">20</span>);</span><br><span class="line"><span class="keyword">var</span> u = <span class="number">15</span>;</span><br><span class="line">f.biFromNumber = <span class="function"><span class="keyword">function</span>(<span class="params">a</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> b = <span class="keyword">new</span> t;</span><br><span class="line">    b.isNeg = <span class="number">0</span> &gt; a,</span><br><span class="line">        a = <span class="built_in">Math</span>.abs(a);</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">var</span> c = <span class="number">0</span>; a &gt; <span class="number">0</span>; )</span><br><span class="line">        b.digits[c++] = a &amp; s,</span><br><span class="line">            a = <span class="built_in">Math</span>.floor(a / p);</span><br><span class="line">    <span class="keyword">return</span> b</span><br><span class="line">&#125;</span><br><span class="line">;</span><br><span class="line"><span class="keyword">var</span> v = f.biFromNumber(<span class="number">1e15</span>);</span><br><span class="line">f.biFromDecimal = <span class="function"><span class="keyword">function</span>(<span class="params">a</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">var</span> b, c = <span class="string">&quot;-&quot;</span> == a.charAt(<span class="number">0</span>), d = c ? <span class="number">1</span> : <span class="number">0</span>; d &lt; a.length &amp;&amp; <span class="string">&quot;0&quot;</span> == a.charAt(d); )</span><br><span class="line">        ++d;</span><br><span class="line">    <span class="keyword">if</span> (d == a.length)</span><br><span class="line">        b = <span class="keyword">new</span> t;</span><br><span class="line">    <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="keyword">var</span> e = a.length - d</span><br><span class="line">            , g = e % u;</span><br><span class="line">        <span class="keyword">for</span> (<span class="number">0</span> == g &amp;&amp; (g = u),</span><br><span class="line">                 b = f.biFromNumber(<span class="built_in">Number</span>(a.substr(d, g))),</span><br><span class="line">                 d += g; d &lt; a.length; )</span><br><span class="line">            b = f.biAdd(f.biMultiply(b, v), f.biFromNumber(<span class="built_in">Number</span>(a.substr(d, u)))),</span><br><span class="line">                d += u;</span><br><span class="line">        b.isNeg = c</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> b</span><br><span class="line">&#125;</span><br><span class="line">    ,</span><br><span class="line">    f.biCopy = <span class="function"><span class="keyword">function</span>(<span class="params">a</span>) </span>&#123;</span><br><span class="line">        <span class="keyword">var</span> b = <span class="keyword">new</span> t(!<span class="number">0</span>);</span><br><span class="line">        <span class="keyword">return</span> b.digits = a.digits.slice(<span class="number">0</span>),</span><br><span class="line">            b.isNeg = a.isNeg,</span><br><span class="line">            b</span><br><span class="line">    &#125;</span><br><span class="line">    ,</span><br><span class="line">    f.reverseStr = <span class="function"><span class="keyword">function</span>(<span class="params">a</span>) </span>&#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">var</span> b = <span class="string">&quot;&quot;</span>, c = a.length - <span class="number">1</span>; c &gt; <span class="number">-1</span>; --c)</span><br><span class="line">            b += a.charAt(c);</span><br><span class="line">        <span class="keyword">return</span> b</span><br><span class="line">    &#125;</span><br><span class="line">;</span><br><span class="line"><span class="keyword">var</span> w = [<span class="string">&quot;0&quot;</span>, <span class="string">&quot;1&quot;</span>, <span class="string">&quot;2&quot;</span>, <span class="string">&quot;3&quot;</span>, <span class="string">&quot;4&quot;</span>, <span class="string">&quot;5&quot;</span>, <span class="string">&quot;6&quot;</span>, <span class="string">&quot;7&quot;</span>, <span class="string">&quot;8&quot;</span>, <span class="string">&quot;9&quot;</span>, <span class="string">&quot;a&quot;</span>, <span class="string">&quot;b&quot;</span>, <span class="string">&quot;c&quot;</span>, <span class="string">&quot;d&quot;</span>, <span class="string">&quot;e&quot;</span>, <span class="string">&quot;f&quot;</span>, <span class="string">&quot;g&quot;</span>, <span class="string">&quot;h&quot;</span>, <span class="string">&quot;i&quot;</span>, <span class="string">&quot;j&quot;</span>, <span class="string">&quot;k&quot;</span>, <span class="string">&quot;l&quot;</span>, <span class="string">&quot;m&quot;</span>, <span class="string">&quot;n&quot;</span>, <span class="string">&quot;o&quot;</span>, <span class="string">&quot;p&quot;</span>, <span class="string">&quot;q&quot;</span>, <span class="string">&quot;r&quot;</span>, <span class="string">&quot;s&quot;</span>, <span class="string">&quot;t&quot;</span>, <span class="string">&quot;u&quot;</span>, <span class="string">&quot;v&quot;</span>, <span class="string">&quot;w&quot;</span>, <span class="string">&quot;x&quot;</span>, <span class="string">&quot;y&quot;</span>, <span class="string">&quot;z&quot;</span>];</span><br><span class="line">f.biToString = <span class="function"><span class="keyword">function</span>(<span class="params">a, b</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> c = <span class="keyword">new</span> t;</span><br><span class="line">    c.digits[<span class="number">0</span>] = b;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">var</span> d = f.biDivideModulo(a, c), e = w[d[<span class="number">1</span>].digits[<span class="number">0</span>]]; <span class="number">1</span> == f.biCompare(d[<span class="number">0</span>], l); )</span><br><span class="line">        d = f.biDivideModulo(d[<span class="number">0</span>], c),</span><br><span class="line">            digit = d[<span class="number">1</span>].digits[<span class="number">0</span>],</span><br><span class="line">            e += w[d[<span class="number">1</span>].digits[<span class="number">0</span>]];</span><br><span class="line">    <span class="keyword">return</span> (a.isNeg ? <span class="string">&quot;-&quot;</span> : <span class="string">&quot;&quot;</span>) + f.reverseStr(e)</span><br><span class="line">&#125;</span><br><span class="line">    ,</span><br><span class="line">    f.biToDecimal = <span class="function"><span class="keyword">function</span>(<span class="params">a</span>) </span>&#123;</span><br><span class="line">        <span class="keyword">var</span> b = <span class="keyword">new</span> t;</span><br><span class="line">        b.digits[<span class="number">0</span>] = <span class="number">10</span>;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">var</span> c = f.biDivideModulo(a, b), d = <span class="built_in">String</span>(c[<span class="number">1</span>].digits[<span class="number">0</span>]); <span class="number">1</span> == f.biCompare(c[<span class="number">0</span>], l); )</span><br><span class="line">            c = f.biDivideModulo(c[<span class="number">0</span>], b),</span><br><span class="line">                d += <span class="built_in">String</span>(c[<span class="number">1</span>].digits[<span class="number">0</span>]);</span><br><span class="line">        <span class="keyword">return</span> (a.isNeg ? <span class="string">&quot;-&quot;</span> : <span class="string">&quot;&quot;</span>) + f.reverseStr(d)</span><br><span class="line">    &#125;</span><br><span class="line">;</span><br><span class="line"><span class="keyword">var</span> x = [<span class="string">&quot;0&quot;</span>, <span class="string">&quot;1&quot;</span>, <span class="string">&quot;2&quot;</span>, <span class="string">&quot;3&quot;</span>, <span class="string">&quot;4&quot;</span>, <span class="string">&quot;5&quot;</span>, <span class="string">&quot;6&quot;</span>, <span class="string">&quot;7&quot;</span>, <span class="string">&quot;8&quot;</span>, <span class="string">&quot;9&quot;</span>, <span class="string">&quot;a&quot;</span>, <span class="string">&quot;b&quot;</span>, <span class="string">&quot;c&quot;</span>, <span class="string">&quot;d&quot;</span>, <span class="string">&quot;e&quot;</span>, <span class="string">&quot;f&quot;</span>];</span><br><span class="line">f.digitToHex = <span class="function"><span class="keyword">function</span>(<span class="params">a</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> b = <span class="number">15</span></span><br><span class="line">        , c = <span class="string">&quot;&quot;</span>;</span><br><span class="line">    <span class="keyword">for</span> (i = <span class="number">0</span>; <span class="number">4</span> &gt; i; ++i)</span><br><span class="line">        c += x[a &amp; b],</span><br><span class="line">            a &gt;&gt;&gt;= <span class="number">4</span>;</span><br><span class="line">    <span class="keyword">return</span> f.reverseStr(c)</span><br><span class="line">&#125;</span><br><span class="line">    ,</span><br><span class="line">    f.biToHex = <span class="function"><span class="keyword">function</span>(<span class="params">a</span>) </span>&#123;</span><br><span class="line">        <span class="keyword">var</span> b = <span class="string">&quot;&quot;</span>;</span><br><span class="line">        f.biHighIndex(a);</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">var</span> c = f.biHighIndex(a); c &gt; <span class="number">-1</span>; --c)</span><br><span class="line">            b += f.digitToHex(a.digits[c]);</span><br><span class="line">        <span class="keyword">return</span> b</span><br><span class="line">    &#125;</span><br><span class="line">    ,</span><br><span class="line">    f.charToHex = <span class="function"><span class="keyword">function</span>(<span class="params">a</span>) </span>&#123;</span><br><span class="line">        <span class="keyword">var</span> b, c = <span class="number">48</span>, d = c + <span class="number">9</span>, e = <span class="number">97</span>, f = e + <span class="number">25</span>, g = <span class="number">65</span>, h = <span class="number">90</span>;</span><br><span class="line">        <span class="keyword">return</span> b = a &gt;= c &amp;&amp; d &gt;= a ? a - c : a &gt;= g &amp;&amp; h &gt;= a ? <span class="number">10</span> + a - g : a &gt;= e &amp;&amp; f &gt;= a ? <span class="number">10</span> + a - e : <span class="number">0</span></span><br><span class="line">    &#125;</span><br><span class="line">    ,</span><br><span class="line">    f.hexToDigit = <span class="function"><span class="keyword">function</span>(<span class="params">a</span>) </span>&#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">var</span> b = <span class="number">0</span>, c = <span class="built_in">Math</span>.min(a.length, <span class="number">4</span>), d = <span class="number">0</span>; c &gt; d; ++d)</span><br><span class="line">            b &lt;&lt;= <span class="number">4</span>,</span><br><span class="line">                b |= f.charToHex(a.charCodeAt(d));</span><br><span class="line">        <span class="keyword">return</span> b</span><br><span class="line">    &#125;</span><br><span class="line">    ,</span><br><span class="line">    f.biFromHex = <span class="function"><span class="keyword">function</span>(<span class="params">a</span>) </span>&#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">var</span> b = <span class="keyword">new</span> t, c = a.length, d = c, e = <span class="number">0</span>; d &gt; <span class="number">0</span>; d -= <span class="number">4</span>,</span><br><span class="line">            ++e)</span><br><span class="line">            b.digits[e] = f.hexToDigit(a.substr(<span class="built_in">Math</span>.max(d - <span class="number">4</span>, <span class="number">0</span>), <span class="built_in">Math</span>.min(d, <span class="number">4</span>)));</span><br><span class="line">        <span class="keyword">return</span> b</span><br><span class="line">    &#125;</span><br><span class="line">    ,</span><br><span class="line">    f.biFromString = <span class="function"><span class="keyword">function</span>(<span class="params">a, b</span>) </span>&#123;</span><br><span class="line">        <span class="keyword">var</span> c = <span class="string">&quot;-&quot;</span> == a.charAt(<span class="number">0</span>)</span><br><span class="line">            , d = c ? <span class="number">1</span> : <span class="number">0</span></span><br><span class="line">            , e = <span class="keyword">new</span> t</span><br><span class="line">            , g = <span class="keyword">new</span> t;</span><br><span class="line">        g.digits[<span class="number">0</span>] = <span class="number">1</span>;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">var</span> h = a.length - <span class="number">1</span>; h &gt;= d; h--) &#123;</span><br><span class="line">            <span class="keyword">var</span> i = a.charCodeAt(h)</span><br><span class="line">                , j = f.charToHex(i)</span><br><span class="line">                , k = f.biMultiplyDigit(g, j);</span><br><span class="line">            e = f.biAdd(e, k),</span><br><span class="line">                g = f.biMultiplyDigit(g, b)</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> e.isNeg = c,</span><br><span class="line">            e</span><br><span class="line">    &#125;</span><br><span class="line">    ,</span><br><span class="line">    f.biDump = <span class="function"><span class="keyword">function</span>(<span class="params">a</span>) </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> (a.isNeg ? <span class="string">&quot;-&quot;</span> : <span class="string">&quot;&quot;</span>) + a.digits.join(<span class="string">&quot; &quot;</span>)</span><br><span class="line">    &#125;</span><br><span class="line">    ,</span><br><span class="line">    f.biAdd = <span class="function"><span class="keyword">function</span>(<span class="params">a, b</span>) </span>&#123;</span><br><span class="line">        <span class="keyword">var</span> c;</span><br><span class="line">        <span class="keyword">if</span> (a.isNeg != b.isNeg)</span><br><span class="line">            b.isNeg = !b.isNeg,</span><br><span class="line">                c = f.biSubtract(a, b),</span><br><span class="line">                b.isNeg = !b.isNeg;</span><br><span class="line">        <span class="keyword">else</span> &#123;</span><br><span class="line">            c = <span class="keyword">new</span> t;</span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">var</span> d, e = <span class="number">0</span>, g = <span class="number">0</span>; g &lt; a.digits.length; ++g)</span><br><span class="line">                d = a.digits[g] + b.digits[g] + e,</span><br><span class="line">                    c.digits[g] = d % p,</span><br><span class="line">                    e = <span class="built_in">Number</span>(d &gt;= p);</span><br><span class="line">            c.isNeg = a.isNeg</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> c</span><br><span class="line">    &#125;</span><br><span class="line">    ,</span><br><span class="line">    f.biSubtract = <span class="function"><span class="keyword">function</span>(<span class="params">a, b</span>) </span>&#123;</span><br><span class="line">        <span class="keyword">var</span> c;</span><br><span class="line">        <span class="keyword">if</span> (a.isNeg != b.isNeg)</span><br><span class="line">            b.isNeg = !b.isNeg,</span><br><span class="line">                c = f.biAdd(a, b),</span><br><span class="line">                b.isNeg = !b.isNeg;</span><br><span class="line">        <span class="keyword">else</span> &#123;</span><br><span class="line">            c = <span class="keyword">new</span> t;</span><br><span class="line">            <span class="keyword">var</span> d, e;</span><br><span class="line">            e = <span class="number">0</span>;</span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">var</span> g = <span class="number">0</span>; g &lt; a.digits.length; ++g)</span><br><span class="line">                d = a.digits[g] - b.digits[g] + e,</span><br><span class="line">                    c.digits[g] = d % p,</span><br><span class="line">                c.digits[g] &lt; <span class="number">0</span> &amp;&amp; (c.digits[g] += p),</span><br><span class="line">                    e = <span class="number">0</span> - <span class="built_in">Number</span>(<span class="number">0</span> &gt; d);</span><br><span class="line">            <span class="keyword">if</span> (<span class="number">-1</span> == e) &#123;</span><br><span class="line">                e = <span class="number">0</span>;</span><br><span class="line">                <span class="keyword">for</span> (<span class="keyword">var</span> g = <span class="number">0</span>; g &lt; a.digits.length; ++g)</span><br><span class="line">                    d = <span class="number">0</span> - c.digits[g] + e,</span><br><span class="line">                        c.digits[g] = d % p,</span><br><span class="line">                    c.digits[g] &lt; <span class="number">0</span> &amp;&amp; (c.digits[g] += p),</span><br><span class="line">                        e = <span class="number">0</span> - <span class="built_in">Number</span>(<span class="number">0</span> &gt; d);</span><br><span class="line">                c.isNeg = !a.isNeg</span><br><span class="line">            &#125; <span class="keyword">else</span></span><br><span class="line">                c.isNeg = a.isNeg</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> c</span><br><span class="line">    &#125;</span><br><span class="line">    ,</span><br><span class="line">    f.biHighIndex = <span class="function"><span class="keyword">function</span>(<span class="params">a</span>) </span>&#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">var</span> b = a.digits.length - <span class="number">1</span>; b &gt; <span class="number">0</span> &amp;&amp; <span class="number">0</span> == a.digits[b]; )</span><br><span class="line">            --b;</span><br><span class="line">        <span class="keyword">return</span> b</span><br><span class="line">    &#125;</span><br><span class="line">    ,</span><br><span class="line">    f.biNumBits = <span class="function"><span class="keyword">function</span>(<span class="params">a</span>) </span>&#123;</span><br><span class="line">        <span class="keyword">var</span> b, c = f.biHighIndex(a), d = a.digits[c], e = (c + <span class="number">1</span>) * o;</span><br><span class="line">        <span class="keyword">for</span> (b = e; b &gt; e - o &amp;&amp; <span class="number">0</span> == (<span class="number">32768</span> &amp; d); --b)</span><br><span class="line">            d &lt;&lt;= <span class="number">1</span>;</span><br><span class="line">        <span class="keyword">return</span> b</span><br><span class="line">    &#125;</span><br><span class="line">    ,</span><br><span class="line">    f.biMultiply = <span class="function"><span class="keyword">function</span>(<span class="params">a, b</span>) </span>&#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">var</span> c, d, e, g = <span class="keyword">new</span> t, h = f.biHighIndex(a), i = f.biHighIndex(b), k = <span class="number">0</span>; i &gt;= k; ++k) &#123;</span><br><span class="line">            <span class="keyword">for</span> (c = <span class="number">0</span>,</span><br><span class="line">                     e = k,</span><br><span class="line">                     j = <span class="number">0</span>; h &gt;= j; ++j,</span><br><span class="line">                     ++e)</span><br><span class="line">                d = g.digits[e] + a.digits[j] * b.digits[k] + c,</span><br><span class="line">                    g.digits[e] = d &amp; s,</span><br><span class="line">                    c = d &gt;&gt;&gt; n;</span><br><span class="line">            g.digits[k + h + <span class="number">1</span>] = c</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> g.isNeg = a.isNeg != b.isNeg,</span><br><span class="line">            g</span><br><span class="line">    &#125;</span><br><span class="line">    ,</span><br><span class="line">    f.biMultiplyDigit = <span class="function"><span class="keyword">function</span>(<span class="params">a, b</span>) </span>&#123;</span><br><span class="line">        <span class="keyword">var</span> c, d, e;</span><br><span class="line">        result = <span class="keyword">new</span> t,</span><br><span class="line">            c = f.biHighIndex(a),</span><br><span class="line">            d = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">var</span> g = <span class="number">0</span>; c &gt;= g; ++g)</span><br><span class="line">            e = result.digits[g] + a.digits[g] * b + d,</span><br><span class="line">                result.digits[g] = e &amp; s,</span><br><span class="line">                d = e &gt;&gt;&gt; n;</span><br><span class="line">        <span class="keyword">return</span> result.digits[<span class="number">1</span> + c] = d,</span><br><span class="line">            result</span><br><span class="line">    &#125;</span><br><span class="line">    ,</span><br><span class="line">    f.arrayCopy = <span class="function"><span class="keyword">function</span>(<span class="params">a, b, c, d, e</span>) </span>&#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">var</span> f = <span class="built_in">Math</span>.min(b + e, a.length), g = b, h = d; f &gt; g; ++g,</span><br><span class="line">            ++h)</span><br><span class="line">            c[h] = a[g]</span><br><span class="line">    &#125;</span><br><span class="line">;</span><br><span class="line"><span class="keyword">var</span> y = [<span class="number">0</span>, <span class="number">32768</span>, <span class="number">49152</span>, <span class="number">57344</span>, <span class="number">61440</span>, <span class="number">63488</span>, <span class="number">64512</span>, <span class="number">65024</span>, <span class="number">65280</span>, <span class="number">65408</span>, <span class="number">65472</span>, <span class="number">65504</span>, <span class="number">65520</span>, <span class="number">65528</span>, <span class="number">65532</span>, <span class="number">65534</span>, <span class="number">65535</span>];</span><br><span class="line">f.biShiftLeft = <span class="function"><span class="keyword">function</span>(<span class="params">a, b</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> c = <span class="built_in">Math</span>.floor(b / o)</span><br><span class="line">        , d = <span class="keyword">new</span> t;</span><br><span class="line">    f.arrayCopy(a.digits, <span class="number">0</span>, d.digits, c, d.digits.length - c);</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">var</span> e = b % o, g = o - e, h = d.digits.length - <span class="number">1</span>, i = h - <span class="number">1</span>; h &gt; <span class="number">0</span>; --h,</span><br><span class="line">        --i)</span><br><span class="line">        d.digits[h] = d.digits[h] &lt;&lt; e &amp; s | (d.digits[i] &amp; y[e]) &gt;&gt;&gt; g;</span><br><span class="line">    <span class="keyword">return</span> d.digits[<span class="number">0</span>] = d.digits[h] &lt;&lt; e &amp; s,</span><br><span class="line">        d.isNeg = a.isNeg,</span><br><span class="line">        d</span><br><span class="line">&#125;</span><br><span class="line">;</span><br><span class="line"><span class="keyword">var</span> z = [<span class="number">0</span>, <span class="number">1</span>, <span class="number">3</span>, <span class="number">7</span>, <span class="number">15</span>, <span class="number">31</span>, <span class="number">63</span>, <span class="number">127</span>, <span class="number">255</span>, <span class="number">511</span>, <span class="number">1023</span>, <span class="number">2047</span>, <span class="number">4095</span>, <span class="number">8191</span>, <span class="number">16383</span>, <span class="number">32767</span>, <span class="number">65535</span>];</span><br><span class="line">f.biShiftRight = <span class="function"><span class="keyword">function</span>(<span class="params">a, b</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> c = <span class="built_in">Math</span>.floor(b / o)</span><br><span class="line">        , d = <span class="keyword">new</span> t;</span><br><span class="line">    f.arrayCopy(a.digits, c, d.digits, <span class="number">0</span>, a.digits.length - c);</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">var</span> e = b % o, g = o - e, h = <span class="number">0</span>, i = h + <span class="number">1</span>; h &lt; d.digits.length - <span class="number">1</span>; ++h,</span><br><span class="line">        ++i)</span><br><span class="line">        d.digits[h] = d.digits[h] &gt;&gt;&gt; e | (d.digits[i] &amp; z[e]) &lt;&lt; g;</span><br><span class="line">    <span class="keyword">return</span> d.digits[d.digits.length - <span class="number">1</span>] &gt;&gt;&gt;= e,</span><br><span class="line">        d.isNeg = a.isNeg,</span><br><span class="line">        d</span><br><span class="line">&#125;</span><br><span class="line">    ,</span><br><span class="line">    f.biMultiplyByRadixPower = <span class="function"><span class="keyword">function</span>(<span class="params">a, b</span>) </span>&#123;</span><br><span class="line">        <span class="keyword">var</span> c = <span class="keyword">new</span> t;</span><br><span class="line">        <span class="keyword">return</span> f.arrayCopy(a.digits, <span class="number">0</span>, c.digits, b, c.digits.length - b),</span><br><span class="line">            c</span><br><span class="line">    &#125;</span><br><span class="line">    ,</span><br><span class="line">    f.biDivideByRadixPower = <span class="function"><span class="keyword">function</span>(<span class="params">a, b</span>) </span>&#123;</span><br><span class="line">        <span class="keyword">var</span> c = <span class="keyword">new</span> t;</span><br><span class="line">        <span class="keyword">return</span> f.arrayCopy(a.digits, b, c.digits, <span class="number">0</span>, c.digits.length - b),</span><br><span class="line">            c</span><br><span class="line">    &#125;</span><br><span class="line">    ,</span><br><span class="line">    f.biModuloByRadixPower = <span class="function"><span class="keyword">function</span>(<span class="params">a, b</span>) </span>&#123;</span><br><span class="line">        <span class="keyword">var</span> c = <span class="keyword">new</span> t;</span><br><span class="line">        <span class="keyword">return</span> f.arrayCopy(a.digits, <span class="number">0</span>, c.digits, <span class="number">0</span>, b),</span><br><span class="line">            c</span><br><span class="line">    &#125;</span><br><span class="line">    ,</span><br><span class="line">    f.biCompare = <span class="function"><span class="keyword">function</span>(<span class="params">a, b</span>) </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (a.isNeg != b.isNeg)</span><br><span class="line">            <span class="keyword">return</span> <span class="number">1</span> - <span class="number">2</span> * <span class="built_in">Number</span>(a.isNeg);</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">var</span> c = a.digits.length - <span class="number">1</span>; c &gt;= <span class="number">0</span>; --c)</span><br><span class="line">            <span class="keyword">if</span> (a.digits[c] != b.digits[c])</span><br><span class="line">                <span class="keyword">return</span> a.isNeg ? <span class="number">1</span> - <span class="number">2</span> * <span class="built_in">Number</span>(a.digits[c] &gt; b.digits[c]) : <span class="number">1</span> - <span class="number">2</span> * <span class="built_in">Number</span>(a.digits[c] &lt; b.digits[c]);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span></span><br><span class="line">    &#125;</span><br><span class="line">    ,</span><br><span class="line">    f.biDivideModulo = <span class="function"><span class="keyword">function</span>(<span class="params">a, b</span>) </span>&#123;</span><br><span class="line">        <span class="keyword">var</span> c, d, e = f.biNumBits(a), g = f.biNumBits(b), h = b.isNeg;</span><br><span class="line">        <span class="keyword">if</span> (g &gt; e)</span><br><span class="line">            <span class="keyword">return</span> a.isNeg ? (c = f.biCopy(m),</span><br><span class="line">                c.isNeg = !b.isNeg,</span><br><span class="line">                a.isNeg = !<span class="number">1</span>,</span><br><span class="line">                b.isNeg = !<span class="number">1</span>,</span><br><span class="line">                d = biSubtract(b, a),</span><br><span class="line">                a.isNeg = !<span class="number">0</span>,</span><br><span class="line">                b.isNeg = h) : (c = <span class="keyword">new</span> t,</span><br><span class="line">                d = f.biCopy(a)),</span><br><span class="line">                [c, d];</span><br><span class="line">        c = <span class="keyword">new</span> t,</span><br><span class="line">            d = a;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">var</span> i = <span class="built_in">Math</span>.ceil(g / o) - <span class="number">1</span>, j = <span class="number">0</span>; b.digits[i] &lt; q; )</span><br><span class="line">            b = f.biShiftLeft(b, <span class="number">1</span>),</span><br><span class="line">                ++j,</span><br><span class="line">                ++g,</span><br><span class="line">                i = <span class="built_in">Math</span>.ceil(g / o) - <span class="number">1</span>;</span><br><span class="line">        d = f.biShiftLeft(d, j),</span><br><span class="line">            e += j;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">var</span> k = <span class="built_in">Math</span>.ceil(e / o) - <span class="number">1</span>, l = f.biMultiplyByRadixPower(b, k - i); <span class="number">-1</span> != f.biCompare(d, l); )</span><br><span class="line">            ++c.digits[k - i],</span><br><span class="line">                d = f.biSubtract(d, l);</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">var</span> n = k; n &gt; i; --n) &#123;</span><br><span class="line">            <span class="keyword">var</span> u = n &gt;= d.digits.length ? <span class="number">0</span> : d.digits[n]</span><br><span class="line">                , v = n - <span class="number">1</span> &gt;= d.digits.length ? <span class="number">0</span> : d.digits[n - <span class="number">1</span>]</span><br><span class="line">                , w = n - <span class="number">2</span> &gt;= d.digits.length ? <span class="number">0</span> : d.digits[n - <span class="number">2</span>]</span><br><span class="line">                , x = i &gt;= b.digits.length ? <span class="number">0</span> : b.digits[i]</span><br><span class="line">                , y = i - <span class="number">1</span> &gt;= b.digits.length ? <span class="number">0</span> : b.digits[i - <span class="number">1</span>];</span><br><span class="line">            c.digits[n - i - <span class="number">1</span>] = u == x ? s : <span class="built_in">Math</span>.floor((u * p + v) / x);</span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">var</span> z = c.digits[n - i - <span class="number">1</span>] * (x * p + y), A = u * r + (v * p + w); z &gt; A; )</span><br><span class="line">                --c.digits[n - i - <span class="number">1</span>],</span><br><span class="line">                    z = c.digits[n - i - <span class="number">1</span>] * (x * p | y),</span><br><span class="line">                    A = u * p * p + (v * p + w);</span><br><span class="line">            l = f.biMultiplyByRadixPower(b, n - i - <span class="number">1</span>),</span><br><span class="line">                d = f.biSubtract(d, f.biMultiplyDigit(l, c.digits[n - i - <span class="number">1</span>])),</span><br><span class="line">            d.isNeg &amp;&amp; (d = f.biAdd(d, l),</span><br><span class="line">                --c.digits[n - i - <span class="number">1</span>])</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> d = f.biShiftRight(d, j),</span><br><span class="line">            c.isNeg = a.isNeg != h,</span><br><span class="line">        a.isNeg &amp;&amp; (c = h ? f.biAdd(c, m) : f.biSubtract(c, m),</span><br><span class="line">            b = f.biShiftRight(b, j),</span><br><span class="line">            d = f.biSubtract(b, d)),</span><br><span class="line">        <span class="number">0</span> == d.digits[<span class="number">0</span>] &amp;&amp; <span class="number">0</span> == f.biHighIndex(d) &amp;&amp; (d.isNeg = !<span class="number">1</span>),</span><br><span class="line">            [c, d]</span><br><span class="line">    &#125;</span><br><span class="line">    ,</span><br><span class="line">    f.biDivide = <span class="function"><span class="keyword">function</span>(<span class="params">a, b</span>) </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> f.biDivideModulo(a, b)[<span class="number">0</span>]</span><br><span class="line">    &#125;</span><br><span class="line">    ,</span><br><span class="line">    f.biModulo = <span class="function"><span class="keyword">function</span>(<span class="params">a, b</span>) </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> f.biDivideModulo(a, b)[<span class="number">1</span>]</span><br><span class="line">    &#125;</span><br><span class="line">    ,</span><br><span class="line">    f.biMultiplyMod = <span class="function"><span class="keyword">function</span>(<span class="params">a, b, c</span>) </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> f.biModulo(f.biMultiply(a, b), c)</span><br><span class="line">    &#125;</span><br><span class="line">    ,</span><br><span class="line">    f.biPow = <span class="function"><span class="keyword">function</span>(<span class="params">a, b</span>) </span>&#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">var</span> c = m, d = a; ; ) &#123;</span><br><span class="line">            <span class="keyword">if</span> (<span class="number">0</span> != (<span class="number">1</span> &amp; b) &amp;&amp; (c = f.biMultiply(c, d)),</span><br><span class="line">                b &gt;&gt;= <span class="number">1</span>,</span><br><span class="line">            <span class="number">0</span> == b)</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            d = f.biMultiply(d, d)</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> c</span><br><span class="line">    &#125;</span><br><span class="line">    ,</span><br><span class="line">    f.biPowMod = <span class="function"><span class="keyword">function</span>(<span class="params">a, b, c</span>) </span>&#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">var</span> d = m, e = a, g = b; ; ) &#123;</span><br><span class="line">            <span class="keyword">if</span> (<span class="number">0</span> != (<span class="number">1</span> &amp; g.digits[<span class="number">0</span>]) &amp;&amp; (d = f.biMultiplyMod(d, e, c)),</span><br><span class="line">                g = f.biShiftRight(g, <span class="number">1</span>),</span><br><span class="line">            <span class="number">0</span> == g.digits[<span class="number">0</span>] &amp;&amp; <span class="number">0</span> == f.biHighIndex(g))</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            e = f.biMultiplyMod(e, e, c)</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> d</span><br><span class="line">    &#125;</span><br><span class="line">    ,</span><br><span class="line">    g.BarrettMu = <span class="function"><span class="keyword">function</span>(<span class="params">a</span>) </span>&#123;</span><br><span class="line">        <span class="built_in">this</span>.modulus = f.biCopy(a),</span><br><span class="line">            <span class="built_in">this</span>.k = f.biHighIndex(<span class="built_in">this</span>.modulus) + <span class="number">1</span>;</span><br><span class="line">        <span class="keyword">var</span> b = <span class="keyword">new</span> t;</span><br><span class="line">        b.digits[<span class="number">2</span> * <span class="built_in">this</span>.k] = <span class="number">1</span>,</span><br><span class="line">            <span class="built_in">this</span>.mu = f.biDivide(b, <span class="built_in">this</span>.modulus),</span><br><span class="line">            <span class="built_in">this</span>.bkplus1 = <span class="keyword">new</span> t,</span><br><span class="line">            <span class="built_in">this</span>.bkplus1.digits[<span class="built_in">this</span>.k + <span class="number">1</span>] = <span class="number">1</span>,</span><br><span class="line">            <span class="built_in">this</span>.modulo = c,</span><br><span class="line">            <span class="built_in">this</span>.multiplyMod = d,</span><br><span class="line">            <span class="built_in">this</span>.powMod = e</span><br><span class="line">    &#125;</span><br><span class="line">;</span><br><span class="line"><span class="keyword">var</span> A = <span class="function"><span class="keyword">function</span>(<span class="params">a, b, c</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> d = f;</span><br><span class="line">    <span class="built_in">this</span>.e = d.biFromHex(a),</span><br><span class="line">        <span class="built_in">this</span>.d = d.biFromHex(b),</span><br><span class="line">        <span class="built_in">this</span>.m = d.biFromHex(c),</span><br><span class="line">        <span class="built_in">this</span>.chunkSize = <span class="number">2</span> * d.biHighIndex(<span class="built_in">this</span>.m),</span><br><span class="line">        <span class="built_in">this</span>.radix = <span class="number">16</span>,</span><br><span class="line">        <span class="built_in">this</span>.barrett = <span class="keyword">new</span> g.BarrettMu(<span class="built_in">this</span>.m)</span><br><span class="line">&#125;;</span><br><span class="line">f.getKeyPair = <span class="function"><span class="keyword">function</span>(<span class="params">a, b, c</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> A(a,b,c)</span><br><span class="line">&#125;</span><br><span class="line">    ,</span><br><span class="line"><span class="string">&quot;undefined&quot;</span> == <span class="keyword">typeof</span> g.twoDigit &amp;&amp; (g.twoDigit = <span class="function"><span class="keyword">function</span>(<span class="params">a</span>) </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> (<span class="number">10</span> &gt; a ? <span class="string">&quot;0&quot;</span> : <span class="string">&quot;&quot;</span>) + <span class="built_in">String</span>(a)</span><br><span class="line">    &#125;</span><br><span class="line">),</span><br><span class="line">    f.encryptedString = <span class="function"><span class="keyword">function</span>(<span class="params">a, b</span>) </span>&#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">var</span> c = [], d = b.length, e = <span class="number">0</span>; d &gt; e; )</span><br><span class="line">            c[e] = b.charCodeAt(e),</span><br><span class="line">                e++;</span><br><span class="line">        <span class="keyword">for</span> (; <span class="number">0</span> != c.length % a.chunkSize; )</span><br><span class="line">            c[e++] = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">var</span> g, h, i, j = c.length, k = <span class="string">&quot;&quot;</span>;</span><br><span class="line">        <span class="keyword">for</span> (e = <span class="number">0</span>; j &gt; e; e += a.chunkSize) &#123;</span><br><span class="line">            <span class="keyword">for</span> (i = <span class="keyword">new</span> t,</span><br><span class="line">                     g = <span class="number">0</span>,</span><br><span class="line">                     h = e; h &lt; e + a.chunkSize; ++g)</span><br><span class="line">                i.digits[g] = c[h++],</span><br><span class="line">                    i.digits[g] += c[h++] &lt;&lt; <span class="number">8</span>;</span><br><span class="line">            <span class="keyword">var</span> l = a.barrett.powMod(i, a.e)</span><br><span class="line">                , m = <span class="number">16</span> == a.radix ? f.biToHex(l) : f.biToString(l, a.radix);</span><br><span class="line">            k += m + <span class="string">&quot; &quot;</span></span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> k.substring(<span class="number">0</span>, k.length - <span class="number">1</span>)</span><br><span class="line">    &#125;</span><br><span class="line">    ,</span><br><span class="line">    f.decryptedString = <span class="function"><span class="keyword">function</span>(<span class="params">a, b</span>) </span>&#123;</span><br><span class="line">        <span class="keyword">var</span> c, d, e, g = b.split(<span class="string">&quot; &quot;</span>), h = <span class="string">&quot;&quot;</span>;</span><br><span class="line">        <span class="keyword">for</span> (c = <span class="number">0</span>; c &lt; g.length; ++c) &#123;</span><br><span class="line">            <span class="keyword">var</span> i;</span><br><span class="line">            <span class="keyword">for</span> (i = <span class="number">16</span> == a.radix ? f.biFromHex(g[c]) : f.biFromString(g[c], a.radix),</span><br><span class="line">                     e = a.barrett.powMod(i, a.d),</span><br><span class="line">                     d = <span class="number">0</span>; d &lt;= f.biHighIndex(e); ++d)</span><br><span class="line">                h += <span class="built_in">String</span>.fromCharCode(<span class="number">255</span> &amp; e.digits[d], e.digits[d] &gt;&gt; <span class="number">8</span>)</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span> == h.charCodeAt(h.length - <span class="number">1</span>) &amp;&amp; (h = h.substring(<span class="number">0</span>, h.length - <span class="number">1</span>)),</span><br><span class="line">            h</span><br><span class="line">    &#125;</span><br><span class="line">    ,</span><br><span class="line">    f.setMaxDigits(<span class="number">130</span>),</span><br><span class="line">    b[a] = g</span><br><span class="line"></span><br><span class="line"><span class="comment">////////////////////////////</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">getpwd</span>(<span class="params">e</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> t = <span class="string">&quot;ab86b6371b5318aaa1d3c9e612a9f1264f372323c8c0f19875b5fc3b3fd3afcc1e5bec527aa94bfa85bffc157e4245aebda05389a5357b75115ac94f074aefcd&quot;</span>,</span><br><span class="line">        n = <span class="string">&quot;10001&quot;</span>,</span><br><span class="line">        a = f.getKeyPair(n, <span class="string">&quot;&quot;</span>, t),</span><br><span class="line">        i = f.encryptedString(a, <span class="built_in">encodeURIComponent</span>(e)).replace(<span class="regexp">/\s/g</span>, <span class="string">&quot;-&quot;</span>);</span><br><span class="line">    <span class="keyword">return</span> i</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.info(getpwd(<span class="string">&quot;1111111111111&quot;</span>))</span><br></pre></td></tr></table></figure>
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2019/10/06/Encrypt%20Python%20RSA%E6%96%87%E4%BB%B6%E5%8A%A0%E5%AF%86/" rel="prev" title="Encrypt Python RSA文件加密">
+      <i class="fa fa-chevron-left"></i> Encrypt Python RSA文件加密
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2019/10/07/JsCrack%20%E6%B5%99%E6%B1%9F%E6%94%BF%E5%8A%A1JS%20%E6%B7%B7%E6%B7%86%E5%A4%84%E7%90%86/" rel="next" title="JsCrack 浙江政务JS混淆处理">
+      JsCrack 浙江政务JS混淆处理 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BD%91%E9%A1%B5%E5%88%86%E6%9E%90"><span class="nav-number">1.</span> <span class="nav-text">网页分析</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%A3%E7%A0%81%E5%AE%9E%E7%8E%B0"><span class="nav-number">2.</span> <span class="nav-text">代码实现</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Leo Lin"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Leo Lin</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">104</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">11</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Leo Lin</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+
+    <script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"model":{"jsonPath":"/live2dw/assets/hijiki.model.json"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":false},"log":false});</script></body>
+</html>

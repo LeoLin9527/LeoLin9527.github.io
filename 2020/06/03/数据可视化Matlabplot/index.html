@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.1.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"yoursite.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="基本操作1、创建一个新的画布(figure)。 1matplotlib.pyplot.figure(num&#x3D;None, figsize&#x3D;None, dpi&#x3D;None, facecolor&#x3D;None, edgecolor&#x3D;None, frameon&#x3D;True, FigureClass&#x3D;&lt;class &amp;#x27;matplotlib.figure.Figure&amp;#x27;&gt;, clear&#x3D;">
+<meta property="og:type" content="article">
+<meta property="og:title" content="数据可视化Matlabplot">
+<meta property="og:url" content="http://yoursite.com/2020/06/03/%E6%95%B0%E6%8D%AE%E5%8F%AF%E8%A7%86%E5%8C%96Matlabplot/index.html">
+<meta property="og:site_name" content="江湖の林九">
+<meta property="og:description" content="基本操作1、创建一个新的画布(figure)。 1matplotlib.pyplot.figure(num&#x3D;None, figsize&#x3D;None, dpi&#x3D;None, facecolor&#x3D;None, edgecolor&#x3D;None, frameon&#x3D;True, FigureClass&#x3D;&lt;class &amp;#x27;matplotlib.figure.Figure&amp;#x27;&gt;, clear&#x3D;">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://yoursite.com/images/seaborn/boxplot.png">
+<meta property="article:published_time" content="2020-06-03T04:20:00.000Z">
+<meta property="article:modified_time" content="2020-06-23T04:28:52.123Z">
+<meta property="article:author" content="Leo Lin">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://yoursite.com/images/seaborn/boxplot.png">
+
+<link rel="canonical" href="http://yoursite.com/2020/06/03/%E6%95%B0%E6%8D%AE%E5%8F%AF%E8%A7%86%E5%8C%96Matlabplot/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>数据可视化Matlabplot | 江湖の林九</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">江湖の林九</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">相逢何必曾相识！</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/06/03/%E6%95%B0%E6%8D%AE%E5%8F%AF%E8%A7%86%E5%8C%96Matlabplot/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Leo Lin">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="江湖の林九">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          数据可视化Matlabplot
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-06-03 12:20:00" itemprop="dateCreated datePublished" datetime="2020-06-03T12:20:00+08:00">2020-06-03</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-06-23 12:28:52" itemprop="dateModified" datetime="2020-06-23T12:28:52+08:00">2020-06-23</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%95%B0%E6%8D%AE%E7%A7%91%E5%AD%A6/" itemprop="url" rel="index"><span itemprop="name">数据科学</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="基本操作"><a href="#基本操作" class="headerlink" title="基本操作"></a>基本操作</h2><p>1、创建一个新的画布(figure)。</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">matplotlib.pyplot.figure(num=None, figsize=None, dpi=None, facecolor=None, edgecolor=None, frameon=True, FigureClass=&lt;class &#x27;matplotlib.figure.Figure&#x27;&gt;, clear=False, **kwargs)</span><br></pre></td></tr></table></figure>
+<p>输入参数：<br>num：整型或者字符串，可选参数，默认：None。<br>            如果不提供该参数，一个新的画布(figure)将被创建而且画布数量将会增加。<br>            如果提供该参数，带有id的画布是已经存在的，激活该画布并返回该画布的引用。<br>            如果这个画布不存在，创建并返回画布实例。<br>            如果num是字符串，窗口标题将被设置为该图的数字。<br>figsize：整型元组，可选参数 ，默认：None。<br>                每英寸的宽度和高度。如果不提供，默认值是figure.figsize。<br>dpi：整型，可选参数，默认：None。每英寸像素点。如果不提供，默认是figure.dpi。<br>facecolor：背景色。如果不提供，默认值：figure.facecolor。<br>edgecolor：边界颜色。如果不提供，默认值：figure.edgecolor。<br>framemon：布尔类型，可选参数，默认值：True。如果是False，禁止绘制画图框。<br>FigureClass：源于matplotlib.figure.Figure的类。（可选）使用自定义图实例。<br>clear：布尔类型，可选参数，默认值：False。如果为True和figure已经存在时，这是清理掉改图。</p>
+<p>2、添加图例与描述信息</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">plt.legend()</span><br><span class="line"></span><br><span class="line">plt.xlabel(<span class="string">&#x27;X axis&#x27;</span>,fontproperties=)</span><br><span class="line">plt.ylabel(<span class="string">&#x27;Y axis&#x27;</span>,fontproperties=)</span><br></pre></td></tr></table></figure>
+
+<p>3、添加刻度</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">plt.xticks()</span><br><span class="line">plt.yticks()</span><br><span class="line"></span><br><span class="line">ax.set_xticks([])</span><br><span class="line">ax.set_yticks([])</span><br></pre></td></tr></table></figure>
+
+<p>4、子图操作</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">fig = plt.figure(figsize=(<span class="number">10</span>,<span class="number">6</span>))</span><br><span class="line">ax1 = fig.add_subplot(<span class="number">4</span>,<span class="number">3</span>,<span class="number">1</span>)</span><br><span class="line">ax2 = fig.add_subplot(<span class="number">4</span>,<span class="number">3</span>,<span class="number">2</span>)</span><br><span class="line"></span><br><span class="line">fig,axes = plt.subplots(<span class="number">2</span>,<span class="number">3</span>,figsize=(<span class="number">10</span>,<span class="number">4</span>))</span><br></pre></td></tr></table></figure>
+
+<h2 id="散点图"><a href="#散点图" class="headerlink" title="散点图"></a>散点图</h2><p>可以展示数据的分布和聚合情况。<br>1、colormap:</p>
+<figure class="highlight prolog"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">cmaps = [(<span class="string">&#x27;Perceptually Uniform Sequential&#x27;</span>, [</span><br><span class="line">            <span class="string">&#x27;viridis&#x27;</span>, <span class="string">&#x27;plasma&#x27;</span>, <span class="string">&#x27;inferno&#x27;</span>, <span class="string">&#x27;magma&#x27;</span>]),</span><br><span class="line">         (<span class="string">&#x27;Sequential&#x27;</span>, [</span><br><span class="line">            <span class="string">&#x27;Greys&#x27;</span>, <span class="string">&#x27;Purples&#x27;</span>, <span class="string">&#x27;Blues&#x27;</span>, <span class="string">&#x27;Greens&#x27;</span>, <span class="string">&#x27;Oranges&#x27;</span>, <span class="string">&#x27;Reds&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;YlOrBr&#x27;</span>, <span class="string">&#x27;YlOrRd&#x27;</span>, <span class="string">&#x27;OrRd&#x27;</span>, <span class="string">&#x27;PuRd&#x27;</span>, <span class="string">&#x27;RdPu&#x27;</span>, <span class="string">&#x27;BuPu&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;GnBu&#x27;</span>, <span class="string">&#x27;PuBu&#x27;</span>, <span class="string">&#x27;YlGnBu&#x27;</span>, <span class="string">&#x27;PuBuGn&#x27;</span>, <span class="string">&#x27;BuGn&#x27;</span>, <span class="string">&#x27;YlGn&#x27;</span>]),</span><br><span class="line">         (<span class="string">&#x27;Sequential (2)&#x27;</span>, [</span><br><span class="line">            <span class="string">&#x27;binary&#x27;</span>, <span class="string">&#x27;gist_yarg&#x27;</span>, <span class="string">&#x27;gist_gray&#x27;</span>, <span class="string">&#x27;gray&#x27;</span>, <span class="string">&#x27;bone&#x27;</span>, <span class="string">&#x27;pink&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;spring&#x27;</span>, <span class="string">&#x27;summer&#x27;</span>, <span class="string">&#x27;autumn&#x27;</span>, <span class="string">&#x27;winter&#x27;</span>, <span class="string">&#x27;cool&#x27;</span>, <span class="string">&#x27;Wistia&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;hot&#x27;</span>, <span class="string">&#x27;afmhot&#x27;</span>, <span class="string">&#x27;gist_heat&#x27;</span>, <span class="string">&#x27;copper&#x27;</span>]),</span><br><span class="line">         (<span class="string">&#x27;Diverging&#x27;</span>, [</span><br><span class="line">            <span class="string">&#x27;PiYG&#x27;</span>, <span class="string">&#x27;PRGn&#x27;</span>, <span class="string">&#x27;BrBG&#x27;</span>, <span class="string">&#x27;PuOr&#x27;</span>, <span class="string">&#x27;RdGy&#x27;</span>, <span class="string">&#x27;RdBu&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;RdYlBu&#x27;</span>, <span class="string">&#x27;RdYlGn&#x27;</span>, <span class="string">&#x27;Spectral&#x27;</span>, <span class="string">&#x27;coolwarm&#x27;</span>, <span class="string">&#x27;bwr&#x27;</span>, <span class="string">&#x27;seismic&#x27;</span>]),</span><br><span class="line">         (<span class="string">&#x27;Qualitative&#x27;</span>, [</span><br><span class="line">            <span class="string">&#x27;Pastel1&#x27;</span>, <span class="string">&#x27;Pastel2&#x27;</span>, <span class="string">&#x27;Paired&#x27;</span>, <span class="string">&#x27;Accent&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;Dark2&#x27;</span>, <span class="string">&#x27;Set1&#x27;</span>, <span class="string">&#x27;Set2&#x27;</span>, <span class="string">&#x27;Set3&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;tab10&#x27;</span>, <span class="string">&#x27;tab20&#x27;</span>, <span class="string">&#x27;tab20b&#x27;</span>, <span class="string">&#x27;tab20c&#x27;</span>]),</span><br><span class="line">         (<span class="string">&#x27;Miscellaneous&#x27;</span>, [</span><br><span class="line">            <span class="string">&#x27;flag&#x27;</span>, <span class="string">&#x27;prism&#x27;</span>, <span class="string">&#x27;ocean&#x27;</span>, <span class="string">&#x27;gist_earth&#x27;</span>, <span class="string">&#x27;terrain&#x27;</span>, <span class="string">&#x27;gist_stern&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;gnuplot&#x27;</span>, <span class="string">&#x27;gnuplot2&#x27;</span>, <span class="string">&#x27;CMRmap&#x27;</span>, <span class="string">&#x27;cubehelix&#x27;</span>, <span class="string">&#x27;brg&#x27;</span>, <span class="string">&#x27;hsv&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;gist_rainbow&#x27;</span>, <span class="string">&#x27;rainbow&#x27;</span>, <span class="string">&#x27;jet&#x27;</span>, <span class="string">&#x27;nipy_spectral&#x27;</span>, <span class="string">&#x27;gist_ncar&#x27;</span>])]</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>2、常用参数（示例可查官方文档）：</p>
+<ul>
+<li>x：指定散点图的x轴数据；</li>
+<li>y：指定散点图的y轴数据；</li>
+<li>s：指定散点图点的大小，默认为20，通过传入新的变量，实现气泡图的绘制；</li>
+<li>c：可用于不同类别的颜色，指定散点图点的颜色，默认为蓝色；b-blue c-cyan g-green k-black m-magenta r-red w-white y-yellow</li>
+<li>marker：指定散点图点的形状，默认为圆形；filled_markers = (‘o’, ‘v’, ‘^’, ‘&lt;’, ‘&gt;’, ‘8’, ‘s’, ‘p’, ‘*’, ‘h’, ‘H’, ‘D’, ‘d’, ‘P’, ‘X’)</li>
+<li>cmap：指定色图，只有当c参数是一个浮点型的数组的时候才起作用；</li>
+<li>alpha：设置散点的透明度；</li>
+<li>linewidths：设置散点边界线的宽度；</li>
+<li>edgecolors：设置散点边界线的颜色；</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">matplotlib.pyplot.scatter(x, y, s=<span class="literal">None</span>, c=<span class="literal">None</span>, marker=<span class="literal">None</span>, cmap=<span class="literal">None</span>, norm=<span class="literal">None</span>, vmin=<span class="literal">None</span>, vmax=<span class="literal">None</span>, alpha=<span class="literal">None</span>, linewidths=<span class="literal">None</span>, verts=<span class="literal">None</span>, edgecolors=<span class="literal">None</span>, *, plotnonfinite=<span class="literal">False</span>, data=<span class="literal">None</span>, **kwargs)</span><br><span class="line"></span><br><span class="line">plt.figure(figsize=(<span class="number">8</span>,<span class="number">6</span>))</span><br><span class="line">x = np.random.randn(<span class="number">1000</span>)</span><br><span class="line">y = np.random.randn(<span class="number">1000</span>)</span><br><span class="line"></span><br><span class="line">plt.scatter(x,y,marker=<span class="string">&#x27;.&#x27;</span>,</span><br><span class="line">            s=np.random.randn(<span class="number">1000</span>)*<span class="number">100</span>,</span><br><span class="line">            cmap=<span class="string">&#x27;Reds&#x27;</span>,</span><br><span class="line">            c=y,</span><br><span class="line">            alpha=<span class="number">0.8</span>)</span><br><span class="line">plt.grid()</span><br></pre></td></tr></table></figure>
+
+<h2 id="箱型图"><a href="#箱型图" class="headerlink" title="箱型图"></a>箱型图</h2><p>又称为盒式图，纵轴按数值从下到上按顺序排序并画出四分位5个数值的位置就是箱型图。<br>用作显示一组<strong>数据聚散和偏态情况</strong>资料，常用于识别异常值。<br><img src="/images/seaborn/boxplot.png"></p>
+<p>1、五要素</p>
+<ul>
+<li>下边缘（Q1），表示最小值（排除异常值后）；</li>
+<li>下四分位数（Q2），又称“第一四分位数”，等于该样本中所有数值由小到大排列后第25%的数字；即有1/4的数据比它小。</li>
+<li>中位数（Q3），又称“第二四分位数”等于该样本中所有数值由小到大排列后第50%的数字；</li>
+<li>上四分位数（Q4），又称“第三四分位数”等于该样本中所有数值由小到大排列后第75%的数字；</li>
+<li>上边缘（Q5），表述最大值。</li>
+</ul>
+<p>2、数学示例<br>有序序列test=c(1,2,3,4,5,6,7,8)，序列长度n=8</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">代码运行结果</span></span><br><span class="line"><span class="string">count</span>    <span class="number">8.00000</span></span><br><span class="line"><span class="string">mean</span>     <span class="number">4.50000</span></span><br><span class="line"><span class="string">std</span>      <span class="number">2.44949</span></span><br><span class="line"><span class="string">min</span>      <span class="number">1.00000</span></span><br><span class="line"><span class="number">25</span><span class="string">%</span>      <span class="number">2.75000</span></span><br><span class="line"><span class="number">50</span><span class="string">%</span>      <span class="number">4.50000</span></span><br><span class="line"><span class="number">75</span><span class="string">%</span>      <span class="number">6.25000</span></span><br><span class="line"><span class="string">max</span>      <span class="number">8.00000</span></span><br><span class="line"><span class="attr">Name:</span> <span class="string">A,</span> <span class="attr">dtype:</span> <span class="string">float64</span></span><br></pre></td></tr></table></figure>
+<p>n表示项数<br>Q2的位置= (n+1) × 0.25<br>Q3的位置= (n+1) × 0.5<br>Q4的位置= (n+1) × 0.75</p>
+<p>下四分位数:(1+n)/4 = 2.25,假设第2个数到第3个数是均匀分布的，可得<code>2*0.25+3*0.75 = 2.75</code></p>
+<p>3、常识补充</p>
+<ul>
+<li>四分位数差（IQR，interquartile range）Q3-Q1 </li>
+<li>大于上四分位数1.5倍四分位数差的值，或者小于下四分位数1.5倍四分位数差的值，即使最大值区间Q4+1.5IQR,最小值区间Q2-1.5IQR划为异常值（outliers）</li>
+<li>异常值之外，最靠近上边缘和下边缘的两个值处，画横线，作为箱线图的触须。</li>
+<li>极端异常值，即超出四分位数差3倍距离的异常值，用实心点表示；较为温和的异常值，即处于1.5倍-3倍四分位数差之间的异常值，用空心点表示。</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> pandas <span class="keyword">as</span> pd</span><br><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"><span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt</span><br><span class="line"></span><br><span class="line">df = pd.DataFrame(np.random.rand(<span class="number">10</span>,<span class="number">5</span>),columns=[<span class="string">&#x27;A&#x27;</span>,<span class="string">&#x27;B&#x27;</span>,<span class="string">&#x27;C&#x27;</span>,<span class="string">&#x27;D&#x27;</span>,<span class="string">&#x27;E&#x27;</span>])</span><br><span class="line">plt.figure(figsize=(<span class="number">10</span>,<span class="number">4</span>))</span><br><span class="line"></span><br><span class="line">f = df.boxplot(sym=<span class="string">&#x27;o&#x27;</span>, <span class="comment"># 异常点形状</span></span><br><span class="line">              vert=<span class="literal">False</span>, <span class="comment"># 是否垂直</span></span><br><span class="line">              whis=[<span class="number">5</span>,<span class="number">95</span>], <span class="comment"># IQR默认1.5，外限则为3，也可以强制上下边缘数据5%和95%的位置【5，95】</span></span><br><span class="line">              patch_artist = <span class="literal">True</span>, <span class="comment"># 上下四分位框内是否填充</span></span><br><span class="line">              meanline = <span class="literal">False</span>,showmeans=<span class="literal">True</span>, <span class="comment"># 是否有均值线及其形状</span></span><br><span class="line">              showbox = <span class="literal">True</span>, <span class="comment"># 是否显示箱线</span></span><br><span class="line">              showcaps = <span class="literal">True</span>, <span class="comment"># 是否显示边缘线</span></span><br><span class="line">              showfliers = <span class="literal">True</span>, <span class="comment"># 是否显示异常值</span></span><br><span class="line">              notch = <span class="literal">False</span>, <span class="comment"># 中间箱体是否缺口</span></span><br><span class="line">              return_type = <span class="string">&#x27;dict&#x27;</span>)</span><br><span class="line">			  </span><br><span class="line">plt.title(<span class="string">&#x27;boxplot&#x27;</span>)</span><br></pre></td></tr></table></figure>
+
+<h2 id="条形图"><a href="#条形图" class="headerlink" title="条形图"></a>条形图</h2><p>可以清楚看出各个数据的大小,比较数据之间的差别。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">bar_height = <span class="number">0.2</span></span><br><span class="line">name = [<span class="string">&#x27;leo&#x27;</span>,<span class="string">&#x27;bob&#x27;</span>,<span class="string">&#x27;tom&#x27;</span>]</span><br><span class="line">x_value = list(range(len(name)))</span><br><span class="line">x_value_mid = [i+bar_height/<span class="number">2</span> <span class="keyword">for</span> i <span class="keyword">in</span> x_value]</span><br><span class="line">x_value_back = [i+bar_height <span class="keyword">for</span> i <span class="keyword">in</span> x_value]</span><br><span class="line"></span><br><span class="line">score_a = [<span class="number">4</span>,<span class="number">5</span>,<span class="number">2</span>]</span><br><span class="line">score_b = [<span class="number">1</span>,<span class="number">3</span>,<span class="number">3</span>]</span><br><span class="line"></span><br><span class="line">fig, [ax1,ax2] = plt.subplots(<span class="number">2</span>,<span class="number">1</span>,figsize=(<span class="number">10</span>,<span class="number">8</span>),facecolor=<span class="string">&#x27;gray&#x27;</span>)</span><br><span class="line">fig.text(<span class="number">0.75</span>, <span class="number">0.45</span>, <span class="string">&#x27;Leo Lin copyright&#x27;</span>,</span><br><span class="line">         fontsize=<span class="number">40</span>, color=<span class="string">&#x27;gray&#x27;</span>,</span><br><span class="line">         ha=<span class="string">&#x27;right&#x27;</span>, va=<span class="string">&#x27;bottom&#x27;</span>, alpha=<span class="number">0.4</span>)</span><br><span class="line"></span><br><span class="line">ax1.barh(x_value,score_a,height=bar_height,color=<span class="string">&#x27;orange&#x27;</span>,label=<span class="string">&quot;a&quot;</span>)</span><br><span class="line">ax1.barh(x_value_back,score_b,height=bar_height,color=<span class="string">&#x27;blue&#x27;</span>,label=<span class="string">&quot;b&quot;</span>)</span><br><span class="line">ax1.legend(loc=<span class="string">&#x27;best&#x27;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 设置x轴刻度标签名称</span></span><br><span class="line">ax1.set_yticks(x_value_mid)</span><br><span class="line">ax1.set_yticklabels(name)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 作y=sin(x)函数</span></span><br><span class="line">x1 = np.linspace(<span class="number">0</span>, <span class="number">4</span> * np.pi, <span class="number">100</span>)</span><br><span class="line">y1 = np.sin(x1)</span><br><span class="line">ax2.plot(x1,y1,linestyle=<span class="string">&#x27;--&#x27;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># wspace用于控制宽度和高度的百分比</span></span><br><span class="line">plt.subplots_adjust(wspace=<span class="number">0</span>,hspace=<span class="number">0</span>)</span><br><span class="line">plt.show()</span><br></pre></td></tr></table></figure>
+
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/06/01/%E8%AE%B0%E4%B8%80%E6%AC%A1%E8%BF%90%E7%BB%B4SQL%E7%AC%94%E8%AF%95%E9%A2%98/" rel="prev" title="记一次运维SQL笔试题">
+      <i class="fa fa-chevron-left"></i> 记一次运维SQL笔试题
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/06/03/Pandas%E9%80%9F%E6%9F%A5%E6%89%8B%E5%86%8C%E4%B8%AD%E6%96%87%E7%89%88/" rel="next" title="Pandas速查手册中文版">
+      Pandas速查手册中文版 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9F%BA%E6%9C%AC%E6%93%8D%E4%BD%9C"><span class="nav-number">1.</span> <span class="nav-text">基本操作</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%95%A3%E7%82%B9%E5%9B%BE"><span class="nav-number">2.</span> <span class="nav-text">散点图</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AE%B1%E5%9E%8B%E5%9B%BE"><span class="nav-number">3.</span> <span class="nav-text">箱型图</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9D%A1%E5%BD%A2%E5%9B%BE"><span class="nav-number">4.</span> <span class="nav-text">条形图</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Leo Lin"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Leo Lin</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">104</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">11</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Leo Lin</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+
+    <script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"model":{"jsonPath":"/live2dw/assets/hijiki.model.json"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":false},"log":false});</script></body>
+</html>

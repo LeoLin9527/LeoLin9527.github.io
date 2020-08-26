@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.1.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"yoursite.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="1.关于三者的定义与区别压缩：删除 Javascript 代码中所有注释、跳格符号、换行符号及无用的空格，从而压缩 JS 文件大小，优化页面加载速度。 混淆：经过编码将变量和函数原命名改为毫无意义的命名（如function(a,b,c,e,g)等），以防止他人窥视和窃取 Javascript 源代码，也有一定压缩效果。 加密：一般用eval方法加密，效果与混淆相似，也做到了压缩的效果。 从定义中可">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Javascript混淆、压缩、加密">
+<meta property="og:url" content="http://yoursite.com/2019/10/05/Javascript%E6%B7%B7%E6%B7%86%E3%80%81%E5%8E%8B%E7%BC%A9%E3%80%81%E5%8A%A0%E5%AF%86/index.html">
+<meta property="og:site_name" content="江湖の林九">
+<meta property="og:description" content="1.关于三者的定义与区别压缩：删除 Javascript 代码中所有注释、跳格符号、换行符号及无用的空格，从而压缩 JS 文件大小，优化页面加载速度。 混淆：经过编码将变量和函数原命名改为毫无意义的命名（如function(a,b,c,e,g)等），以防止他人窥视和窃取 Javascript 源代码，也有一定压缩效果。 加密：一般用eval方法加密，效果与混淆相似，也做到了压缩的效果。 从定义中可">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2019-10-05T14:25:00.000Z">
+<meta property="article:modified_time" content="2020-04-24T02:50:45.632Z">
+<meta property="article:author" content="Leo Lin">
+<meta property="article:tag" content="Javascript">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://yoursite.com/2019/10/05/Javascript%E6%B7%B7%E6%B7%86%E3%80%81%E5%8E%8B%E7%BC%A9%E3%80%81%E5%8A%A0%E5%AF%86/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>Javascript混淆、压缩、加密 | 江湖の林九</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">江湖の林九</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">相逢何必曾相识！</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/10/05/Javascript%E6%B7%B7%E6%B7%86%E3%80%81%E5%8E%8B%E7%BC%A9%E3%80%81%E5%8A%A0%E5%AF%86/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Leo Lin">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="江湖の林九">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Javascript混淆、压缩、加密
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-10-05 22:25:00" itemprop="dateCreated datePublished" datetime="2019-10-05T22:25:00+08:00">2019-10-05</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-04-24 10:50:45" itemprop="dateModified" datetime="2020-04-24T10:50:45+08:00">2020-04-24</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%89%8D%E7%AB%AF%E8%BF%9B%E9%98%B6/" itemprop="url" rel="index"><span itemprop="name">前端进阶</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="1-关于三者的定义与区别"><a href="#1-关于三者的定义与区别" class="headerlink" title="1.关于三者的定义与区别"></a>1.关于三者的定义与区别</h2><p><strong>压缩</strong>：删除 Javascript 代码中所有注释、跳格符号、换行符号及无用的空格，从而压缩 JS 文件大小，优化页面加载速度。</p>
+<p><strong>混淆</strong>：经过编码将变量和函数原命名改为毫无意义的命名（如function(a,b,c,e,g)等），以防止他人窥视和窃取 Javascript 源代码，也有一定压缩效果。</p>
+<p><strong>加密</strong>：一般用eval方法加密，效果与混淆相似，也做到了压缩的效果。</p>
+<p>从定义中可以看出，压缩的主要目的是消除注释等无用字符，达到精简js代码，减小js文件大小的目的，这也是页面优化的一种方式；而混淆和加密的目的比较接近，都是为了防止他人直接查看源码，对代码（如重要的api等）起保护作用，但这也只是增加了阅读代码的代价，也就是所谓的防君子不防小人。但是当混淆和加密联合使用时，如先混淆在加密（或者先加密再混淆）时，破解时间就会增加。关于js的加密，可以参考这篇文章：<a target="_blank" rel="noopener" href="http://www.cnblogs.com/top5/archive/2009/08/07/1540860.html">http://www.cnblogs.com/top5/archive/2009/08/07/1540860.html</a></p>
+<h2 id="2-示例"><a href="#2-示例" class="headerlink" title="2.示例"></a>2.示例</h2><p>下面以更直观的方式来体会一下这四种方式（压缩、混淆、加密、混淆&amp;加密）的不同。</p>
+<p>源js代码如下：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* 这个是一个类 */</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">xx</span>(<span class="params">num, str</span>) </span>&#123;</span><br><span class="line">    <span class="comment">//说明</span></span><br><span class="line">    <span class="keyword">var</span> a = num;</span><br><span class="line">    <span class="built_in">this</span>.aa = a;</span><br><span class="line">    <span class="built_in">this</span>.bb = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;alert(str);&#125;</span><br><span class="line">    <span class="built_in">this</span>.cc = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">var</span> i = <span class="number">0</span>; i &lt; <span class="number">10</span>; i++) &#123;</span><br><span class="line">            <span class="built_in">document</span>.title = i;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">this</span>.yy = <span class="keyword">new</span> yy();</span><br><span class="line">    <span class="function"><span class="keyword">function</span> <span class="title">xxf</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">        alert(<span class="string">&quot;xxf&quot;</span>);</span><br><span class="line">        <span class="keyword">if</span> ((<span class="regexp">/\&#123;\d+\&#125;/</span>).test(<span class="string">&quot;a\sdf&#123;2&#125;ab&quot;</span>))</span><br><span class="line">            alert(<span class="string">&quot;&#123;\\d&#125; is match!&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">xx.prototype.dd = <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">    alert(<span class="string">&quot;dd&quot;</span>);</span><br><span class="line">    a.yy.ll();</span><br><span class="line">    <span class="keyword">var</span> fnx = <span class="function"><span class="keyword">function</span>(<span class="params">i</span>) </span>&#123;</span><br><span class="line">        <span class="built_in">this</span>.ab = i;</span><br><span class="line">        <span class="built_in">this</span>.aa = <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">            alert(<span class="built_in">this</span>.ab);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">var</span> f1 = <span class="keyword">new</span> fnx(<span class="number">1</span>);</span><br><span class="line">    f1.aa();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">yy</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">    alert(<span class="string">&#x27;yy&#x27;</span>);</span><br><span class="line">&#125;</span><br><span class="line">yy.prototype.ll = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    alert(<span class="string">&quot;yyll&quot;</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> a = <span class="keyword">new</span> xx(<span class="number">100</span>, <span class="string">&quot;hello&quot;</span>), b = <span class="keyword">new</span> xx(<span class="number">0</span>, <span class="string">&quot;ttyp&quot;</span>);</span><br><span class="line"><span class="built_in">eval</span>(<span class="string">&quot;a.aa=20&quot;</span>);</span><br><span class="line">a.bb();</span><br><span class="line">b.dd();</span><br><span class="line">alert(a.aa);</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> k = <span class="number">9</span>;</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">kk</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> k = <span class="number">0</span>;</span><br><span class="line">    alert(k);</span><br><span class="line">&#125;</span><br><span class="line">kk();</span><br><span class="line">alert(k);</span><br><span class="line"><span class="comment">//输入结果alert:&quot;yy&quot;-&gt;&quot;yy&quot;-&gt;&quot;hello&quot;-&gt;&quot;dd&quot;-&gt;&quot;yyll&quot;-&gt;&quot;12&quot;-&gt;&quot;20&quot;-&gt;&quot;0&quot;-&gt;&quot;9&quot;</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h4 id="（1）经过压缩后的代码如下："><a href="#（1）经过压缩后的代码如下：" class="headerlink" title="（1）经过压缩后的代码如下："></a>（1）经过压缩后的代码如下：</h4><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">1</span> <span class="function"><span class="keyword">function</span> <span class="title">xx</span>(<span class="params">num,str</span>)</span>&#123;<span class="keyword">var</span> a=num;<span class="built_in">this</span>.aa=a;<span class="built_in">this</span>.bb=<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;alert(str)&#125;;<span class="built_in">this</span>.cc=<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;<span class="keyword">for</span>(<span class="keyword">var</span> i=<span class="number">0</span>;i&lt;<span class="number">10</span>;i++)&#123;<span class="built_in">document</span>.title=i&#125;&#125;;<span class="built_in">this</span>.yy=<span class="keyword">new</span> yy();<span class="function"><span class="keyword">function</span> <span class="title">xxf</span>(<span class="params"></span>)</span>&#123;alert(<span class="string">&quot;xxf&quot;</span>);<span class="keyword">if</span>((<span class="regexp">/\&#123;\d+\&#125;/</span>).test(<span class="string">&quot;a\sdf&#123;2&#125;ab&quot;</span>))alert(<span class="string">&quot;&#123;\\d&#125; is match!&quot;</span>)&#125;&#125;;xx.prototype.dd=<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;alert(<span class="string">&quot;dd&quot;</span>);a.yy.ll();<span class="keyword">var</span> fnx=<span class="function"><span class="keyword">function</span>(<span class="params">i</span>)</span>&#123;<span class="built_in">this</span>.ab=i;<span class="built_in">this</span>.aa=<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;alert(<span class="built_in">this</span>.ab)&#125;&#125;;<span class="keyword">var</span> f1=<span class="keyword">new</span> fnx(<span class="number">1</span>);f1.aa()&#125;;<span class="function"><span class="keyword">function</span> <span class="title">yy</span>(<span class="params"></span>)</span>&#123;alert(<span class="string">&#x27;yy&#x27;</span>)&#125;;yy.prototype.ll=<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;alert(<span class="string">&quot;yyll&quot;</span>)&#125;;<span class="keyword">var</span> a=<span class="keyword">new</span> xx(<span class="number">100</span>,<span class="string">&quot;hello&quot;</span>),b=<span class="keyword">new</span> xx(<span class="number">0</span>,<span class="string">&quot;ttyp&quot;</span>);<span class="built_in">eval</span>(<span class="string">&quot;a.aa=20&quot;</span>);a.bb();b.dd();alert(a.aa);<span class="keyword">var</span> k=<span class="number">9</span>;<span class="function"><span class="keyword">function</span> <span class="title">kk</span>(<span class="params"></span>)</span>&#123;<span class="keyword">var</span> k=<span class="number">0</span>;alert(k)&#125;;kk();alert(k);</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>压缩后与源码相比只是少了注释、空格、换行等。</p>
+<h4 id="（2）经过混淆后的代码如下："><a href="#（2）经过混淆后的代码如下：" class="headerlink" title="（2）经过混淆后的代码如下："></a>（2）经过混淆后的代码如下：</h4><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">1</span> <span class="function"><span class="keyword">function</span> <span class="title">xx</span>(<span class="params">d,e</span>)</span>&#123;<span class="keyword">var</span> f=d;<span class="built_in">this</span>.aa=f;<span class="built_in">this</span>.bb=<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;alert(e)&#125;;<span class="built_in">this</span>.cc=<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;<span class="keyword">for</span>(<span class="keyword">var</span> g=<span class="number">0</span>;g&lt;<span class="number">10</span>;g++)&#123;<span class="built_in">document</span>.title=g&#125;&#125;;<span class="built_in">this</span>.yy=<span class="keyword">new</span> yy();<span class="function"><span class="keyword">function</span> <span class="title">xxf</span>(<span class="params"></span>)</span>&#123;alert(<span class="string">&quot;xxf&quot;</span>);<span class="keyword">if</span>((<span class="regexp">/\&#123;\d+\&#125;/</span>).test(<span class="string">&quot;a\sdf&#123;2&#125;ab&quot;</span>))alert(<span class="string">&quot;&#123;\\d&#125; is match!&quot;</span>)&#125;&#125;;xx.prototype.dd=<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;alert(<span class="string">&quot;dd&quot;</span>);a.yy.ll();<span class="keyword">var</span> fnx=<span class="function"><span class="keyword">function</span>(<span class="params">e</span>)</span>&#123;<span class="built_in">this</span>.ab=e;<span class="built_in">this</span>.aa=<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;alert(<span class="built_in">this</span>.ab)&#125;&#125;;<span class="keyword">var</span> d=<span class="keyword">new</span> fnx(<span class="number">1</span>);d.aa()&#125;;<span class="function"><span class="keyword">function</span> <span class="title">yy</span>(<span class="params"></span>)</span>&#123;alert(<span class="string">&#x27;yy&#x27;</span>)&#125;;yy.prototype.ll=<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;alert(<span class="string">&quot;yyll&quot;</span>)&#125;;<span class="keyword">var</span> a=<span class="keyword">new</span> xx(<span class="number">100</span>,<span class="string">&quot;hello&quot;</span>),b=<span class="keyword">new</span> xx(<span class="number">0</span>,<span class="string">&quot;ttyp&quot;</span>);<span class="built_in">eval</span>(<span class="string">&quot;a.aa=20&quot;</span>);a.bb();b.dd();alert(a.aa);<span class="keyword">var</span> c=<span class="number">9</span>;<span class="function"><span class="keyword">function</span> <span class="title">kk</span>(<span class="params"></span>)</span>&#123;<span class="keyword">var</span> d=<span class="number">0</span>;alert(d)&#125;;kk();alert(c);</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>混淆后除了少了注释、空格和换行等，参数也被a，b，c，d，e等字符代替，提高了阅读的难度。</p>
+<h4 id="（3）经过加密后的代码如下："><a href="#（3）经过加密后的代码如下：" class="headerlink" title="（3）经过加密后的代码如下："></a>（3）经过加密后的代码如下：</h4><figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">1</span> eval(function(p,a,c,k,e,d)&#123;e=function(c)&#123;return(c&lt;a?<span class="string">&quot;&quot;</span>:e(parseInt(c/a)))+((c=c%a)&gt;<span class="number">35</span>?String.fromCharCode(c+<span class="number">29</span>):c.toString(<span class="number">36</span>))&#125;;if(!&#x27;&#x27;.replace(/^/,String))&#123;while(c--)d[e(c)]=k[c]||e(c);k=[function(e)&#123;return d[e]&#125;];e=function()&#123;return&#x27;\\w+&#x27;&#125;;c=<span class="number">1</span>;&#125;;while(c--)if(k[c])p=p.replace(new RegExp(&#x27;\\b&#x27;+e(c)+&#x27;\\b&#x27;,&#x27;g&#x27;),k[c]);return p;&#125;(&#x27;<span class="number">3</span> e(o,l)&#123;<span class="number">5</span> a=o;<span class="number">6</span>.<span class="number">8</span>=a;<span class="number">6</span>.p=<span class="number">3</span>()&#123;<span class="number">4</span>(l)&#125;;<span class="number">6</span>.B=<span class="number">3</span>()&#123;A(<span class="number">5</span> i=<span class="number">0</span>;i&lt;y;i++)&#123;x.z=i&#125;&#125;;<span class="number">6</span>.<span class="number">7</span>=c <span class="number">7</span>();<span class="number">3</span> j()&#123;<span class="number">4</span>(<span class="string">&quot;j&quot;</span>);t((/\\&#123;\\d+\\&#125;/).s(<span class="string">&quot;a\\u&#123;2&#125;g&quot;</span>))<span class="number">4</span>(<span class="string">&quot;&#123;\\\\d&#125; w v!&quot;</span>)&#125;&#125;;e.r.f=<span class="number">3</span>()&#123;<span class="number">4</span>(<span class="string">&quot;f&quot;</span>);a.<span class="number">7</span>.h();<span class="number">5</span> n=<span class="number">3</span>(i)&#123;<span class="number">6</span>.g=i;<span class="number">6</span>.<span class="number">8</span>=<span class="number">3</span>()&#123;<span class="number">4</span>(<span class="number">6</span>.g)&#125;&#125;;<span class="number">5</span> m=c n(<span class="number">1</span>);m.<span class="number">8</span>()&#125;;<span class="number">3</span> <span class="number">7</span>()&#123;<span class="number">4</span>(\&#x27;<span class="number">7</span>\&#x27;)&#125;;<span class="number">7</span>.r.h=<span class="number">3</span>()&#123;<span class="number">4</span>(<span class="string">&quot;D&quot;</span>)&#125;;<span class="number">5</span> a=c e(F,<span class="string">&quot;H&quot;</span>),b=c e(<span class="number">0</span>,<span class="string">&quot;G&quot;</span>);E(<span class="string">&quot;a.8=C&quot;</span>);a.p();b.f();<span class="number">4</span>(a.<span class="number">8</span>);<span class="number">5</span> k=<span class="number">9</span>;<span class="number">3</span> q()&#123;<span class="number">5</span> k=<span class="number">0</span>;<span class="number">4</span>(k)&#125;;q();<span class="number">4</span>(k);&#x27;,<span class="number">44</span>,<span class="number">44</span>,&#x27;|||function|alert|var|this|yy|aa||||new||xx|dd|ab|ll||xxf||str|f<span class="number">1</span>|fnx|num|bb|kk|prototype|test|if|sdf|match|is|document|<span class="number">10</span>|title|for|cc|<span class="number">20</span>|yyll|eval|<span class="number">100</span>|ttyp|hello&#x27;.split(&#x27;|&#x27;),<span class="number">0</span>,&#123;&#125;))</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>加密后除了有混淆的作用外，有些代码被加密了，进一步提高了阅读的难度。</p>
+<h4 id="（4）经过混淆-amp-加密后的代码如下"><a href="#（4）经过混淆-amp-加密后的代码如下" class="headerlink" title="（4）经过混淆&amp;加密后的代码如下"></a>（4）经过混淆&amp;加密后的代码如下</h4><figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">eval</span>(function(p,a,c,k,e,d)&#123;e=function(c)&#123;return(c&lt;a?<span class="string">&quot;&quot;</span>:e(parseInt(c/a)))+((c=c%a)&gt;<span class="number">35</span>?String.fromCharCode(c+<span class="number">29</span>):c.toString(<span class="number">36</span>))&#125;;if(!&#x27;&#x27;.replace(/^/,String))&#123;while(c--)d[e(c)]=k[c]||e(c);k=[function(e)&#123;return d[e]&#125;];e=function()&#123;return&#x27;\\w+&#x27;&#125;;c=<span class="number">1</span>;&#125;;while(c--)if(k[c])p=p.replace(new RegExp(&#x27;\\b&#x27;+e(c)+&#x27;\\b&#x27;,&#x27;g&#x27;),k[c]);return p;&#125;(&#x27;<span class="number">4</span> i(d,e)&#123;<span class="number">5</span> f=d;<span class="number">6</span>.<span class="number">8</span>=f;<span class="number">6</span>.p=<span class="number">4</span>()&#123;<span class="number">3</span>(e)&#125;;<span class="number">6</span>.s=<span class="number">4</span>()&#123;t(<span class="number">5</span> g=<span class="number">0</span>;g&lt;y;g++)&#123;G.F=g&#125;&#125;;<span class="number">6</span>.<span class="number">7</span>=h <span class="number">7</span>();<span class="number">4</span> l()&#123;<span class="number">3</span>(<span class="string">&quot;l&quot;</span>);x((/\\&#123;\\d+\\&#125;/).v(<span class="string">&quot;a\\u&#123;2&#125;j&quot;</span>))<span class="number">3</span>(<span class="string">&quot;&#123;\\\\d&#125; w r!&quot;</span>)&#125;&#125;;i.o.k=<span class="number">4</span>()&#123;<span class="number">3</span>(<span class="string">&quot;k&quot;</span>);a.<span class="number">7</span>.m();<span class="number">5</span> n=<span class="number">4</span>(e)&#123;<span class="number">6</span>.j=e;<span class="number">6</span>.<span class="number">8</span>=<span class="number">4</span>()&#123;<span class="number">3</span>(<span class="number">6</span>.j)&#125;&#125;;<span class="number">5</span> d=h n(<span class="number">1</span>);d.<span class="number">8</span>()&#125;;<span class="number">4</span> <span class="number">7</span>()&#123;<span class="number">3</span>(\&#x27;<span class="number">7</span>\&#x27;)&#125;;<span class="number">7</span>.o.m=<span class="number">4</span>()&#123;<span class="number">3</span>(<span class="string">&quot;E&quot;</span>)&#125;;<span class="number">5</span> a=h i(A,<span class="string">&quot;z&quot;</span>),b=h i(<span class="number">0</span>,<span class="string">&quot;B&quot;</span>);D(<span class="string">&quot;a.8=C&quot;</span>);a.p();b.k();<span class="number">3</span>(a.<span class="number">8</span>);<span class="number">5</span> c=<span class="number">9</span>;<span class="number">4</span> q()&#123;<span class="number">5</span> d=<span class="number">0</span>;<span class="number">3</span>(d)&#125;;q();<span class="number">3</span>(c);&#x27;,<span class="number">43</span>,<span class="number">43</span>,&#x27;|||alert|function|var|this|yy|aa|||||||||new|xx|ab|dd|xxf|ll|fnx|prototype|bb|kk|match|cc|for|sdf|test|is|if|<span class="number">10</span>|hello|<span class="number">100</span>|ttyp|<span class="number">20</span>|eval|yyll|title|document&#x27;.split(&#x27;|&#x27;),<span class="number">0</span>,&#123;&#125;))</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h2 id="3-浏览器是怎么解析混淆和加密后的js代码的"><a href="#3-浏览器是怎么解析混淆和加密后的js代码的" class="headerlink" title="3.浏览器是怎么解析混淆和加密后的js代码的"></a>3.浏览器是怎么解析混淆和加密后的js代码的</h2><figure class="highlight excel"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">其实变量名只要是<span class="built_in">Unicode</span>字符就行了，对于js引擎来说都是一样的，只是人类觉得他们不同而已。</span><br></pre></td></tr></table></figure>
+
+<h2 id="4-js压缩工具"><a href="#4-js压缩工具" class="headerlink" title="4.js压缩工具"></a>4.js压缩工具</h2><p>其实js的压缩工具网上有很多，在线和安装版的都有，文章中使用的是HDS JSObfuscator v2.13绿色版。</p>
+<p>在线的js压缩工具：<a target="_blank" rel="noopener" href="http://tool.chinaz.com/js.aspx">http://tool.chinaz.com/js.aspx</a></p>
+<h2 id="5-注意事项"><a href="#5-注意事项" class="headerlink" title="5.注意事项"></a>5.注意事项</h2><p>源js文件一定要按照规范编写，分号，注释符，var等都要规范，否则很容易出错。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Javascript/" rel="tag"># Javascript</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2019/10/05/JsCrack%20%E7%B2%89%E7%AC%94%E7%BD%91RSA%E7%99%BB%E5%BD%95/" rel="prev" title="JsCrack 粉笔网RSA登录">
+      <i class="fa fa-chevron-left"></i> JsCrack 粉笔网RSA登录
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2019/10/05/Javascript%E5%88%9B%E5%BB%BA%E5%AF%B9%E8%B1%A1%E7%9A%847%E7%A7%8D%E6%96%B9%E6%B3%95/" rel="next" title="Javascript创建对象的7种方法">
+      Javascript创建对象的7种方法 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E5%85%B3%E4%BA%8E%E4%B8%89%E8%80%85%E7%9A%84%E5%AE%9A%E4%B9%89%E4%B8%8E%E5%8C%BA%E5%88%AB"><span class="nav-number">1.</span> <span class="nav-text">1.关于三者的定义与区别</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-%E7%A4%BA%E4%BE%8B"><span class="nav-number">2.</span> <span class="nav-text">2.示例</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%EF%BC%881%EF%BC%89%E7%BB%8F%E8%BF%87%E5%8E%8B%E7%BC%A9%E5%90%8E%E7%9A%84%E4%BB%A3%E7%A0%81%E5%A6%82%E4%B8%8B%EF%BC%9A"><span class="nav-number">2.0.1.</span> <span class="nav-text">（1）经过压缩后的代码如下：</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%EF%BC%882%EF%BC%89%E7%BB%8F%E8%BF%87%E6%B7%B7%E6%B7%86%E5%90%8E%E7%9A%84%E4%BB%A3%E7%A0%81%E5%A6%82%E4%B8%8B%EF%BC%9A"><span class="nav-number">2.0.2.</span> <span class="nav-text">（2）经过混淆后的代码如下：</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%EF%BC%883%EF%BC%89%E7%BB%8F%E8%BF%87%E5%8A%A0%E5%AF%86%E5%90%8E%E7%9A%84%E4%BB%A3%E7%A0%81%E5%A6%82%E4%B8%8B%EF%BC%9A"><span class="nav-number">2.0.3.</span> <span class="nav-text">（3）经过加密后的代码如下：</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%EF%BC%884%EF%BC%89%E7%BB%8F%E8%BF%87%E6%B7%B7%E6%B7%86-amp-%E5%8A%A0%E5%AF%86%E5%90%8E%E7%9A%84%E4%BB%A3%E7%A0%81%E5%A6%82%E4%B8%8B"><span class="nav-number">2.0.4.</span> <span class="nav-text">（4）经过混淆&amp;加密后的代码如下</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-%E6%B5%8F%E8%A7%88%E5%99%A8%E6%98%AF%E6%80%8E%E4%B9%88%E8%A7%A3%E6%9E%90%E6%B7%B7%E6%B7%86%E5%92%8C%E5%8A%A0%E5%AF%86%E5%90%8E%E7%9A%84js%E4%BB%A3%E7%A0%81%E7%9A%84"><span class="nav-number">3.</span> <span class="nav-text">3.浏览器是怎么解析混淆和加密后的js代码的</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-js%E5%8E%8B%E7%BC%A9%E5%B7%A5%E5%85%B7"><span class="nav-number">4.</span> <span class="nav-text">4.js压缩工具</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9"><span class="nav-number">5.</span> <span class="nav-text">5.注意事项</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Leo Lin"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Leo Lin</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">104</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">11</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Leo Lin</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+
+    <script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"model":{"jsonPath":"/live2dw/assets/hijiki.model.json"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":false},"log":false});</script></body>
+</html>

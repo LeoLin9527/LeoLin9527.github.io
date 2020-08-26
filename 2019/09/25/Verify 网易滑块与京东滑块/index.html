@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.1.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"yoursite.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="前言模拟拖动滑块总的分为如下四个部分：  下载背景图与滑块图 过opencv识别缺口位置得到距离 据距离生成轨迹 模拟拖动  12345678来自stackoverflow的示例const example &#x3D; await page.$(&amp;#x27;#example&amp;#x27;);const bounding_box &#x3D; await example.boundingBox();await page.">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Verify 网易滑块">
+<meta property="og:url" content="http://yoursite.com/2019/09/25/Verify%20%E7%BD%91%E6%98%93%E6%BB%91%E5%9D%97%E4%B8%8E%E4%BA%AC%E4%B8%9C%E6%BB%91%E5%9D%97/index.html">
+<meta property="og:site_name" content="江湖の林九">
+<meta property="og:description" content="前言模拟拖动滑块总的分为如下四个部分：  下载背景图与滑块图 过opencv识别缺口位置得到距离 据距离生成轨迹 模拟拖动  12345678来自stackoverflow的示例const example &#x3D; await page.$(&amp;#x27;#example&amp;#x27;);const bounding_box &#x3D; await example.boundingBox();await page.">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://i.loli.net/2019/09/24/8QsigMdaSwyrLxU.gif">
+<meta property="article:published_time" content="2019-09-25T03:33:07.000Z">
+<meta property="article:modified_time" content="2020-04-24T15:44:03.814Z">
+<meta property="article:author" content="Leo Lin">
+<meta property="article:tag" content="验证码">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://i.loli.net/2019/09/24/8QsigMdaSwyrLxU.gif">
+
+<link rel="canonical" href="http://yoursite.com/2019/09/25/Verify%20%E7%BD%91%E6%98%93%E6%BB%91%E5%9D%97%E4%B8%8E%E4%BA%AC%E4%B8%9C%E6%BB%91%E5%9D%97/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>Verify 网易滑块 | 江湖の林九</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">江湖の林九</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">相逢何必曾相识！</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/09/25/Verify%20%E7%BD%91%E6%98%93%E6%BB%91%E5%9D%97%E4%B8%8E%E4%BA%AC%E4%B8%9C%E6%BB%91%E5%9D%97/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Leo Lin">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="江湖の林九">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Verify 网易滑块
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-09-25 11:33:07" itemprop="dateCreated datePublished" datetime="2019-09-25T11:33:07+08:00">2019-09-25</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-04-24 23:44:03" itemprop="dateModified" datetime="2020-04-24T23:44:03+08:00">2020-04-24</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%BD%91%E7%BB%9C%E7%88%AC%E8%99%AB/" itemprop="url" rel="index"><span itemprop="name">网络爬虫</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>模拟拖动滑块总的分为如下四个部分：</p>
+<ol>
+<li>下载背景图与滑块图</li>
+<li>过opencv识别缺口位置得到距离</li>
+<li>据距离生成轨迹</li>
+<li>模拟拖动</li>
+</ol>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">来自stackoverflow的示例</span><br><span class="line">const example = <span class="keyword">await</span> page.$(<span class="string">&#x27;#example&#x27;</span>);</span><br><span class="line">const bounding_box = <span class="keyword">await</span> example.boundingBox();</span><br><span class="line"></span><br><span class="line"><span class="keyword">await</span> page.mouse.move(bounding_box.x + bounding_box.width / <span class="number">2</span>, bounding_box.y + bounding_box.height / <span class="number">2</span>);</span><br><span class="line"><span class="keyword">await</span> page.mouse.down();</span><br><span class="line"><span class="keyword">await</span> page.mouse.move(<span class="number">126</span>, <span class="number">19</span>);</span><br><span class="line"><span class="keyword">await</span> page.mouse.up();</span><br></pre></td></tr></table></figure>
+
+<p>1、图片处理</p>
+<p>网页中滑块的背景图是经过缩放的，而我们识别出来的缺口距离是下载来的原图大小，并且页面滑块不是从背景图最左侧开始的，可能距离背景图左边缘有一定的距离。<br>那么实际用于计算轨迹的距离应该是：识别距离 x(w/W) - s，将网页缩放考虑进取。</p>
+<p>2、滑动验证变种处理</p>
+<p>背景图由分割的图片组组成，遇到这种情况直接截图处理。</p>
+<p>背景图中随机干扰图形，这种先根据滑块的偏移锁定 y 轴坐标，识别出来的效果用 y 轴坐标范围来效验，找出最大可能性的坐标点。</p>
+<p>直接拖动的，这种在目前淘宝使用，重心在拖动轨迹的处理，同时注意在输入账号密码的时候检测输入速度。</p>
+<p>3、滑动验证可能进化的方向</p>
+<p>增加图形干扰，使识别难度加大，处理方法还是先根据滑块锁定一个坐标范围最后在识别出来的点上效验。</p>
+<p>增加更细的轨迹检测，将后台轨迹识别的粒度细化，结合机器学习绘制轨迹，与正常轨迹对比；这种一般在生成时增加更多随机因子，同时表现出更多的人为特征，如过滑与回滑、滑动中抖动等。</p>
+<p>行为检测，从输入账号密码到拖动滑块，检测整个过程鼠标的移动轨迹。</p>
+<p>将目前的缺口识别改为内容识别，拖动滑块到指定内容下，这种难度大，结合打码平台。</p>
+<p>更换滑动验证，改为点选、人机交互等方式，那就先期待吧。</p>
+<h2 id="网易滑块"><a href="#网易滑块" class="headerlink" title="网易滑块"></a>网易滑块</h2><p>page.mouse.move中的x,y参数是在页面上的绝对坐标。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> asyncio</span><br><span class="line"><span class="keyword">import</span> random</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> cv2</span><br><span class="line"><span class="keyword">import</span> requests</span><br><span class="line"><span class="keyword">from</span> pyppeteer <span class="keyword">import</span> launch</span><br><span class="line"></span><br><span class="line">width, height = <span class="number">1366</span>, <span class="number">768</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># 使用tkinter获取屏幕大小</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">screen_size</span>():</span></span><br><span class="line">    <span class="keyword">import</span> tkinter</span><br><span class="line">    tk = tkinter.Tk()</span><br><span class="line">    width = tk.winfo_screenwidth()</span><br><span class="line">    height = tk.winfo_screenheight()</span><br><span class="line">    tk.quit()</span><br><span class="line">    <span class="keyword">return</span> width, height</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">input_time_random</span>():</span></span><br><span class="line">    <span class="keyword">return</span> random.randint(<span class="number">100</span>, <span class="number">151</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">YiDun</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span>(<span class="params">self</span>):</span></span><br><span class="line">        self.url = <span class="string">&quot;http://dun.163.com/trial/jigsaw&quot;</span></span><br><span class="line">        self.loop = asyncio.get_event_loop()</span><br><span class="line">        self.loop.run_until_complete(self.main())</span><br><span class="line"></span><br><span class="line">    <span class="keyword">async</span> <span class="function"><span class="keyword">def</span> <span class="title">main</span>(<span class="params">self</span>):</span></span><br><span class="line">        browser = <span class="keyword">await</span> launch(&#123;<span class="string">&#x27;headless&#x27;</span>: <span class="literal">False</span>, <span class="string">&#x27;args&#x27;</span>: [<span class="string">&#x27;--start-maximized&#x27;</span>]&#125;)</span><br><span class="line">        page = <span class="keyword">await</span> browser.newPage()</span><br><span class="line">        <span class="comment"># browser = await launch(headless=False, args=[f&#x27;--window-size=&#123;width&#125;,&#123;height&#125;&#x27;])</span></span><br><span class="line">        <span class="comment"># await page.setViewport(&#123;&#x27;width&#x27;: width, &#x27;height&#x27;: height&#125;)</span></span><br><span class="line">        <span class="comment"># 设置网页可视区域大小</span></span><br><span class="line">        width, height = screen_size()</span><br><span class="line">        <span class="keyword">await</span> page.setViewport(&#123;</span><br><span class="line">            <span class="string">&quot;width&quot;</span>: width,</span><br><span class="line">            <span class="string">&quot;height&quot;</span>: height</span><br><span class="line">        &#125;)</span><br><span class="line">        <span class="keyword">await</span> page.goto(self.url)</span><br><span class="line">        <span class="keyword">await</span> page.waitFor(<span class="number">2000</span>)</span><br><span class="line"></span><br><span class="line">        bg = <span class="keyword">await</span> page.xpath(<span class="string">&quot;//img[@class=&#x27;yidun_bg-img&#x27;]&quot;</span>)</span><br><span class="line">        img_bg = <span class="keyword">await</span> (<span class="keyword">await</span> bg[<span class="number">0</span>].getProperty(<span class="string">&#x27;src&#x27;</span>)).jsonValue()</span><br><span class="line">        slide = <span class="keyword">await</span> page.xpath(<span class="string">&quot;//img[@class=&#x27;yidun_jigsaw&#x27;]&quot;</span>)</span><br><span class="line">        img_slide = <span class="keyword">await</span> (<span class="keyword">await</span> slide[<span class="number">0</span>].getProperty(<span class="string">&#x27;src&#x27;</span>)).jsonValue()</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (img_name, img_data) <span class="keyword">in</span> zip(</span><br><span class="line">                [<span class="string">&quot;background.jpg&quot;</span>, <span class="string">&quot;slider.png&quot;</span>],</span><br><span class="line">                [img_bg, img_slide]):</span><br><span class="line">            <span class="keyword">with</span> open(img_name, <span class="string">&#x27;wb&#x27;</span>) <span class="keyword">as</span> f:</span><br><span class="line">                rsp = requests.get(img_data)</span><br><span class="line">                f.write(rsp.content)</span><br><span class="line">        distance = self.get_distance()</span><br><span class="line">        trajectory = self.get_track(distance + <span class="number">2</span>)</span><br><span class="line">        <span class="keyword">await</span> self.move_slide(page, distance)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">async</span> <span class="function"><span class="keyword">def</span> <span class="title">move_slide</span>(<span class="params">self, page, distance</span>):</span></span><br><span class="line">        el = <span class="keyword">await</span> page.querySelector(<span class="string">&#x27;div.yidun_slider&#x27;</span>)</span><br><span class="line">        box = <span class="keyword">await</span> el.boundingBox()  <span class="comment"># 一定要先用选择器再取box函数</span></span><br><span class="line">        print(<span class="string">&quot;box:&quot;</span>, box)</span><br><span class="line">        <span class="keyword">await</span> page.hover(<span class="string">&#x27;span.yidun_slider__icon&#x27;</span>)</span><br><span class="line">        <span class="keyword">await</span> page.mouse.down()</span><br><span class="line">        <span class="keyword">await</span> page.waitFor(<span class="number">1000</span>)</span><br><span class="line">        <span class="keyword">await</span> page.mouse.move(box[<span class="string">&#x27;x&#x27;</span>] + distance + box[<span class="string">&#x27;width&#x27;</span>] / <span class="number">2</span> + <span class="number">10</span>, box[<span class="string">&#x27;y&#x27;</span>],</span><br><span class="line">                              &#123;<span class="string">&#x27;steps&#x27;</span>: <span class="number">1</span>, <span class="string">&#x27;delay&#x27;</span>: random.randint(<span class="number">2000</span>, <span class="number">4000</span>)&#125;)</span><br><span class="line">        <span class="keyword">await</span> page.mouse.up()</span><br><span class="line">        <span class="keyword">await</span> page.waitFor(<span class="number">100000</span>)</span><br><span class="line">        <span class="comment"># for track in trajectory[&#x27;plus&#x27;]:</span></span><br><span class="line">        <span class="comment">#     await page.mouse.move(track, 0, &#123;&#x27;delay&#x27;: random.randint(1000, 2000)&#125;)</span></span><br><span class="line">        <span class="comment">#</span></span><br><span class="line">        <span class="comment"># print(&quot;mid ok&quot;)</span></span><br><span class="line">        <span class="comment"># await asyncio.sleep(0.5)</span></span><br><span class="line">        <span class="comment"># for track in trajectory[&#x27;reduce&#x27;]:</span></span><br><span class="line">        <span class="comment">#     await page.mouse.move(track, 0, &#123;&#x27;delay&#x27;: random.randint(1000, 2000)&#125;)</span></span><br><span class="line">        <span class="comment"># # 模拟抖动</span></span><br><span class="line">        <span class="comment"># await page.mouse.move(-2, 0, &#123;&#x27;delay&#x27;: random.randint(500, 1000)&#125;)</span></span><br><span class="line">        <span class="comment"># await page.mouse.move(2, 0, &#123;&#x27;delay&#x27;: random.randint(500, 1000)&#125;)</span></span><br><span class="line"></span><br><span class="line"><span class="meta">    @staticmethod</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">get_distance</span>(<span class="params">target=<span class="string">&#x27;background.jpg&#x27;</span>, template=<span class="string">&#x27;slider.png&#x27;</span></span>):</span></span><br><span class="line">        target_rgb = cv2.imread(target)</span><br><span class="line"></span><br><span class="line">        target_gray = cv2.cvtColor(target_rgb, cv2.COLOR_BGR2GRAY)</span><br><span class="line"></span><br><span class="line">        template_rgb = cv2.imread(template, <span class="number">0</span>)</span><br><span class="line"></span><br><span class="line">        res = cv2.matchTemplate(target_gray, template_rgb, cv2.TM_CCOEFF_NORMED)</span><br><span class="line">        <span class="comment"># 求这个矩阵的最小值，最大值，并得到最大值，最小值的索引</span></span><br><span class="line">        value = cv2.minMaxLoc(res)</span><br><span class="line">        a, b, c, d = value</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> abs(a) &gt;= abs(b):</span><br><span class="line">            distance = c[<span class="number">0</span>]</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            distance = d[<span class="number">0</span>]</span><br><span class="line">        print(value)</span><br><span class="line">        <span class="keyword">return</span> distance</span><br><span class="line"></span><br><span class="line"><span class="meta">    @staticmethod</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">get_track</span>(<span class="params">distance</span>):</span></span><br><span class="line">        <span class="comment"># 生成某个区间的随机数,两位小数</span></span><br><span class="line">        value = round(random.uniform(<span class="number">0.55</span>, <span class="number">0.75</span>), <span class="number">2</span>)  <span class="comment"># 分割加减速路径的阀值</span></span><br><span class="line">        distance += <span class="number">20</span>  <span class="comment"># 划过缺口20px</span></span><br><span class="line">        v, t, sum = <span class="number">0</span>, <span class="number">0.2</span>, <span class="number">0</span>  <span class="comment"># 初始速度，初始计算周期，累积滑动总距的变量</span></span><br><span class="line">        plus = []  <span class="comment"># 用于记录轨迹</span></span><br><span class="line">        mid = distance * value  <span class="comment"># 将滑动距离分段，一段加速度，一段减速度</span></span><br><span class="line">        <span class="keyword">while</span> sum &lt; distance:</span><br><span class="line">            <span class="keyword">if</span> sum &lt; mid:</span><br><span class="line">                a = round(random.uniform(<span class="number">2.5</span>, <span class="number">3.5</span>), <span class="number">1</span>)  <span class="comment"># 指定范围随机产生一个加速度</span></span><br><span class="line">            <span class="keyword">else</span>:</span><br><span class="line">                a = -(round(random.uniform(<span class="number">2.0</span>, <span class="number">3.0</span>), <span class="number">1</span>))  <span class="comment"># 指定范围随机产生一个减速的加速度</span></span><br><span class="line">            s = v * t + <span class="number">0.5</span> * a * (t ** <span class="number">2</span>)  <span class="comment"># 一个周期需要滑动的距离</span></span><br><span class="line">            v = v + a * t  <span class="comment"># 一个周期结束时的速度</span></span><br><span class="line">            sum += s</span><br><span class="line">            plus.append(round(s))</span><br><span class="line"></span><br><span class="line">        reduce = [<span class="number">-3</span>, <span class="number">-3</span>, <span class="number">-2</span>, <span class="number">-2</span>, <span class="number">-2</span>, <span class="number">-2</span>, <span class="number">-2</span>, <span class="number">-1</span>, <span class="number">-1</span>, <span class="number">-1</span>]  <span class="comment"># 手动制造回滑的轨迹累积20px</span></span><br><span class="line">        <span class="keyword">return</span> &#123;<span class="string">&#x27;plus&#x27;</span>: plus, <span class="string">&#x27;reduce&#x27;</span>: reduce&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">&#x27;__main__&#x27;</span>:</span><br><span class="line">    yidun = YiDun()</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p><img src="https://i.loli.net/2019/09/24/8QsigMdaSwyrLxU.gif" alt="演示"></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E9%AA%8C%E8%AF%81%E7%A0%81/" rel="tag"># 验证码</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2019/09/25/Verify%20BiliBili%E6%BB%91%E5%9D%97/" rel="prev" title="Verify BiliBili滑块">
+      <i class="fa fa-chevron-left"></i> Verify BiliBili滑块
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2019/09/25/Verify%20%E9%AA%8C%E8%AF%81%E7%A0%81%E4%BA%91%E7%89%87/" rel="next" title="Verify 云片验证码">
+      Verify 云片验证码 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%89%8D%E8%A8%80"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BD%91%E6%98%93%E6%BB%91%E5%9D%97"><span class="nav-number">2.</span> <span class="nav-text">网易滑块</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Leo Lin"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Leo Lin</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">104</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">11</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Leo Lin</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+
+    <script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"model":{"jsonPath":"/live2dw/assets/hijiki.model.json"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":false},"log":false});</script></body>
+</html>

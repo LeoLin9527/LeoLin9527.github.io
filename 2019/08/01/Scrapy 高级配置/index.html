@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.1.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"yoursite.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="errbackerrback必须要有callback函数，failure.request就是创建的Request对象。errback函数能捕获的scrapy错误有：连接建立超时，DNS错误等。 123456789101112131415161718def start_requests(self):	for u in self.start_urls:		yield scrapy.Request(u,">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Scrapy 高级配置">
+<meta property="og:url" content="http://yoursite.com/2019/08/01/Scrapy%20%E9%AB%98%E7%BA%A7%E9%85%8D%E7%BD%AE/index.html">
+<meta property="og:site_name" content="江湖の林九">
+<meta property="og:description" content="errbackerrback必须要有callback函数，failure.request就是创建的Request对象。errback函数能捕获的scrapy错误有：连接建立超时，DNS错误等。 123456789101112131415161718def start_requests(self):	for u in self.start_urls:		yield scrapy.Request(u,">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2019-08-01T02:00:00.000Z">
+<meta property="article:modified_time" content="2020-05-14T11:15:37.948Z">
+<meta property="article:author" content="Leo Lin">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://yoursite.com/2019/08/01/Scrapy%20%E9%AB%98%E7%BA%A7%E9%85%8D%E7%BD%AE/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>Scrapy 高级配置 | 江湖の林九</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">江湖の林九</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">相逢何必曾相识！</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/08/01/Scrapy%20%E9%AB%98%E7%BA%A7%E9%85%8D%E7%BD%AE/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Leo Lin">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="江湖の林九">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Scrapy 高级配置
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-08-01 10:00:00" itemprop="dateCreated datePublished" datetime="2019-08-01T10:00:00+08:00">2019-08-01</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-05-14 19:15:37" itemprop="dateModified" datetime="2020-05-14T19:15:37+08:00">2020-05-14</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%BD%91%E7%BB%9C%E7%88%AC%E8%99%AB/" itemprop="url" rel="index"><span itemprop="name">网络爬虫</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="errback"><a href="#errback" class="headerlink" title="errback"></a>errback</h2><p>errback必须要有callback函数，failure.request就是创建的Request对象。<br>errback函数能捕获的scrapy错误有：连接建立超时，DNS错误等。</p>
+<figure class="highlight ruby"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">start_requests</span><span class="params">(<span class="keyword">self</span>)</span></span><span class="symbol">:</span></span><br><span class="line">	<span class="keyword">for</span> u <span class="keyword">in</span> <span class="keyword">self</span>.<span class="symbol">start_urls:</span></span><br><span class="line">		<span class="keyword">yield</span> scrapy.Request(u, callback=<span class="keyword">self</span>.parse_httpbin,</span><br><span class="line">								errback=<span class="keyword">self</span>.errback_httpbin,</span><br><span class="line">								dont_filter=True)</span><br><span class="line">								</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">errback_httpbin</span><span class="params">(<span class="keyword">self</span>, failure)</span></span><span class="symbol">:</span></span><br><span class="line">	<span class="comment"># log all failures</span></span><br><span class="line">	<span class="keyword">self</span>.logger.error(repr(failure))</span><br><span class="line"></span><br><span class="line">	<span class="comment"># in case you want to do something special for some errors,</span></span><br><span class="line">	<span class="comment"># you may need the failure&#x27;s type:</span></span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> failure.check(HttpError)<span class="symbol">:</span></span><br><span class="line">		<span class="comment"># these exceptions come from HttpError spider middleware</span></span><br><span class="line">		<span class="comment"># you can get the non-200 response</span></span><br><span class="line">		response = failure.value.response</span><br><span class="line">		<span class="keyword">self</span>.logger.error(<span class="string">&#x27;HttpError on %s&#x27;</span>, response.url)		</span><br></pre></td></tr></table></figure>
+
+<h2 id="配置关闭条件-0代表不开启"><a href="#配置关闭条件-0代表不开启" class="headerlink" title="配置关闭条件(0代表不开启)"></a>配置关闭条件(0代表不开启)</h2><p>1、CLOSESPIDER_TIMEOUT<br>默认值：0<br>如果一个spider在指定的秒数后仍在运行， 它将以 closespider_timeout 的原因被自动关闭。</p>
+<p>2、CLOSESPIDER_ITEMCOUNT<br>默认值：0<br>一个整数值，指定条目的个数。如果spider爬取条目数超过了指定的数， 并且这些条目通过item pipeline传递，spider将会以 closespider_itemcount 的原因被自动关闭。</p>
+<p>3、CLOSESPIDER_PAGECOUNT<br>默认值：0<br>一个整数值，指定最大的抓取响应(reponses)数。 如果spider抓取数超过指定的值，则会以 closespider_pagecount 的原因自动关闭。</p>
+<h2 id="项目相关设置"><a href="#项目相关设置" class="headerlink" title="项目相关设置"></a>项目相关设置</h2><p>1、邮件比如MAIL_FROM，可以让你配置MailSender类，该类目前用于统计邮件信息以及内存使用信息。<br>2、<code>SCRAPY_SETTINGS_MODULE</code> 以及 <code>SCRAPY_PROJECT</code>，可以调整Scrapy项目与其他项目集成的方式，比如Django。</p>
+<h2 id="下载调优"><a href="#下载调优" class="headerlink" title="下载调优"></a>下载调优</h2><p>将<code>REDIRECT_PRIORITY_ADJUST</code>设为2，意味着每次发生重定向时，新请求会在所有非重定向请求完成服务后才会被调度；<br>而将<code>REDIRECT_MAX_TIMES</code>设置为20，则表示在执行20次重定向后下载器将会放弃尝试。</p>
+<figure class="highlight vala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta"># -*- coding: utf-8 -*-</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># Scrapy settings for companyNews project</span></span><br><span class="line"><span class="meta">#</span></span><br><span class="line"><span class="meta"># For simplicity, this file contains only settings considered important or</span></span><br><span class="line"><span class="meta"># commonly used. You can find more settings consulting the documentation:</span></span><br><span class="line"><span class="meta">#</span></span><br><span class="line"><span class="meta">#     http://doc.scrapy.org/en/latest/topics/settings.html</span></span><br><span class="line"><span class="meta">#     http://scrapy.readthedocs.org/en/latest/topics/downloader-middleware.html</span></span><br><span class="line"><span class="meta">#     http://scrapy.readthedocs.org/en/latest/topics/spider-middleware.html</span></span><br><span class="line"></span><br><span class="line">BOT_NAME = <span class="string">&#x27;companyNews&#x27;</span></span><br><span class="line"></span><br><span class="line">SPIDER_MODULES = [<span class="string">&#x27;companyNews.spiders&#x27;</span>]</span><br><span class="line">NEWSPIDER_MODULE = <span class="string">&#x27;companyNews.spiders&#x27;</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#-----------------------日志文件配置-----------------------------------</span></span><br><span class="line"><span class="meta">#日志文件名</span></span><br><span class="line"><span class="meta">#LOG_FILE = &quot;dg.log&quot;</span></span><br><span class="line"><span class="meta">#日志文件级别</span></span><br><span class="line">LOG_LEVEL = <span class="string">&#x27;WARNING&#x27;</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># Obey robots.txt rules</span></span><br><span class="line"><span class="meta"># robots.txt 是遵循 Robot协议 的一个文件，它保存在网站的服务器中，它的作用是，告诉搜索引擎爬虫，</span></span><br><span class="line"><span class="meta"># 本网站哪些目录下的网页 不希望 你进行爬取收录。在Scrapy启动后，会在第一时间访问网站的 robots.txt 文件，</span></span><br><span class="line"><span class="meta"># 然后决定该网站的爬取范围。</span></span><br><span class="line"><span class="meta"># ROBOTSTXT_OBEY = True</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># ------------------------全局并发数的一些配置:-------------------------------</span></span><br><span class="line"><span class="meta"># Configure maximum concurrent requests performed by Scrapy (default: 16)</span></span><br><span class="line"><span class="meta"># 默认 Request 并发数：16</span></span><br><span class="line"><span class="meta"># CONCURRENT_REQUESTS = 32</span></span><br><span class="line"><span class="meta"># 默认 Item 并发数：100</span></span><br><span class="line"><span class="meta"># CONCURRENT_ITEMS = 100</span></span><br><span class="line"><span class="meta"># The download delay setting will honor only one of:</span></span><br><span class="line"><span class="meta"># 默认每个域名的并发数：16</span></span><br><span class="line"><span class="meta">#CONCURRENT_REQUESTS_PER_DOMAIN = 16</span></span><br><span class="line"><span class="meta"># 每个IP的最大并发数：0表示忽略</span></span><br><span class="line"><span class="meta"># CONCURRENT_REQUESTS_PER_IP = 0</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># Configure a delay for requests for the same website (default: 0)</span></span><br><span class="line"><span class="meta"># See http://scrapy.readthedocs.org/en/latest/topics/settings.html#download-delay</span></span><br><span class="line"><span class="meta"># See also autothrottle settings and docs</span></span><br><span class="line"><span class="meta">#DOWNLOAD_DELAY 会影响 CONCURRENT_REQUESTS，不能使并发显现出来,设置下载延迟</span></span><br><span class="line"><span class="meta">#DOWNLOAD_DELAY = 3</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># Disable cookies (enabled by default)</span></span><br><span class="line"><span class="meta">#禁用cookies</span></span><br><span class="line"><span class="meta"># COOKIES_ENABLED = True</span></span><br><span class="line"><span class="meta"># COOKIES_DEBUG = True</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># Disable Telnet Console (enabled by default)</span></span><br><span class="line"><span class="meta">#TELNETCONSOLE_ENABLED = False</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># Crawl responsibly by identifying yourself (and your website) on the user-agent</span></span><br><span class="line"><span class="meta">#USER_AGENT = &#x27;haoduofuli (+http://www.yourdomain.com)&#x27;</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># Override the default request headers:</span></span><br><span class="line">DEFAULT_REQUEST_HEADERS = &#123;</span><br><span class="line">  <span class="string">&#x27;Accept&#x27;</span>: <span class="string">&#x27;text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8&#x27;</span>,</span><br><span class="line">  <span class="string">&#x27;Accept-Language&#x27;</span>: <span class="string">&#x27;en&#x27;</span>,</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta"># Enable or disable spider middlewares</span></span><br><span class="line"><span class="meta"># See http://scrapy.readthedocs.org/en/latest/topics/spider-middleware.html</span></span><br><span class="line">SPIDER_MIDDLEWARES = &#123;</span><br><span class="line">    <span class="string">&#x27;companyNews.middlewares.UserAgentmiddleware&#x27;</span>: <span class="number">401</span>,</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta"># Enable or disable downloader middlewares</span></span><br><span class="line"><span class="meta"># See http://scrapy.readthedocs.org/en/latest/topics/downloader-middleware.html</span></span><br><span class="line">DOWNLOADER_MIDDLEWARES = &#123;</span><br><span class="line">     <span class="string">&#x27;companyNews.middlewares.UserAgentmiddleware&#x27;</span>: <span class="number">400</span>,</span><br><span class="line">     # <span class="string">&#x27;companyNews.middlewares.CookieMiddleware&#x27;</span>: <span class="number">700</span>,</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">MYEXT_ENABLED=True      # 开启扩展</span><br><span class="line">IDLE_NUMBER=<span class="number">10</span>           # 配置空闲持续时间单位为 <span class="number">360</span>个 ，一个时间单位为<span class="number">5</span>s</span><br><span class="line"><span class="meta"># Enable or disable extensions</span></span><br><span class="line"><span class="meta"># See http://scrapy.readthedocs.org/en/latest/topics/extensions.html</span></span><br><span class="line"><span class="meta"># 在 EXTENSIONS 配置，激活扩展</span></span><br><span class="line">EXTENSIONS = &#123;</span><br><span class="line">    # <span class="string">&#x27;scrapy.extensions.telnet.TelnetConsole&#x27;</span>: None,</span><br><span class="line">    <span class="string">&#x27;companyNews.extensions.RedisSpiderSmartIdleClosedExensions&#x27;</span>: <span class="number">500</span>,</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta"># Configure item pipelines</span></span><br><span class="line"><span class="meta"># See http://scrapy.readthedocs.org/en/latest/topics/item-pipeline.html</span></span><br><span class="line"><span class="meta"># 注意:自定义pipeline的优先级需高于Redispipeline,因为RedisPipeline不会返回item,</span></span><br><span class="line"><span class="meta"># 所以如果RedisPipeline优先级高于自定义pipeline,那么自定义pipeline无法获取到item</span></span><br><span class="line">ITEM_PIPELINES = &#123;</span><br><span class="line">     #将清除的项目在redis进行处理，# 将RedisPipeline注册到pipeline组件中(这样才能将数据存入Redis)</span><br><span class="line">    # <span class="string">&#x27;scrapy_redis.pipelines.RedisPipeline&#x27;</span>: <span class="number">400</span>,</span><br><span class="line">    <span class="string">&#x27;companyNews.pipelines.companyNewsPipeline&#x27;</span>: <span class="number">300</span>,# 自定义pipeline视情况选择性注册(可选)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta"># Enable and configure the AutoThrottle extension (disabled by default)</span></span><br><span class="line"><span class="meta"># See http://doc.scrapy.org/en/latest/topics/autothrottle.html</span></span><br><span class="line"><span class="meta">#AUTOTHROTTLE_ENABLED = True</span></span><br><span class="line"><span class="meta"># The initial download delay</span></span><br><span class="line"><span class="meta">#AUTOTHROTTLE_START_DELAY = 5</span></span><br><span class="line"><span class="meta"># The maximum download delay to be set in case of high latencies</span></span><br><span class="line"><span class="meta">#AUTOTHROTTLE_MAX_DELAY = 60</span></span><br><span class="line"><span class="meta"># The average number of requests Scrapy should be sending in parallel to</span></span><br><span class="line"><span class="meta"># each remote server</span></span><br><span class="line"><span class="meta">#AUTOTHROTTLE_TARGET_CONCURRENCY = 1.0</span></span><br><span class="line"><span class="meta"># Enable showing throttling stats for every response received:</span></span><br><span class="line"><span class="meta">#AUTOTHROTTLE_DEBUG = False</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># Enable and configure HTTP caching (disabled by default)</span></span><br><span class="line"><span class="meta"># See http://scrapy.readthedocs.org/en/latest/topics/downloader-middleware.html#httpcache-middleware-settings</span></span><br><span class="line"><span class="meta"># ----------------scrapy默认已经自带了缓存，配置如下-----------------</span></span><br><span class="line"><span class="meta"># 打开缓存</span></span><br><span class="line"><span class="meta">#HTTPCACHE_ENABLED = True</span></span><br><span class="line"><span class="meta"># 设置缓存过期时间（单位：秒）</span></span><br><span class="line"><span class="meta">#HTTPCACHE_EXPIRATION_SECS = 0</span></span><br><span class="line"><span class="meta"># 缓存路径(默认为：.scrapy/httpcache)</span></span><br><span class="line"><span class="meta">#HTTPCACHE_DIR = &#x27;httpcache&#x27;</span></span><br><span class="line"><span class="meta"># 忽略的状态码</span></span><br><span class="line"><span class="meta">#HTTPCACHE_IGNORE_HTTP_CODES = []</span></span><br><span class="line"><span class="meta"># 缓存模式(文件缓存)</span></span><br><span class="line"><span class="meta">#HTTPCACHE_STORAGE = &#x27;scrapy.extensions.httpcache.FilesystemCacheStorage&#x27;</span></span><br><span class="line"><span class="meta">#HTTPCACHE_POLICY = &quot;scrapy.extensions.httpcache.DummyPolicy&quot; 策略：所有请求均缓存，下次请求直接访问原来的缓存即可</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#-----------------Scrapy-Redis分布式爬虫相关设置如下--------------------------</span></span><br><span class="line"><span class="meta"># Enables scheduling storing requests queue in redis.</span></span><br><span class="line"><span class="meta">#启用Redis调度存储请求队列，使用Scrapy-Redis的调度器,不再使用scrapy的调度器</span></span><br><span class="line">SCHEDULER = <span class="string">&quot;scrapy_redis.scheduler.Scheduler&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># Ensure all spiders share same duplicates filter through redis.</span></span><br><span class="line"><span class="meta">#确保所有的爬虫通过Redis去重，使用Scrapy-Redis的去重组件,不再使用scrapy的去重组件</span></span><br><span class="line">DUPEFILTER_CLASS = <span class="string">&quot;scrapy_redis.dupefilter.RFPDupeFilter&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># 默认请求序列化使用的是pickle 但是我们可以更改为其他类似的。PS：这玩意儿2.X的可以用。3.X的不能用</span></span><br><span class="line"><span class="meta"># SCHEDULER_SERIALIZER = &quot;scrapy_redis.picklecompat&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># 使用优先级调度请求队列 （默认使用），</span></span><br><span class="line"><span class="meta"># 使用Scrapy-Redis的从请求集合中取出请求的方式,三种方式择其一即可:</span></span><br><span class="line"><span class="meta"># 分别按(1)请求的优先级/(2)队列FIFO/(先进先出)(3)栈FILO 取出请求（先进后出）</span></span><br><span class="line"><span class="meta"># SCHEDULER_QUEUE_CLASS = &#x27;scrapy_redis.queue.PriorityQueue&#x27;</span></span><br><span class="line"><span class="meta"># 可选用的其它队列</span></span><br><span class="line">SCHEDULER_QUEUE_CLASS = <span class="string">&#x27;scrapy_redis.queue.FifoQueue&#x27;</span></span><br><span class="line"><span class="meta"># SCHEDULER_QUEUE_CLASS = &#x27;scrapy_redis.queue.LifoQueue&#x27;</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># Don&#x27;t cleanup redis queues, allows to pause/resume crawls.</span></span><br><span class="line"><span class="meta">#不清除Redis队列、这样可以暂停/恢复 爬取，</span></span><br><span class="line"><span class="meta"># 允许暂停,redis请求记录不会丢失(重启爬虫不会重头爬取已爬过的页面)</span></span><br><span class="line"><span class="meta">#SCHEDULER_PERSIST = True</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#----------------------redis的地址配置-------------------------------------</span></span><br><span class="line"><span class="meta"># Specify the full Redis URL for connecting (optional).</span></span><br><span class="line"><span class="meta"># If set, this takes precedence over the REDIS_HOST and REDIS_PORT settings.</span></span><br><span class="line"><span class="meta"># 指定用于连接redis的URL（可选）</span></span><br><span class="line"><span class="meta"># 如果设置此项，则此项优先级高于设置的REDIS_HOST 和 REDIS_PORT</span></span><br><span class="line"><span class="meta"># REDIS_URL = &#x27;redis://root:密码@主机ＩＰ:端口&#x27;</span></span><br><span class="line">REDIS_URL = <span class="string">&#x27;redis://root:123456@192.168.8.30:6379&#x27;</span></span><br><span class="line"><span class="meta"># 自定义的redis参数（连接超时之类的）</span></span><br><span class="line">REDIS_PARAMS=&#123;<span class="string">&#x27;db&#x27;</span>: <span class="number">2</span>&#125;</span><br><span class="line"><span class="meta"># Specify the host and port to use when connecting to Redis (optional).</span></span><br><span class="line"><span class="meta"># 指定连接到redis时使用的端口和地址（可选）</span></span><br><span class="line"><span class="meta">#REDIS_HOST = &#x27;127.0.0.1&#x27;</span></span><br><span class="line"><span class="meta">#REDIS_PORT = 6379</span></span><br><span class="line"><span class="meta">#REDIS_PASS = &#x27;19940225&#x27;</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># REDIRECT_ENABLED = False</span></span><br><span class="line"><span class="meta">#</span></span><br><span class="line"><span class="meta"># HTTPERROR_ALLOWED_CODES = [302, 301]</span></span><br><span class="line"><span class="meta">#</span></span><br><span class="line"><span class="meta"># DEPTH_LIMIT = 3</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#------------------------------------------------------------------------------------------------</span></span><br><span class="line"><span class="meta"># 最大空闲时间防止分布式爬虫因为等待而关闭</span></span><br><span class="line"><span class="meta"># 这只有当上面设置的队列类是SpiderQueue或SpiderStack时才有效</span></span><br><span class="line"><span class="meta"># 并且当您的蜘蛛首次启动时，也可能会阻止同一时间启动（由于队列为空）</span></span><br><span class="line"><span class="meta"># SCHEDULER_IDLE_BEFORE_CLOSE = 10</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># 序列化项目管道作为redis Key存储</span></span><br><span class="line"><span class="meta"># REDIS_ITEMS_KEY = &#x27;%(spider)s:items&#x27;</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># 默认使用ScrapyJSONEncoder进行项目序列化</span></span><br><span class="line"><span class="meta"># You can use any importable path to a callable object.</span></span><br><span class="line"><span class="meta"># REDIS_ITEMS_SERIALIZER = &#x27;json.dumps&#x27;</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># 自定义redis客户端类</span></span><br><span class="line"><span class="meta"># REDIS_PARAMS[&#x27;redis_cls&#x27;] = &#x27;myproject.RedisClient&#x27;</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># 如果为True，则使用redis的&#x27;spop&#x27;进行操作。</span></span><br><span class="line"><span class="meta"># 如果需要避免起始网址列表出现重复，这个选项非常有用。开启此选项urls必须通过sadd添加，否则会出现类型错误。</span></span><br><span class="line"><span class="meta"># REDIS_START_URLS_AS_SET = False</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># RedisSpider和RedisCrawlSpider默认 start_usls 键</span></span><br><span class="line"><span class="meta"># REDIS_START_URLS_KEY = &#x27;%(name)s:start_urls&#x27;</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># 设置redis使用utf-8之外的编码</span></span><br><span class="line"><span class="meta"># REDIS_ENCODING = &#x27;latin1&#x27;</span></span><br></pre></td></tr></table></figure>
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2019/08/01/Scrapy%20get%E8%AF%B7%E6%B1%82%E5%92%8Cpost%E8%AF%B7%E6%B1%82/" rel="prev" title="Scrapy get请求和post请求">
+      <i class="fa fa-chevron-left"></i> Scrapy get请求和post请求
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2019/08/01/Python%20%E4%BC%98%E9%9B%85%E6%96%B9%E5%BC%8F(%E4%BC%98%E5%85%88%E7%BA%A7%E5%92%8C%E6%A0%BC%E5%BC%8F%E5%8C%96)/" rel="next" title="优雅写Python(优先级和格式化)">
+      优雅写Python(优先级和格式化) <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#errback"><span class="nav-number">1.</span> <span class="nav-text">errback</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%85%8D%E7%BD%AE%E5%85%B3%E9%97%AD%E6%9D%A1%E4%BB%B6-0%E4%BB%A3%E8%A1%A8%E4%B8%8D%E5%BC%80%E5%90%AF"><span class="nav-number">2.</span> <span class="nav-text">配置关闭条件(0代表不开启)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%A1%B9%E7%9B%AE%E7%9B%B8%E5%85%B3%E8%AE%BE%E7%BD%AE"><span class="nav-number">3.</span> <span class="nav-text">项目相关设置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%8B%E8%BD%BD%E8%B0%83%E4%BC%98"><span class="nav-number">4.</span> <span class="nav-text">下载调优</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Leo Lin"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Leo Lin</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">104</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">11</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Leo Lin</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+
+    <script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"model":{"jsonPath":"/live2dw/assets/hijiki.model.json"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":false},"log":false});</script></body>
+</html>

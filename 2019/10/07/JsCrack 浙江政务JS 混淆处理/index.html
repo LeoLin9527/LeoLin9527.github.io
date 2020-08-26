@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.1.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"yoursite.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="前言采集浙江政务网事项时，遇到直接请求返回一堆JS代码，如下所示:点击示例网址 1234567&lt;html&gt;&lt;script&gt;var arg1&#x3D;&amp;#x27;58D144B55D654665F61C1E42FC02C0AD30D92BEC&amp;#x27;;var _0x4818&#x3D;[&amp;#x27;\x63\x73\x4b\x48\x77\x71\x4d\x49&amp;#x27;,&amp;#x27;\">
+<meta property="og:type" content="article">
+<meta property="og:title" content="JsCrack 浙江政务JS混淆处理">
+<meta property="og:url" content="http://yoursite.com/2019/10/07/JsCrack%20%E6%B5%99%E6%B1%9F%E6%94%BF%E5%8A%A1JS%20%E6%B7%B7%E6%B7%86%E5%A4%84%E7%90%86/index.html">
+<meta property="og:site_name" content="江湖の林九">
+<meta property="og:description" content="前言采集浙江政务网事项时，遇到直接请求返回一堆JS代码，如下所示:点击示例网址 1234567&lt;html&gt;&lt;script&gt;var arg1&#x3D;&amp;#x27;58D144B55D654665F61C1E42FC02C0AD30D92BEC&amp;#x27;;var _0x4818&#x3D;[&amp;#x27;\x63\x73\x4b\x48\x77\x71\x4d\x49&amp;#x27;,&amp;#x27;\">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://yoursite.com/images/5-zjzw/zjzw1.png">
+<meta property="og:image" content="http://yoursite.com/images/5-zjzw/zjzw2.png">
+<meta property="og:image" content="http://yoursite.com/images/5-zjzw/zjzw3.png">
+<meta property="article:published_time" content="2019-10-07T04:00:00.000Z">
+<meta property="article:modified_time" content="2020-04-23T12:54:13.205Z">
+<meta property="article:author" content="Leo Lin">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://yoursite.com/images/5-zjzw/zjzw1.png">
+
+<link rel="canonical" href="http://yoursite.com/2019/10/07/JsCrack%20%E6%B5%99%E6%B1%9F%E6%94%BF%E5%8A%A1JS%20%E6%B7%B7%E6%B7%86%E5%A4%84%E7%90%86/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>JsCrack 浙江政务JS混淆处理 | 江湖の林九</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">江湖の林九</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">相逢何必曾相识！</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/10/07/JsCrack%20%E6%B5%99%E6%B1%9F%E6%94%BF%E5%8A%A1JS%20%E6%B7%B7%E6%B7%86%E5%A4%84%E7%90%86/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Leo Lin">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="江湖の林九">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          JsCrack 浙江政务JS混淆处理
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-10-07 12:00:00" itemprop="dateCreated datePublished" datetime="2019-10-07T12:00:00+08:00">2019-10-07</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-04-23 20:54:13" itemprop="dateModified" datetime="2020-04-23T20:54:13+08:00">2020-04-23</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%BD%91%E7%BB%9C%E7%88%AC%E8%99%AB/" itemprop="url" rel="index"><span itemprop="name">网络爬虫</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>采集浙江政务网事项时，遇到直接请求返回一堆JS代码，如下所示:<br>点击<a target="_blank" rel="noopener" href="http://www.zjzwfw.gov.cn/zjservice/item/detail/index.do?localInnerCode=5d3897f3-fd52-46a3-868c-7c271ad1789d&webId=8&eventType=2">示例网址</a></p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&lt;html&gt;<span class="xml"><span class="tag">&lt;<span class="name">script</span>&gt;</span></span></span><br><span class="line"><span class="xml">var arg1=&#x27;58D144B55D654665F61C1E42FC02C0AD30D92BEC&#x27;;</span></span><br><span class="line">var _0x4818=[&#x27;\x63\x73\x4b\x48\x77\x71\x4d\x49&#x27;,&#x27;\x5a\x73\x4b\x4a\x77\x72\x38\x56\x65\x41\x73\x79&#x27;,&#x27;\x55\x63\x4b\x69\x4e\x38\x4f\x2f\x77\x70\x6c\x77\x4d\x41\x3d\x3d&#x27;,&#x27;\x4a\x52\x38\x43\x54\x67\x3d\x3d&#x27;,&#x27;\x59\x73\x4f\x6e\x62\x53\x45\x51\x77\x37\x6f\x7a\x77\x71\x5a\x4b\x65\x73\x4b\x55\x77\x37\x6b\x77\x58\x38\x4f\x52\x49\x51\x3d\x3d&#x27;,&#x27;\x77\x37\x6f\x56\x53\x38\x4f\x53\x77\x6f\x50\x43\x6c\x33\x6a\x43\x68\x4d\x4b\x68\x77\x36\x48\x44\x6c\x73\x4b\x58\x77\x34\x73\x2f\x59\x73\x4f\x47&#x27;,&#x27;\x66\x77\x56\x6d\x49\x31\x41\x74\x77\x70\x6c\x61\x59\x38\x4f\x74\x77\x35\x63\x4e\x66\x53\x67\x70\x77\x36\x4d\x3d&#x27;,&#x27;\x4f\x63\x4f\x4e\x77\x72\x6a\x43\x71\x73\x4b\x78\x54\x47\x54\x43\x68\x73\x4f\x6a\x45\x57\x45\x38\x50\x63\x4f\x63\x4a\x38\x4b\x36&#x27;,&#x27;\x55\x38\x4b\x35\x4c\x63\x4f\x74\x77\x70\x56\x30\x45\x4d\x4f\x6b\x77\x34\x37\x44\x72\x4d\x4f\x58&#x27;,&#x27;\x48\x4d\x4f\x32\x77\x6f\x48\x43\x69\x4d\x4b\x39\x53\x6c\x58\x43\x6c\x63\x4f\x6f\x43\x31\x6b\x3d&#x27;,&#x27;\x61\x73\x4b\x49\x77\x71\x4d\x44\x64\x67\x4d\x75\x50\x73\x4f\x4b\x42\x4d\x4b\x63\x77\x72\x72\x43\x74\x6b\x4c\x44\x72\x4d\x4b\x42\x77\x36\x34\x64&#x27;,&#x27;\x77\x71\x49\x6d\x4d\x54\x30\x74\x77\x36\x52\x4e\x77\x35\x6b\x3d&#x27;,&#x27;\x44\x4d\x4b\x63\x55\x30\x4a\x6d\x55\x77\x55\x76&#x27;,&#x27;\x56\x6a\x48\x44\x6c\x4d\x4f\x48\x56\x63\x4f\x4e\x58\x33\x66\x44\x69\x63\x4b\x4a\x48\x51\x3d\x3d&#x27;,&#x27;\x77\x71\x68\x42\x48\x38\x4b\x6e\x77\x34\x54\x44\x68\x53\x44\x44\x67\x4d\x4f\x64\x77\x72\x6a\x43\x6e\x63\x4f\x57\x77\x70\x68\x68\x4e\x38\x4b\x43\x47\x63\x4b\x71\x77\x36\x64\x48\x41\x55\x35\x2b\x77\x72\x67\x32\x4a\x63\x4b\x61\x77\x34\x49\x45\x4a\x63\x4f\x63\x77\x72\x52\x4a\x77\x6f\x5a\x30\x77\x71\x46\x39\x59\x67\x41\x56&#x27;,&#x27;\x64\x7a\x64\x32\x77\x35\x62\x44\x6d\x33\x6a\x44\x70\x73\x4b\x33\x77\x70\x59\x3d&#x27;,&#x27;\x77\x34\x50\x44\x67\x63\x4b\x58\x77\x6f\x33\x43\x6b\x63\x4b\x4c\x77\x72\x35\x71\x77\x72\x59\x3d&#x27;,&#x27;\x77\x72\x4a\x4f\x54\x63\x4f\x51\x57\x4d\x4f\x67&#x27;,&#x27;\x77\x71\x54\x44\x76\x63\x4f\x6a\x77\x34\x34\x37\x77\x72\x34\x3d&#x27;,&#x27;\x77\x35\x58\x44\x71\x73\x4b\x68\x4d\x46\x31\x2f&#x27;,&#x27;\x77\x72\x41\x79\x48\x73\x4f\x66\x77\x70\x70\x63&#x27;,&#x27;\x4a\x33\x64\x56\x50\x63\x4f\x78\x4c\x67\x3d\x3d&#x27;,&#x27;\x77\x72\x64\x48\x77\x37\x70\x39\x5a\x77\x3d\x3d&#x27;,&#x27;\x77\x34\x72\x44\x6f\x38\x4b\x6d\x4e\x45\x77\x3d&#x27;,&#x27;\x49\x4d\x4b\x41\x55\x6b\x42\x74&#x27;,&#x27;\x77\x36\x62\x44\x72\x63\x4b\x51\x77\x70\x56\x48\x77\x70\x4e\x51\x77\x71\x55\x3d&#x27;,&#x27;\x64\x38\x4f\x73\x57\x68\x41\x55\x77\x37\x59\x7a\x77\x72\x55\x3d&#x27;,&#x27;\x77\x71\x6e\x43\x6b\x73\x4f\x65\x65\x7a\x72\x44\x68\x77\x3d\x3d&#x27;,&#x27;\x55\x73\x4b\x6e\x49\x4d\x4b\x57\x56\x38\x4b\x2f&#x27;,&#x27;\x77\x34\x7a\x44\x6f\x63\x4b\x38\x4e\x55\x5a\x76&#x27;,&#x27;\x63\x38\x4f\x78\x5a\x68\x41\x4a\x77\x36\x73\x6b\x77\x71\x4a\x6a&#x27;,&#x27;\x50\x63\x4b\x49\x77\x34\x6e\x43\x6b\x6b\x56\x62&#x27;,&#x27;\x4b\x48\x67\x6f\x64\x4d\x4f\x32\x56\x51\x3d\x3d&#x27;,&#x27;\x77\x70\x73\x6d\x77\x71\x76\x44\x6e\x47\x46\x71&#x27;,&#x27;\x77\x71\x4c\x44\x74\x38\x4f\x6b\x77\x34\x63\x3d&#x27;,&#x27;\x77\x37\x77\x31\x77\x34\x50\x43\x70\x73\x4f\x34\x77\x71\x41\x3d&#x27;,&#x27;\x77\x71\x39\x46\x52\x73\x4f\x71\x57\x4d\x4f\x71&#x27;,&#x27;\x62\x79\x42\x68\x77\x37\x72\x44\x6d\x33\x34\x3d&#x27;,&#x27;\x4c\x48\x67\x2b\x53\x38\x4f\x74\x54\x77\x3d\x3d&#x27;,&#x27;\x77\x71\x68\x4f\x77\x37\x31\x35\x64\x73\x4f\x48&#x27;,&#x27;\x55\x38\x4f\x37\x56\x73\x4f\x30\x77\x71\x76\x44\x76\x63\x4b\x75\x4b\x73\x4f\x71\x58\x38\x4b\x72&#x27;,&#x27;\x59\x69\x74\x74\x77\x35\x44\x44\x6e\x57\x6e\x44\x72\x41\x3d\x3d&#x27;,&#x27;\x59\x4d\x4b\x49\x77\x71\x55\x55\x66\x67\x49\x6b&#x27;,&#x27;\x61\x42\x37\x44\x6c\x4d\x4f\x44\x54\x51\x3d\x3d&#x27;,&#x27;\x77\x70\x66\x44\x68\x38\x4f\x72\x77\x36\x6b\x6b&#x27;,&#x27;\x77\x37\x76\x43\x71\x4d\x4f\x72\x59\x38\x4b\x41\x56\x6b\x35\x4f\x77\x70\x6e\x43\x75\x38\x4f\x61\x58\x73\x4b\x5a\x50\x33\x44\x43\x6c\x63\x4b\x79\x77\x36\x48\x44\x72\x51\x3d\x3d&#x27;,&#x27;\x77\x6f\x77\x2b\x77\x36\x76\x44\x6d\x48\x70\x73\x77\x37\x52\x74\x77\x6f\x39\x38\x4c\x43\x37\x43\x69\x47\x37\x43\x6b\x73\x4f\x52\x54\x38\x4b\x6c\x57\x38\x4f\x35\x77\x72\x33\x44\x69\x38\x4f\x54\x48\x73\x4f\x44\x65\x48\x6a\x44\x6d\x63\x4b\x6c\x4a\x73\x4b\x71\x56\x41\x3d\x3d&#x27;,&#x27;\x4e\x77\x56\x2b&#x27;,&#x27;\x77\x37\x48\x44\x72\x63\x4b\x74\x77\x70\x4a\x61\x77\x70\x5a\x62&#x27;,&#x27;\x77\x70\x51\x73\x77\x71\x76\x44\x69\x48\x70\x75\x77\x36\x49\x3d&#x27;,&#x27;\x59\x4d\x4b\x55\x77\x71\x4d\x4a\x5a\x51\x3d\x3d&#x27;,&#x27;\x4b\x48\x31\x56\x4b\x63\x4f\x71\x4b\x73\x4b\x31&#x27;,&#x27;\x66\x51\x35\x73\x46\x55\x6b\x6b\x77\x70\x49\x3d&#x27;,&#x27;\x77\x72\x76\x43\x72\x63\x4f\x42\x52\x38\x4b\x6b&#x27;,&#x27;\x4d\x33\x77\x30\x66\x51\x3d\x3d&#x27;,&#x27;\x77\x36\x78\x58\x77\x71\x50\x44\x76\x4d\x4f\x46\x77\x6f\x35\x64&#x27;];(function(_0x4c97f0,_0x1742fd)&#123;var _0x4db1c=function(_0x48181e)&#123;while(--_0x48181e)&#123;_0x4c97f0[&#x27;\x70\x75\x73\x68&#x27;](_0x4c97f0[&#x27;\x73\x68\x69\x66\x74&#x27;]());&#125;&#125;;var _0x3cd6c6=function()&#123;var _0xb8360b=&#123;&#x27;\x64\x61\x74\x61&#x27;:&#123;&#x27;\x6b\x65\x79&#x27;:&#x27;\x63\x6f\x6f\x6b\x69\x65&#x27;,&#x27;\x76\x61\x6c\x75\x65&#x27;:&#x27;\x74\x69\x6d\x65\x6f\x75\x74&#x27;&#125;,&#x27;\x73\x65\x74\x43\x6f\x6f\x6b\x69\x65&#x27;:function(_0x20bf34,_0x3e840e,_0x5693d3,_0x5e8b26)&#123;_0x5e8b26=_0x5e8b26||&#123;&#125;;var _0xba82f0=_0x3e840e+&#x27;\x3d&#x27;+_0x5693d3;var _0x5afe31=0x0;for(var _0x5afe31=0x0,_0x178627=_0x20bf34[&#x27;\x6c\x65\x6e\x67\x74\x68&#x27;];_0x5afe31&lt;_0x178627;_0x5afe31++)&#123;var _0x41b2ff=_0x20bf34[_0x5afe31];_0xba82f0+=&#x27;\x3b\x20&#x27;+_0x41b2ff;var _0xd79219=_0x20bf34[_0x41b2ff];_0x20bf34[&#x27;\x70\x75\x73\x68&#x27;](_0xd79219);_0x178627=_0x20bf34[&#x27;\x6c\x65\x6e\x67\x74\x68&#x27;];if(_0xd79219!==!![])&#123;_0xba82f0+=&#x27;\x3d&#x27;+_0xd79219;&#125;&#125;_0x5e8b26[&#x27;\x63\x6f\x6f\x6b\x69\x65&#x27;]=_0xba82f0;&#125;,&#x27;\x72\x65\x6d\x6f\x76\x65\x43\x6f\x6f\x6b\x69\x65&#x27;:function()&#123;return&#x27;\x64\x65\x76&#x27;;&#125;,&#x27;\x67\x65\x74\x43\x6f\x6f\x6b\x69\x65&#x27;:function(_0x4a11fe,_0x189946)&#123;_0x4a11fe=_0x4a11fe||function(_0x6259a2)&#123;return _0x6259a2;&#125;;var _0x25af93=_0x4a11fe(new RegExp(&#x27;\x28\x3f\x3a\x5e\x7c\x3b\x20\x29&#x27;+_0x189946[&#x27;\x72\x65\x70\x6c\x61\x63\x65&#x27;](/([.$?*|&#123;&#125;()[]\/+^])/g,&#x27;\x24\x31&#x27;)+&#x27;\x3d\x28\x5b\x5e\x3b\x5d\x2a\x29&#x27;));var _0x52d57c=function(_0x105f59,_0x3fd789)&#123;_0x105f59(++_0x3fd789);&#125;;_0x52d57c(_0x4db1c,_0x1742fd);return _0x25af93?decodeURIComponent(_0x25af93[0x1]):undefined;&#125;&#125;;var _0x4a2aed=function()&#123;var _0x124d17=new RegExp(&#x27;\x5c\x77\x2b\x20\x2a\x5c\x28\x5c\x29\x20\x2a\x7b\x5c\x77\x2b\x20\x2a\x5b\x27\x7c\x22\x5d\x2e\x2b\x5b\x27\x7c\x22\x5d\x3b\x3f\x20\x2a\x7d&#x27;);return _0x124d17[&#x27;\x74\x65\x73\x74&#x27;](_0xb8360b[&#x27;\x72\x65\x6d\x6f\x76\x65\x43\x6f\x6f\x6b\x69\x65&#x27;][&#x27;\x74\x6f\x53\x74\x72\x69\x6e\x67&#x27;]());&#125;;_0xb8360b[&#x27;\x75\x70\x64\x61\x74\x65\x43\x6f\x6f\x6b\x69\x65&#x27;]=_0x4a2aed;var _0x2d67ec=&#x27;&#x27;;var _0x120551=_0xb8360b[&#x27;\x75\x70\x64\x61\x74\x65\x43\x6f\x6f\x6b\x69\x65&#x27;]();if(!_0x120551)&#123;_0xb8360b[&#x27;\x73\x65\x74\x43\x6f\x6f\x6b\x69\x65&#x27;]([&#x27;\x2a&#x27;],&#x27;\x63\x6f\x75\x6e\x74\x65\x72&#x27;,0x1);&#125;else if(_0x120551)&#123;_0x2d67ec=_0xb8360b[&#x27;\x67\x65\x74\x43\x6f\x6f\x6b\x69\x65&#x27;](null,&#x27;\x63\x6f\x75\x6e\x74\x65\x72&#x27;);&#125;else&#123;_0xb8360b[&#x27;\x72\x65\x6d\x6f\x76\x65\x43\x6f\x6f\x6b\x69\x65&#x27;]();&#125;&#125;;_0x3cd6c6();&#125;(_0x4818,0x15b));var _0x55f3=function(_0x4c97f0,_0x1742fd)&#123;var _0x4c97f0=parseInt(_0x4c97f0,0x10);var _0x48181e=_0x4818[_0x4c97f0];if(!_0x55f3[&#x27;\x61\x74\x6f\x62\x50\x6f\x6c\x79\x66\x69\x6c\x6c\x41\x70\x70\x65\x6e\x64\x65\x64&#x27;])&#123;(function()&#123;var _0xdf49c6=Function(&#x27;\x72\x65\x74\x75\x72\x6e\x20\x28\x66\x75\x6e\x63\x74\x69\x6f\x6e\x20\x28\x29\x20&#x27;+&#x27;\x7b\x7d\x2e\x63\x6f\x6e\x73\x74\x72\x75\x63\x74\x6f\x72\x28\x22\x72\x65\x74\x75\x72\x6e\x20\x74\x68\x69\x73\x22\x29\x28\x29&#x27;+&#x27;\x29\x3b&#x27;);var _0xb8360b=_0xdf49c6();var _0x389f44=&#x27;\x41\x42\x43\x44\x45\x46\x47\x48\x49\x4a\x4b\x4c\x4d\x4e\x4f\x50\x51\x52\x53\x54\x55\x56\x57\x58\x59\x5a\x61\x62\x63\x64\x65\x66\x67\x68\x69\x6a\x6b\x6c\x6d\x6e\x6f\x70\x71\x72\x73\x74\x75\x76\x77\x78\x79\x7a\x30\x31\x32\x33\x34\x35\x36\x37\x38\x39\x2b\x2f\x3d&#x27;;_0xb8360b[&#x27;\x61\x74\x6f\x62&#x27;]||(_0xb8360b[&#x27;\x61\x74\x6f\x62&#x27;]=function(_0xba82f0)&#123;var _0xec6bb4=String(_0xba82f0)[&#x27;\x72\x65\x70\x6c\x61\x63\x65&#x27;](/=+$/,&#x27;&#x27;);for(var _0x1a0f04=0x0,_0x18c94e,_0x41b2ff,_0xd79219=0x0,_0x5792f7=&#x27;&#x27;;_0x41b2ff=_0xec6bb4[&#x27;\x63\x68\x61\x72\x41\x74&#x27;](_0xd79219++);~_0x41b2ff&amp;&amp;(_0x18c94e=_0x1a0f04%0x4?_0x18c94e*0x40+_0x41b2ff:_0x41b2ff,_0x1a0f04++%0x4)?_0x5792f7+=String[&#x27;\x66\x72\x6f\x6d\x43\x68\x61\x72\x43\x6f\x64\x65&#x27;](0xff&amp;_0x18c94e&gt;&gt;(-0x2*_0x1a0f04&amp;0x6)):0x0)&#123;_0x41b2ff=_0x389f44[&#x27;\x69\x6e\x64\x65\x78\x4f\x66&#x27;](_0x41b2ff);&#125;return _0x5792f7;&#125;);&#125;());_0x55f3[&#x27;\x61\x74\x6f\x62\x50\x6f\x6c\x79\x66\x69\x6c\x6c\x41\x70\x70\x65\x6e\x64\x65\x64&#x27;]=!![];&#125;if(!_0x55f3[&#x27;\x72\x63\x34&#x27;])&#123;var _0x232678=function(_0x401af1,_0x532ac0)&#123;var _0x45079a=[],_0x52d57c=0x0,_0x105f59,_0x3fd789=&#x27;&#x27;,_0x4a2aed=&#x27;&#x27;;_0x401af1=atob(_0x401af1);for(var _0x124d17=0x0,_0x1b9115=_0x401af1[&#x27;\x6c\x65\x6e\x67\x74\x68&#x27;];_0x124d17&lt;_0x1b9115;_0x124d17++)&#123;_0x4a2aed+=&#x27;\x25&#x27;+(&#x27;\x30\x30&#x27;+_0x401af1[&#x27;\x63\x68\x61\x72\x43\x6f\x64\x65\x41\x74&#x27;](_0x124d17)[&#x27;\x74\x6f\x53\x74\x72\x69\x6e\x67&#x27;](0x10))[&#x27;\x73\x6c\x69\x63\x65&#x27;](-0x2);&#125;_0x401af1=decodeURIComponent(_0x4a2aed);for(var _0x2d67ec=0x0;_0x2d67ec&lt;0x100;_0x2d67ec++)&#123;_0x45079a[_0x2d67ec]=_0x2d67ec;&#125;for(_0x2d67ec=0x0;_0x2d67ec&lt;0x100;_0x2d67ec++)&#123;_0x52d57c=(_0x52d57c+_0x45079a[_0x2d67ec]+_0x532ac0[&#x27;\x63\x68\x61\x72\x43\x6f\x64\x65\x41\x74&#x27;](_0x2d67ec%_0x532ac0[&#x27;\x6c\x65\x6e\x67\x74\x68&#x27;]))%0x100;_0x105f59=_0x45079a[_0x2d67ec];_0x45079a[_0x2d67ec]=_0x45079a[_0x52d57c];_0x45079a[_0x52d57c]=_0x105f59;&#125;_0x2d67ec=0x0;_0x52d57c=0x0;for(var _0x4e5ce2=0x0;_0x4e5ce2&lt;_0x401af1[&#x27;\x6c\x65\x6e\x67\x74\x68&#x27;];_0x4e5ce2++)&#123;_0x2d67ec=(_0x2d67ec+0x1)%0x100;_0x52d57c=(_0x52d57c+_0x45079a[_0x2d67ec])%0x100;_0x105f59=_0x45079a[_0x2d67ec];_0x45079a[_0x2d67ec]=_0x45079a[_0x52d57c];_0x45079a[_0x52d57c]=_0x105f59;_0x3fd789+=String[&#x27;\x66\x72\x6f\x6d\x43\x68\x61\x72\x43\x6f\x64\x65&#x27;](_0x401af1[&#x27;\x63\x68\x61\x72\x43\x6f\x64\x65\x41\x74&#x27;](_0x4e5ce2)^_0x45079a[(_0x45079a[_0x2d67ec]+_0x45079a[_0x52d57c])%0x100]);&#125;return _0x3fd789;&#125;;_0x55f3[&#x27;\x72\x63\x34&#x27;]=_0x232678;&#125;if(!_0x55f3[&#x27;\x64\x61\x74\x61&#x27;])&#123;_0x55f3[&#x27;\x64\x61\x74\x61&#x27;]=&#123;&#125;;&#125;if(_0x55f3[&#x27;\x64\x61\x74\x61&#x27;][_0x4c97f0]===undefined)&#123;if(!_0x55f3[&#x27;\x6f\x6e\x63\x65&#x27;])&#123;var _0x5f325c=function(_0x23a392)&#123;this[&#x27;\x72\x63\x34\x42\x79\x74\x65\x73&#x27;]=_0x23a392;this[&#x27;\x73\x74\x61\x74\x65\x73&#x27;]=[0x1,0x0,0x0];this[&#x27;\x6e\x65\x77\x53\x74\x61\x74\x65&#x27;]=function()&#123;return&#x27;\x6e\x65\x77\x53\x74\x61\x74\x65&#x27;;&#125;;this[&#x27;\x66\x69\x72\x73\x74\x53\x74\x61\x74\x65&#x27;]=&#x27;\x5c\x77\x2b\x20\x2a\x5c\x28\x5c\x29\x20\x2a\x7b\x5c\x77\x2b\x20\x2a&#x27;;this[&#x27;\x73\x65\x63\x6f\x6e\x64\x53\x74\x61\x74\x65&#x27;]=&#x27;\x5b\x27\x7c\x22\x5d\x2e\x2b\x5b\x27\x7c\x22\x5d\x3b\x3f\x20\x2a\x7d&#x27;;&#125;;_0x5f325c[&#x27;\x70\x72\x6f\x74\x6f\x74\x79\x70\x65&#x27;][&#x27;\x63\x68\x65\x63\x6b\x53\x74\x61\x74\x65&#x27;]=function()&#123;var _0x19f809=new RegExp(this[&#x27;\x66\x69\x72\x73\x74\x53\x74\x61\x74\x65&#x27;]+this[&#x27;\x73\x65\x63\x6f\x6e\x64\x53\x74\x61\x74\x65&#x27;]);return this[&#x27;\x72\x75\x6e\x53\x74\x61\x74\x65&#x27;](_0x19f809[&#x27;\x74\x65\x73\x74&#x27;](this[&#x27;\x6e\x65\x77\x53\x74\x61\x74\x65&#x27;][&#x27;\x74\x6f\x53\x74\x72\x69\x6e\x67&#x27;]())?--this[&#x27;\x73\x74\x61\x74\x65\x73&#x27;][0x1]:--this[&#x27;\x73\x74\x61\x74\x65\x73&#x27;][0x0]);&#125;;_0x5f325c[&#x27;\x70\x72\x6f\x74\x6f\x74\x79\x70\x65&#x27;][&#x27;\x72\x75\x6e\x53\x74\x61\x74\x65&#x27;]=function(_0x4380bd)&#123;if(!Boolean(~_0x4380bd))&#123;return _0x4380bd;&#125;return this[&#x27;\x67\x65\x74\x53\x74\x61\x74\x65&#x27;](this[&#x27;\x72\x63\x34\x42\x79\x74\x65\x73&#x27;]);&#125;;_0x5f325c[&#x27;\x70\x72\x6f\x74\x6f\x74\x79\x70\x65&#x27;][&#x27;\x67\x65\x74\x53\x74\x61\x74\x65&#x27;]=function(_0x58d85e)&#123;for(var _0x1c9f5b=0x0,_0x1ce9e0=this[&#x27;\x73\x74\x61\x74\x65\x73&#x27;][&#x27;\x6c\x65\x6e\x67\x74\x68&#x27;];_0x1c9f5b&lt;_0x1ce9e0;_0x1c9f5b++)&#123;this[&#x27;\x73\x74\x61\x74\x65\x73&#x27;][&#x27;\x70\x75\x73\x68&#x27;](Math[&#x27;\x72\x6f\x75\x6e\x64&#x27;](Math[&#x27;\x72\x61\x6e\x64\x6f\x6d&#x27;]()));_0x1ce9e0=this[&#x27;\x73\x74\x61\x74\x65\x73&#x27;][&#x27;\x6c\x65\x6e\x67\x74\x68&#x27;];&#125;return _0x58d85e(this[&#x27;\x73\x74\x61\x74\x65\x73&#x27;][0x0]);&#125;;new _0x5f325c(_0x55f3)[&#x27;\x63\x68\x65\x63\x6b\x53\x74\x61\x74\x65&#x27;]();_0x55f3[&#x27;\x6f\x6e\x63\x65&#x27;]=!![];&#125;_0x48181e=_0x55f3[&#x27;\x72\x63\x34&#x27;](_0x48181e,_0x1742fd);_0x55f3[&#x27;\x64\x61\x74\x61&#x27;][_0x4c97f0]=_0x48181e;&#125;else&#123;_0x48181e=_0x55f3[&#x27;\x64\x61\x74\x61&#x27;][_0x4c97f0];&#125;return _0x48181e;&#125;;var arg3=null;var arg4=null;var arg5=null;var arg6=null;var arg7=null;var arg8=null;var arg9=null;var arg10=null;var l=function()&#123;while(window[_0x55f3(&#x27;0x1&#x27;, &#x27;\x58\x4d\x57\x5e&#x27;)]||window[&#x27;\x5f\x5f\x70\x68\x61\x6e\x74\x6f\x6d\x61\x73&#x27;])&#123;&#125;;var _0x5e8b26=_0x55f3(&#x27;0x3&#x27;, &#x27;\x6a\x53\x31\x59&#x27;);String[_0x55f3(&#x27;0x5&#x27;, &#x27;\x6e\x5d\x66\x52&#x27;)][_0x55f3(&#x27;0x6&#x27;, &#x27;\x50\x67\x35\x34&#x27;)]=function(_0x4e08d8)&#123;var _0x5a5d3b=&#x27;&#x27;;for(var _0xe89588=0x0;_0xe89588&lt;this[_0x55f3(&#x27;0x8&#x27;, &#x27;\x29\x68\x52\x63&#x27;)]&amp;&amp;_0xe89588&lt;_0x4e08d8[_0x55f3(&#x27;0xa&#x27;, &#x27;\x6a\x45\x26\x5e&#x27;)];_0xe89588+=0x2)&#123;var _0x401af1=parseInt(this[_0x55f3(&#x27;0xb&#x27;, &#x27;\x56\x32\x4b\x45&#x27;)](_0xe89588,_0xe89588+0x2),0x10);var _0x105f59=parseInt(_0x4e08d8[_0x55f3(&#x27;0xd&#x27;, &#x27;\x58\x4d\x57\x5e&#x27;)](_0xe89588,_0xe89588+0x2),0x10);var _0x189e2c=(_0x401af1^_0x105f59)[_0x55f3(&#x27;0xf&#x27;, &#x27;\x57\x31\x46\x45&#x27;)](0x10);if(_0x189e2c[_0x55f3(&#x27;0x11&#x27;, &#x27;\x4d\x47\x72\x76&#x27;)]==0x1)&#123;_0x189e2c=&#x27;\x30&#x27;+_0x189e2c;&#125;_0x5a5d3b+=_0x189e2c;&#125;return _0x5a5d3b;&#125;;String[&#x27;\x70\x72\x6f\x74\x6f\x74\x79\x70\x65&#x27;][_0x55f3(&#x27;0x14&#x27;, &#x27;\x5a\x2a\x44\x4d&#x27;)]=function()&#123;var _0x4b082b=[0xf,0x23,0x1d,0x18,0x21,0x10,0x1,0x26,0xa,0x9,0x13,0x1f,0x28,0x1b,0x16,0x17,0x19,0xd,0x6,0xb,0x27,0x12,0x14,0x8,0xe,0x15,0x20,0x1a,0x2,0x1e,0x7,0x4,0x11,0x5,0x3,0x1c,0x22,0x25,0xc,0x24];var _0x4da0dc=[];var _0x12605e=&#x27;&#x27;;for(var _0x20a7bf=0x0;_0x20a7bf&lt;this[&#x27;\x6c\x65\x6e\x67\x74\x68&#x27;];_0x20a7bf++)&#123;var _0x385ee3=this[_0x20a7bf];for(var _0x217721=0x0;_0x217721&lt;_0x4b082b[_0x55f3(&#x27;0x16&#x27;, &#x27;\x61\x48\x2a\x4e&#x27;)];_0x217721++)&#123;if(_0x4b082b[_0x217721]==_0x20a7bf+0x1)&#123;_0x4da0dc[_0x217721]=_0x385ee3;&#125;&#125;&#125;_0x12605e=_0x4da0dc[&#x27;\x6a\x6f\x69\x6e&#x27;](&#x27;&#x27;);return _0x12605e;&#125;;var _0x23a392=arg1[_0x55f3(&#x27;0x19&#x27;, &#x27;\x50\x67\x35\x34&#x27;)]();arg2=_0x23a392[_0x55f3(&#x27;0x1b&#x27;, &#x27;\x7a\x35\x4f\x26&#x27;)](_0x5e8b26);setTimeout(&#x27;\x72\x65\x6c\x6f\x61\x64\x28\x61\x72\x67\x32\x29&#x27;,0x66a);&#125;;var _0x4db1c=function()&#123;function _0x355d23(_0x450614)&#123;if((&#x27;&#x27;+_0x450614/_0x450614)[_0x55f3(&#x27;0x1c&#x27;, &#x27;\x56\x32\x4b\x45&#x27;)]!==0x1||_0x450614%0x14===0x0)&#123;(function()&#123;&#125;[_0x55f3(&#x27;0x1d&#x27;, &#x27;\x43\x4e\x55\x59&#x27;)]((undefined+&#x27;&#x27;)[0x2]+(!![]+&#x27;&#x27;)[0x3]+([][_0x55f3(&#x27;0x1e&#x27;, &#x27;\x77\x38\x50\x52&#x27;)]()+&#x27;&#x27;)[0x2]+(undefined+&#x27;&#x27;)[0x0]+(![]+[0x0]+String)[0x14]+(![]+[0x0]+String)[0x14]+(!![]+&#x27;&#x27;)[0x3]+(!![]+&#x27;&#x27;)[0x1])());&#125;else&#123;(function()&#123;&#125;[&#x27;\x63\x6f\x6e\x73\x74\x72\x75\x63\x74\x6f\x72&#x27;]((undefined+&#x27;&#x27;)[0x2]+(!![]+&#x27;&#x27;)[0x3]+([][_0x55f3(&#x27;0x1f&#x27;, &#x27;\x4c\x24\x28\x44&#x27;)]()+&#x27;&#x27;)[0x2]+(undefined+&#x27;&#x27;)[0x0]+(![]+[0x0]+String)[0x14]+(![]+[0x0]+String)[0x14]+(!![]+&#x27;&#x27;)[0x3]+(!![]+&#x27;&#x27;)[0x1])());&#125;_0x355d23(++_0x450614);&#125;try&#123;_0x355d23(0x0);&#125;catch(_0x54c483)&#123;&#125;&#125;;if(function()&#123;var _0x470d8f=function()&#123;var _0x4c97f0=!![];return function(_0x1742fd,_0x4db1c)&#123;var _0x48181e=_0x4c97f0?function()&#123;if(_0x4db1c)&#123;var _0x55f3be=_0x4db1c[&#x27;\x61\x70\x70\x6c\x79&#x27;](_0x1742fd,arguments);_0x4db1c=null;return _0x55f3be;&#125;&#125;:function()&#123;&#125;;_0x4c97f0=![];return _0x48181e;&#125;;&#125;();var _0x501fd7=_0x470d8f(this,function()&#123;var _0x4c97f0=function()&#123;return&#x27;\x64\x65\x76&#x27;;&#125;,_0x1742fd=function()&#123;return&#x27;\x77\x69\x6e\x64\x6f\x77&#x27;;&#125;;var _0x55f3be=function()&#123;var _0x3ad9a1=new RegExp(&#x27;\x5c\x77\x2b\x20\x2a\x5c\x28\x5c\x29\x20\x2a\x7b\x5c\x77\x2b\x20\x2a\x5b\x27\x7c\x22\x5d\x2e\x2b\x5b\x27\x7c\x22\x5d\x3b\x3f\x20\x2a\x7d&#x27;);return!_0x3ad9a1[&#x27;\x74\x65\x73\x74&#x27;](_0x4c97f0[&#x27;\x74\x6f\x53\x74\x72\x69\x6e\x67&#x27;]());&#125;;var _0x1b93ad=function()&#123;var _0x20bf34=new RegExp(&#x27;\x28\x5c\x5c\x5b\x78\x7c\x75\x5d\x28\x5c\x77\x29\x7b\x32\x2c\x34\x7d\x29\x2b&#x27;);return _0x20bf34[&#x27;\x74\x65\x73\x74&#x27;](_0x1742fd[&#x27;\x74\x6f\x53\x74\x72\x69\x6e\x67&#x27;]());&#125;;var _0x5afe31=function(_0x178627)&#123;var _0x1a0f04=~-0x1&gt;&gt;0x1+0xff%0x0;if(_0x178627[&#x27;\x69\x6e\x64\x65\x78\x4f\x66&#x27;](&#x27;\x69&#x27;===_0x1a0f04))&#123;_0xd79219(_0x178627);&#125;&#125;;var _0xd79219=function(_0x5792f7)&#123;var _0x4e08d8=~-0x4&gt;&gt;0x1+0xff%0x0;if(_0x5792f7[&#x27;\x69\x6e\x64\x65\x78\x4f\x66&#x27;]((!![]+&#x27;&#x27;)[0x3])!==_0x4e08d8)&#123;_0x5afe31(_0x5792f7);&#125;&#125;;if(!_0x55f3be())&#123;if(!_0x1b93ad())&#123;_0x5afe31(&#x27;\x69\x6e\x64\u0435\x78\x4f\x66&#x27;);&#125;else&#123;_0x5afe31(&#x27;\x69\x6e\x64\x65\x78\x4f\x66&#x27;);&#125;&#125;else&#123;_0x5afe31(&#x27;\x69\x6e\x64\u0435\x78\x4f\x66&#x27;);&#125;&#125;);_0x501fd7();var _0x3a394d=function()&#123;var _0x1ab151=!![];return function(_0x372617,_0x42d229)&#123;var _0x3b3503=_0x1ab151?function()&#123;if(_0x42d229)&#123;var _0x7086d9=_0x42d229[_0x55f3(&#x27;0x21&#x27;, &#x27;\x4b\x4e\x29\x46&#x27;)](_0x372617,arguments);_0x42d229=null;return _0x7086d9;&#125;&#125;:function()&#123;&#125;;_0x1ab151=![];return _0x3b3503;&#125;;&#125;();var _0x5b6351=_0x3a394d(this,function()&#123;var _0x46cbaa=Function(_0x55f3(&#x27;0x22&#x27;, &#x27;\x26\x68\x5a\x59&#x27;)+_0x55f3(&#x27;0x23&#x27;, &#x27;\x61\x48\x2a\x4e&#x27;)+&#x27;\x29\x3b&#x27;);var _0x1766ff=function()&#123;&#125;;var _0x9b5e29=_0x46cbaa();_0x9b5e29[_0x55f3(&#x27;0x26&#x27;, &#x27;\x61\x48\x2a\x4e&#x27;)][&#x27;\x6c\x6f\x67&#x27;]=_0x1766ff;_0x9b5e29[_0x55f3(&#x27;0x29&#x27;, &#x27;\x56\x25\x59\x52&#x27;)][_0x55f3(&#x27;0x2a&#x27;, &#x27;\x50\x5e\x45\x71&#x27;)]=_0x1766ff;_0x9b5e29[_0x55f3(&#x27;0x2c&#x27;, &#x27;\x6c\x67\x4d\x30&#x27;)][_0x55f3(&#x27;0x2d&#x27;, &#x27;\x4c\x24\x28\x44&#x27;)]=_0x1766ff;_0x9b5e29[_0x55f3(&#x27;0x2f&#x27;, &#x27;\x43\x5a\x63\x38&#x27;)][_0x55f3(&#x27;0x30&#x27;, &#x27;\x57\x75\x36\x25&#x27;)]=_0x1766ff;&#125;);_0x5b6351();try&#123;return!!window[&#x27;\x61\x64\x64\x45\x76\x65\x6e\x74\x4c\x69\x73\x74\x65\x6e\x65\x72&#x27;];&#125;catch(_0x35538d)&#123;return![];&#125;&#125;())&#123;document[_0x55f3(&#x27;0x33&#x27;, &#x27;\x56\x25\x59\x52&#x27;)](_0x55f3(&#x27;0x34&#x27;, &#x27;\x79\x41\x70\x7a&#x27;),l,![]);&#125;else&#123;document[_0x55f3(&#x27;0x36&#x27;, &#x27;\x79\x41\x70\x7a&#x27;)](_0x55f3(&#x27;0x37&#x27;, &#x27;\x4c\x24\x28\x44&#x27;),l);&#125;_0x4db1c();setInterval(function()&#123;_0x4db1c();&#125;,0xfa0);</span><br><span class="line">        </span><br><span class="line">function setCookie(name,value)&#123;var expiredate=new Date();expiredate.setTime(expiredate.getTime()+(3600*1000));document.cookie=name+&quot;=&quot;+value+&quot;;expires=&quot;+expiredate.toGMTString()+&quot;;max-age=3600;path=/&quot;;&#125;</span><br><span class="line">function reload(x) &#123;setCookie(&quot;acw_sc__v2&quot;, x);document.location.reload();&#125;</span><br><span class="line">&lt;/script&gt;&lt;/html&gt;</span><br></pre></td></tr></table></figure>
+
+<h2 id="反调试处理"><a href="#反调试处理" class="headerlink" title="反调试处理"></a>反调试处理</h2><p>1、重写函数表达式即可</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">_0x355d23 = <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;&#125;</span><br></pre></td></tr></table></figure>
+<p><img src="/images/5-zjzw/zjzw1.png" alt="断点"></p>
+<h2 id="代码格式化"><a href="#代码格式化" class="headerlink" title="代码格式化"></a>代码格式化</h2><p>1、工具：<a target="_blank" rel="noopener" href="https://beautifier.io/">https://beautifier.io/</a><br><img src="/images/5-zjzw/zjzw2.png"><br><strong>注</strong>：勾选箭头所示选项否则不能解析”\x”字符</p>
+<p>2、自己写的解析脚本（有Bug无法处理正则部分转义）</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">parse16</span>():</span></span><br><span class="line">    content = <span class="string">&#x27;&#x27;</span></span><br><span class="line">    <span class="keyword">with</span> open(<span class="string">&#x27;xxx.js&#x27;</span>, <span class="string">&#x27;r+&#x27;</span>, encoding=<span class="string">&#x27;utf8&#x27;</span>) <span class="keyword">as</span> f:</span><br><span class="line">        content = f.read()</span><br><span class="line">        <span class="comment"># 匹配16进制字符串</span></span><br><span class="line">        pattern = re.compile(<span class="string">r&#x27;\\x[a-zA-Z0-9]&#123;2&#125;&#x27;</span>)</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> pattern.findall(content):</span><br><span class="line">            <span class="comment"># 解码并替换16进制字符串</span></span><br><span class="line">            content = content.replace(i, i.encode(<span class="string">&#x27;utf-8&#x27;</span>).decode(<span class="string">&#x27;unicode_escape&#x27;</span>))</span><br><span class="line"></span><br><span class="line">    <span class="keyword">with</span> open(<span class="string">&#x27;xxx.js&#x27;</span>, <span class="string">&#x27;w+&#x27;</span>, encoding=<span class="string">&#x27;utf8&#x27;</span>) <span class="keyword">as</span> f:</span><br><span class="line">        f.write(content)</span><br></pre></td></tr></table></figure>
+
+<h2 id="Cookie分析"><a href="#Cookie分析" class="headerlink" title="Cookie分析"></a>Cookie分析</h2><p>从如下函数即可看出，设置cookie后刷新该页，从此图可验证：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">reload</span>(<span class="params">x</span>) </span>&#123;setCookie(<span class="string">&quot;acw_sc__v2&quot;</span>, x);<span class="built_in">document</span>.location.reload();&#125;</span><br></pre></td></tr></table></figure>
+<p><img src="/images/5-zjzw/zjzw3.png"></p>
+<h2 id="acw-sc-v2如何生成"><a href="#acw-sc-v2如何生成" class="headerlink" title="acw_sc__v2如何生成"></a>acw_sc__v2如何生成</h2><p>arg2是通过执行_0x23a392[_0x55f3(‘0x1b’, ‘z5O&amp;’)] 函数返回得到，实参是 _0x5e8b26。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> _0x23a392 = arg1[_0x55f3(<span class="string">&#x27;0x19&#x27;</span>, <span class="string">&#x27;Pg54&#x27;</span>)]();</span><br><span class="line">arg2 = _0x23a392[_0x55f3(<span class="string">&#x27;0x1b&#x27;</span>, <span class="string">&#x27;z5O&amp;&#x27;</span>)](_0x5e8b26);</span><br><span class="line"><span class="built_in">setTimeout</span>(<span class="string">&#x27;reload(arg2)&#x27;</span>, <span class="number">0x66a</span>);</span><br></pre></td></tr></table></figure>
+
+<h3 id="第一部分（匿名函数）：此函数是用于对大数组-0x4818-进行操作。"><a href="#第一部分（匿名函数）：此函数是用于对大数组-0x4818-进行操作。" class="headerlink" title="第一部分（匿名函数）：此函数是用于对大数组 _0x4818 进行操作。"></a>第一部分（匿名函数）：此函数是用于对大数组 _0x4818 进行操作。</h3><p>代码压缩：<a target="_blank" rel="noopener" href="https://www.sojson.com/yasuojs.html">https://www.sojson.com/yasuojs.html</a><br><strong>注</strong>：实参是数组和一个十六进制数，正则不匹配换行，所以需要将此函数压缩后再运行。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> _0x4db1c = <span class="function"><span class="keyword">function</span>(<span class="params">_0x48181e</span>) </span>&#123;</span><br><span class="line">	<span class="keyword">while</span> (--_0x48181e) &#123;</span><br><span class="line">		<span class="comment">// shift将数组第一个元素删除,并返回第一个元素的值,push在末尾添加值</span></span><br><span class="line">		qs_base_data[<span class="string">&#x27;push&#x27;</span>](qs_base_data[<span class="string">&#x27;shift&#x27;</span>]());</span><br><span class="line">	&#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">_0x52d57c(_0x4db1c, _0x1742fd);</span><br></pre></td></tr></table></figure>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 用于防代码格式化</span></span><br><span class="line"><span class="keyword">var</span> _0x4a2aed = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">	<span class="keyword">var</span> _0x124d17 = <span class="keyword">new</span> <span class="built_in">RegExp</span>(<span class="string">&#x27;\\w+ *\\(\\) *&#123;\\w+ *[\&#x27;|\&quot;].+[\&#x27;|\&quot;];? *&#125;&#x27;</span>);</span><br><span class="line">	<span class="keyword">return</span> _0x124d17[<span class="string">&#x27;test&#x27;</span>](_0xb8360b[<span class="string">&#x27;removeCookie&#x27;</span>][<span class="string">&#x27;toString&#x27;</span>]());</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>得到处理后的数组：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[<span class="string">&quot;wqImMT0tw6RNw5k=&quot;</span>, <span class="string">&quot;DMKcU0JmUwUv&quot;</span>, <span class="string">&quot;VjHDlMOHVcONX3fDicKJHQ==&quot;</span>, <span class="string">&quot;wqhBH8Knw4TDhSDDgMOdwrjCncOWwphhN8KCGcKqw6dHAU5+wrg2JcKaw4IEJcOcwrRJwoZ0wqF9YgAV&quot;</span>, <span class="string">&quot;dzd2w5bDm3jDpsK3wpY=&quot;</span>, <span class="string">&quot;w4PDgcKXwo3CkcKLwr5qwrY=&quot;</span>, <span class="string">&quot;wrJOTcOQWMOg&quot;</span>, <span class="string">&quot;wqTDvcOjw447wr4=&quot;</span>, <span class="string">&quot;w5XDqsKhMF1/&quot;</span>, <span class="string">&quot;wrAyHsOfwppc&quot;</span>, <span class="string">&quot;J3dVPcOxLg==&quot;</span>, <span class="string">&quot;wrdHw7p9Zw==&quot;</span>, <span class="string">&quot;w4rDo8KmNEw=&quot;</span>, <span class="string">&quot;IMKAUkBt&quot;</span>, <span class="string">&quot;w6bDrcKQwpVHwpNQwqU=&quot;</span>, <span class="string">&quot;d8OsWhAUw7YzwrU=&quot;</span>, <span class="string">&quot;wqnCksOeezrDhw==&quot;</span>, <span class="string">&quot;UsKnIMKWV8K/&quot;</span>, <span class="string">&quot;w4zDocK8NUZv&quot;</span>, <span class="string">&quot;c8OxZhAJw6skwqJj&quot;</span>, <span class="string">&quot;PcKIw4nCkkVb&quot;</span>, <span class="string">&quot;KHgodMO2VQ==&quot;</span>, <span class="string">&quot;wpsmwqvDnGFq&quot;</span>, <span class="string">&quot;wqLDt8Okw4c=&quot;</span>, <span class="string">&quot;w7w1w4PCpsO4wqA=&quot;</span>, <span class="string">&quot;wq9FRsOqWMOq&quot;</span>, <span class="string">&quot;byBhw7rDm34=&quot;</span>, <span class="string">&quot;LHg+S8OtTw==&quot;</span>, <span class="string">&quot;wqhOw715dsOH&quot;</span>, <span class="string">&quot;U8O7VsO0wqvDvcKuKsOqX8Kr&quot;</span>, <span class="string">&quot;Yittw5DDnWnDrA==&quot;</span>, <span class="string">&quot;YMKIwqUUfgIk&quot;</span>, <span class="string">&quot;aB7DlMODTQ==&quot;</span>, <span class="string">&quot;wpfDh8Orw6kk&quot;</span>, <span class="string">&quot;w7vCqMOrY8KAVk5OwpnCu8OaXsKZP3DClcKyw6HDrQ==&quot;</span>, <span class="string">&quot;wow+w6vDmHpsw7Rtwo98LC7CiG7CksORT8KlW8O5wr3Di8OTHsODeHjDmcKlJsKqVA==&quot;</span>, <span class="string">&quot;NwV+&quot;</span>, <span class="string">&quot;w7HDrcKtwpJawpZb&quot;</span>, <span class="string">&quot;wpQswqvDiHpuw6I=&quot;</span>, <span class="string">&quot;YMKUwqMJZQ==&quot;</span>, <span class="string">&quot;KH1VKcOqKsK1&quot;</span>, <span class="string">&quot;fQ5sFUkkwpI=&quot;</span>, <span class="string">&quot;wrvCrcOBR8Kk&quot;</span>, <span class="string">&quot;M3w0fQ==&quot;</span>, <span class="string">&quot;w6xXwqPDvMOFwo5d&quot;</span>, <span class="string">&quot;csKHwqMI&quot;</span>, <span class="string">&quot;ZsKJwr8VeAsy&quot;</span>, <span class="string">&quot;UcKiN8O/wplwMA==&quot;</span>, <span class="string">&quot;JR8CTg==&quot;</span>, <span class="string">&quot;YsOnbSEQw7ozwqZKesKUw7kwX8ORIQ==&quot;</span>, <span class="string">&quot;w7oVS8OSwoPCl3jChMKhw6HDlsKXw4s/YsOG&quot;</span>, <span class="string">&quot;fwVmI1AtwplaY8Otw5cNfSgpw6M=&quot;</span>, <span class="string">&quot;OcONwrjCqsKxTGTChsOjEWE8PcOcJ8K6&quot;</span>, <span class="string">&quot;U8K5LcOtwpV0EMOkw47DrMOX&quot;</span>, <span class="string">&quot;HMO2woHCiMK9SlXClcOoC1k=&quot;</span>, <span class="string">&quot;asKIwqMDdgMuPsOKBMKcwrrCtkLDrMKBw64d&quot;</span>]</span><br></pre></td></tr></table></figure>
+
+<h3 id="第二部分（解密字符串函数）"><a href="#第二部分（解密字符串函数）" class="headerlink" title="第二部分（解密字符串函数）"></a>第二部分（解密字符串函数）</h3><p>什么也不用改，压缩后调用即可</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> _0x55f3=<span class="function"><span class="keyword">function</span>(<span class="params">_0x4c97f0,_0x1742fd</span>)</span>&#123;<span class="keyword">var</span> _0x4c97f0=<span class="built_in">parseInt</span>(_0x4c97f0,<span class="number">0x10</span>);<span class="keyword">var</span> _0x48181e=_0x4818[_0x4c97f0];<span class="keyword">if</span>(!_0x55f3[<span class="string">&#x27;atobPolyfillAppended&#x27;</span>])&#123;(<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;<span class="keyword">var</span> _0xdf49c6=<span class="built_in">Function</span>(<span class="string">&#x27;return (function () &#123;&#125;.constructor(\&quot;return this\&quot;)());&#x27;</span>);<span class="keyword">var</span> _0xb8360b=_0xdf49c6();<span class="keyword">var</span> _0x389f44=<span class="string">&#x27;ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=&#x27;</span>;_0xb8360b[<span class="string">&#x27;atob&#x27;</span>]||(_0xb8360b[<span class="string">&#x27;atob&#x27;</span>]=<span class="function"><span class="keyword">function</span>(<span class="params">_0xba82f0</span>)</span>&#123;<span class="keyword">var</span> _0xec6bb4=<span class="built_in">String</span>(_0xba82f0)[<span class="string">&#x27;replace&#x27;</span>](<span class="regexp">/=+$/</span>,<span class="string">&#x27;&#x27;</span>);<span class="keyword">for</span>(<span class="keyword">var</span> _0x1a0f04=<span class="number">0x0</span>,_0x18c94e,_0x41b2ff,_0xd79219=<span class="number">0x0</span>,_0x5792f7=<span class="string">&#x27;&#x27;</span>;_0x41b2ff=_0xec6bb4[<span class="string">&#x27;charAt&#x27;</span>](_0xd79219++);~_0x41b2ff&amp;&amp;(_0x18c94e=_0x1a0f04%<span class="number">0x4</span>?_0x18c94e*<span class="number">0x40</span>+_0x41b2ff:_0x41b2ff,_0x1a0f04++%<span class="number">0x4</span>)?_0x5792f7+=<span class="built_in">String</span>[<span class="string">&#x27;fromCharCode&#x27;</span>](<span class="number">0xff</span>&amp;_0x18c94e&gt;&gt;(<span class="number">-0x2</span>*_0x1a0f04&amp;<span class="number">0x6</span>)):<span class="number">0x0</span>)&#123;_0x41b2ff=_0x389f44[<span class="string">&#x27;indexOf&#x27;</span>](_0x41b2ff)&#125;<span class="keyword">return</span> _0x5792f7&#125;)&#125;());_0x55f3[<span class="string">&#x27;atobPolyfillAppended&#x27;</span>]=!![]&#125;<span class="keyword">if</span>(!_0x55f3[<span class="string">&#x27;rc4&#x27;</span>])&#123;<span class="keyword">var</span> _0x232678=<span class="function"><span class="keyword">function</span>(<span class="params">_0x401af1,_0x532ac0</span>)</span>&#123;<span class="keyword">var</span> _0x45079a=[],_0x52d57c=<span class="number">0x0</span>,_0x105f59,_0x3fd789=<span class="string">&#x27;&#x27;</span>,_0x4a2aed=<span class="string">&#x27;&#x27;</span>;_0x401af1=atob(_0x401af1);<span class="keyword">for</span>(<span class="keyword">var</span> _0x124d17=<span class="number">0x0</span>,_0x1b9115=_0x401af1[<span class="string">&#x27;length&#x27;</span>];_0x124d17&lt;_0x1b9115;_0x124d17++)&#123;_0x4a2aed+=<span class="string">&#x27;%&#x27;</span>+(<span class="string">&#x27;00&#x27;</span>+_0x401af1[<span class="string">&#x27;charCodeAt&#x27;</span>](_0x124d17)[<span class="string">&#x27;toString&#x27;</span>](<span class="number">0x10</span>))[<span class="string">&#x27;slice&#x27;</span>](<span class="number">-0x2</span>)&#125;_0x401af1=<span class="built_in">decodeURIComponent</span>(_0x4a2aed);<span class="keyword">for</span>(<span class="keyword">var</span> _0x2d67ec=<span class="number">0x0</span>;_0x2d67ec&lt;<span class="number">0x100</span>;_0x2d67ec++)&#123;_0x45079a[_0x2d67ec]=_0x2d67ec&#125;<span class="keyword">for</span>(_0x2d67ec=<span class="number">0x0</span>;_0x2d67ec&lt;<span class="number">0x100</span>;_0x2d67ec++)&#123;_0x52d57c=(_0x52d57c+_0x45079a[_0x2d67ec]+_0x532ac0[<span class="string">&#x27;charCodeAt&#x27;</span>](_0x2d67ec%_0x532ac0[<span class="string">&#x27;length&#x27;</span>]))%<span class="number">0x100</span>;_0x105f59=_0x45079a[_0x2d67ec];_0x45079a[_0x2d67ec]=_0x45079a[_0x52d57c];_0x45079a[_0x52d57c]=_0x105f59&#125;_0x2d67ec=<span class="number">0x0</span>;_0x52d57c=<span class="number">0x0</span>;<span class="keyword">for</span>(<span class="keyword">var</span> _0x4e5ce2=<span class="number">0x0</span>;_0x4e5ce2&lt;_0x401af1[<span class="string">&#x27;length&#x27;</span>];_0x4e5ce2++)&#123;_0x2d67ec=(_0x2d67ec+<span class="number">0x1</span>)%<span class="number">0x100</span>;_0x52d57c=(_0x52d57c+_0x45079a[_0x2d67ec])%<span class="number">0x100</span>;_0x105f59=_0x45079a[_0x2d67ec];_0x45079a[_0x2d67ec]=_0x45079a[_0x52d57c];_0x45079a[_0x52d57c]=_0x105f59;_0x3fd789+=<span class="built_in">String</span>[<span class="string">&#x27;fromCharCode&#x27;</span>](_0x401af1[<span class="string">&#x27;charCodeAt&#x27;</span>](_0x4e5ce2)^_0x45079a[(_0x45079a[_0x2d67ec]+_0x45079a[_0x52d57c])%<span class="number">0x100</span>])&#125;<span class="keyword">return</span> _0x3fd789&#125;;_0x55f3[<span class="string">&#x27;rc4&#x27;</span>]=_0x232678&#125;<span class="keyword">if</span>(!_0x55f3[<span class="string">&#x27;data&#x27;</span>])&#123;_0x55f3[<span class="string">&#x27;data&#x27;</span>]=&#123;&#125;&#125;<span class="keyword">if</span>(_0x55f3[<span class="string">&#x27;data&#x27;</span>][_0x4c97f0]===<span class="literal">undefined</span>)&#123;<span class="keyword">if</span>(!_0x55f3[<span class="string">&#x27;once&#x27;</span>])&#123;<span class="keyword">var</span> _0x5f325c=<span class="function"><span class="keyword">function</span>(<span class="params">_0x23a392</span>)</span>&#123;<span class="built_in">this</span>[<span class="string">&#x27;rc4Bytes&#x27;</span>]=_0x23a392;<span class="built_in">this</span>[<span class="string">&#x27;states&#x27;</span>]=[<span class="number">0x1</span>,<span class="number">0x0</span>,<span class="number">0x0</span>];<span class="built_in">this</span>[<span class="string">&#x27;newState&#x27;</span>]=<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;<span class="keyword">return</span><span class="string">&#x27;newState&#x27;</span>&#125;;<span class="built_in">this</span>[<span class="string">&#x27;firstState&#x27;</span>]=<span class="string">&#x27;\\w+ *\\(\\) *&#123;\\w+ *&#x27;</span>;<span class="built_in">this</span>[<span class="string">&#x27;secondState&#x27;</span>]=<span class="string">&#x27;[\&#x27;|\&quot;].+[\&#x27;|\&quot;];? *&#125;&#x27;</span>&#125;;_0x5f325c[<span class="string">&#x27;prototype&#x27;</span>][<span class="string">&#x27;checkState&#x27;</span>]=<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;<span class="keyword">var</span> _0x19f809=<span class="keyword">new</span> <span class="built_in">RegExp</span>(<span class="built_in">this</span>[<span class="string">&#x27;firstState&#x27;</span>]+<span class="built_in">this</span>[<span class="string">&#x27;secondState&#x27;</span>]);<span class="keyword">return</span> <span class="built_in">this</span>[<span class="string">&#x27;runState&#x27;</span>](_0x19f809[<span class="string">&#x27;test&#x27;</span>](<span class="built_in">this</span>[<span class="string">&#x27;newState&#x27;</span>][<span class="string">&#x27;toString&#x27;</span>]())?--<span class="built_in">this</span>[<span class="string">&#x27;states&#x27;</span>][<span class="number">0x1</span>]:--<span class="built_in">this</span>[<span class="string">&#x27;states&#x27;</span>][<span class="number">0x0</span>])&#125;;_0x5f325c[<span class="string">&#x27;prototype&#x27;</span>][<span class="string">&#x27;runState&#x27;</span>]=<span class="function"><span class="keyword">function</span>(<span class="params">_0x4380bd</span>)</span>&#123;<span class="keyword">if</span>(!<span class="built_in">Boolean</span>(~_0x4380bd))&#123;<span class="keyword">return</span> _0x4380bd&#125;<span class="keyword">return</span> <span class="built_in">this</span>[<span class="string">&#x27;getState&#x27;</span>](<span class="built_in">this</span>[<span class="string">&#x27;rc4Bytes&#x27;</span>])&#125;;_0x5f325c[<span class="string">&#x27;prototype&#x27;</span>][<span class="string">&#x27;getState&#x27;</span>]=<span class="function"><span class="keyword">function</span>(<span class="params">_0x58d85e</span>)</span>&#123;<span class="keyword">for</span>(<span class="keyword">var</span> _0x1c9f5b=<span class="number">0x0</span>,_0x1ce9e0=<span class="built_in">this</span>[<span class="string">&#x27;states&#x27;</span>][<span class="string">&#x27;length&#x27;</span>];_0x1c9f5b&lt;_0x1ce9e0;_0x1c9f5b++)&#123;<span class="built_in">this</span>[<span class="string">&#x27;states&#x27;</span>][<span class="string">&#x27;push&#x27;</span>](<span class="built_in">Math</span>[<span class="string">&#x27;round&#x27;</span>](<span class="built_in">Math</span>[<span class="string">&#x27;random&#x27;</span>]()));_0x1ce9e0=<span class="built_in">this</span>[<span class="string">&#x27;states&#x27;</span>][<span class="string">&#x27;length&#x27;</span>]&#125;<span class="keyword">return</span> _0x58d85e(<span class="built_in">this</span>[<span class="string">&#x27;states&#x27;</span>][<span class="number">0x0</span>])&#125;;<span class="keyword">new</span> _0x5f325c(_0x55f3)[<span class="string">&#x27;checkState&#x27;</span>]();_0x55f3[<span class="string">&#x27;once&#x27;</span>]=!![]&#125;_0x48181e=_0x55f3[<span class="string">&#x27;rc4&#x27;</span>](_0x48181e,_0x1742fd);_0x55f3[<span class="string">&#x27;data&#x27;</span>][_0x4c97f0]=_0x48181e&#125;<span class="keyword">else</span>&#123;_0x48181e=_0x55f3[<span class="string">&#x27;data&#x27;</span>][_0x4c97f0]&#125;<span class="keyword">return</span> _0x48181e&#125;;</span><br><span class="line"> _0x55f3(<span class="string">&#x27;0x3&#x27;</span>, <span class="string">&#x27;jS1Y&#x27;</span>);</span><br><span class="line"><span class="string">&quot;3000176000856006061501533003690027800375&quot;</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="第三部分-生成arg2"><a href="#第三部分-生成arg2" class="headerlink" title="第三部分 生成arg2"></a>第三部分 生成arg2</h3><p>将arg2的值返回即可。</p>
+<h3 id="第四部分-反调试"><a href="#第四部分-反调试" class="headerlink" title="第四部分 反调试"></a>第四部分 反调试</h3><p>可直接删除该部分代码。</p>
+<h2 id="改写后的JS文件"><a href="#改写后的JS文件" class="headerlink" title="改写后的JS文件"></a>改写后的JS文件</h2><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> arg1 = <span class="string">&#x27;3BCA0C4E465FE26F5624EE022F71C91FD4D78682&#x27;</span>;</span><br><span class="line"><span class="comment">// var _0x4818 = [&#x27;csKHwqMI&#x27;, &#x27;ZsKJwr8VeAsy&#x27;, &#x27;UcKiN8O/wplwMA==&#x27;, &#x27;JR8CTg==&#x27;, &#x27;YsOnbSEQw7ozwqZKesKUw7kwX8ORIQ==&#x27;, &#x27;w7oVS8OSwoPCl3jChMKhw6HDlsKXw4s/YsOG&#x27;, &#x27;fwVmI1AtwplaY8Otw5cNfSgpw6M=&#x27;, &#x27;OcONwrjCqsKxTGTChsOjEWE8PcOcJ8K6&#x27;, &#x27;U8K5LcOtwpV0EMOkw47DrMOX&#x27;, &#x27;HMO2woHCiMK9SlXClcOoC1k=&#x27;, &#x27;asKIwqMDdgMuPsOKBMKcwrrCtkLDrMKBw64d&#x27;, &#x27;wqImMT0tw6RNw5k=&#x27;, &#x27;DMKcU0JmUwUv&#x27;, &#x27;VjHDlMOHVcONX3fDicKJHQ==&#x27;, &#x27;wqhBH8Knw4TDhSDDgMOdwrjCncOWwphhN8KCGcKqw6dHAU5+wrg2JcKaw4IEJcOcwrRJwoZ0wqF9YgAV&#x27;, &#x27;dzd2w5bDm3jDpsK3wpY=&#x27;, &#x27;w4PDgcKXwo3CkcKLwr5qwrY=&#x27;, &#x27;wrJOTcOQWMOg&#x27;, &#x27;wqTDvcOjw447wr4=&#x27;, &#x27;w5XDqsKhMF1/&#x27;, &#x27;wrAyHsOfwppc&#x27;, &#x27;J3dVPcOxLg==&#x27;, &#x27;wrdHw7p9Zw==&#x27;, &#x27;w4rDo8KmNEw=&#x27;, &#x27;IMKAUkBt&#x27;, &#x27;w6bDrcKQwpVHwpNQwqU=&#x27;, &#x27;d8OsWhAUw7YzwrU=&#x27;, &#x27;wqnCksOeezrDhw==&#x27;, &#x27;UsKnIMKWV8K/&#x27;, &#x27;w4zDocK8NUZv&#x27;, &#x27;c8OxZhAJw6skwqJj&#x27;, &#x27;PcKIw4nCkkVb&#x27;, &#x27;KHgodMO2VQ==&#x27;, &#x27;wpsmwqvDnGFq&#x27;, &#x27;wqLDt8Okw4c=&#x27;, &#x27;w7w1w4PCpsO4wqA=&#x27;, &#x27;wq9FRsOqWMOq&#x27;, &#x27;byBhw7rDm34=&#x27;, &#x27;LHg+S8OtTw==&#x27;, &#x27;wqhOw715dsOH&#x27;, &#x27;U8O7VsO0wqvDvcKuKsOqX8Kr&#x27;, &#x27;Yittw5DDnWnDrA==&#x27;, &#x27;YMKIwqUUfgIk&#x27;, &#x27;aB7DlMODTQ==&#x27;, &#x27;wpfDh8Orw6kk&#x27;, &#x27;w7vCqMOrY8KAVk5OwpnCu8OaXsKZP3DClcKyw6HDrQ==&#x27;, &#x27;wow+w6vDmHpsw7Rtwo98LC7CiG7CksORT8KlW8O5wr3Di8OTHsODeHjDmcKlJsKqVA==&#x27;, &#x27;NwV+&#x27;, &#x27;w7HDrcKtwpJawpZb&#x27;, &#x27;wpQswqvDiHpuw6I=&#x27;, &#x27;YMKUwqMJZQ==&#x27;, &#x27;KH1VKcOqKsK1&#x27;, &#x27;fQ5sFUkkwpI=&#x27;, &#x27;wrvCrcOBR8Kk&#x27;, &#x27;M3w0fQ==&#x27;, &#x27;w6xXwqPDvMOFwo5d&#x27;];</span></span><br><span class="line"><span class="keyword">var</span> _0x4818 = [<span class="string">&quot;wqImMT0tw6RNw5k=&quot;</span>, <span class="string">&quot;DMKcU0JmUwUv&quot;</span>, <span class="string">&quot;VjHDlMOHVcONX3fDicKJHQ==&quot;</span>, <span class="string">&quot;wqhBH8Knw4TDhSDDgMOdwrjCncOWwphhN8KCGcKqw6dHAU5+wrg2JcKaw4IEJcOcwrRJwoZ0wqF9YgAV&quot;</span>, <span class="string">&quot;dzd2w5bDm3jDpsK3wpY=&quot;</span>, <span class="string">&quot;w4PDgcKXwo3CkcKLwr5qwrY=&quot;</span>, <span class="string">&quot;wrJOTcOQWMOg&quot;</span>, <span class="string">&quot;wqTDvcOjw447wr4=&quot;</span>, <span class="string">&quot;w5XDqsKhMF1/&quot;</span>, <span class="string">&quot;wrAyHsOfwppc&quot;</span>, <span class="string">&quot;J3dVPcOxLg==&quot;</span>, <span class="string">&quot;wrdHw7p9Zw==&quot;</span>, <span class="string">&quot;w4rDo8KmNEw=&quot;</span>, <span class="string">&quot;IMKAUkBt&quot;</span>, <span class="string">&quot;w6bDrcKQwpVHwpNQwqU=&quot;</span>, <span class="string">&quot;d8OsWhAUw7YzwrU=&quot;</span>, <span class="string">&quot;wqnCksOeezrDhw==&quot;</span>, <span class="string">&quot;UsKnIMKWV8K/&quot;</span>, <span class="string">&quot;w4zDocK8NUZv&quot;</span>, <span class="string">&quot;c8OxZhAJw6skwqJj&quot;</span>, <span class="string">&quot;PcKIw4nCkkVb&quot;</span>, <span class="string">&quot;KHgodMO2VQ==&quot;</span>, <span class="string">&quot;wpsmwqvDnGFq&quot;</span>, <span class="string">&quot;wqLDt8Okw4c=&quot;</span>, <span class="string">&quot;w7w1w4PCpsO4wqA=&quot;</span>, <span class="string">&quot;wq9FRsOqWMOq&quot;</span>, <span class="string">&quot;byBhw7rDm34=&quot;</span>, <span class="string">&quot;LHg+S8OtTw==&quot;</span>, <span class="string">&quot;wqhOw715dsOH&quot;</span>, <span class="string">&quot;U8O7VsO0wqvDvcKuKsOqX8Kr&quot;</span>, <span class="string">&quot;Yittw5DDnWnDrA==&quot;</span>, <span class="string">&quot;YMKIwqUUfgIk&quot;</span>, <span class="string">&quot;aB7DlMODTQ==&quot;</span>, <span class="string">&quot;wpfDh8Orw6kk&quot;</span>, <span class="string">&quot;w7vCqMOrY8KAVk5OwpnCu8OaXsKZP3DClcKyw6HDrQ==&quot;</span>, <span class="string">&quot;wow+w6vDmHpsw7Rtwo98LC7CiG7CksORT8KlW8O5wr3Di8OTHsODeHjDmcKlJsKqVA==&quot;</span>, <span class="string">&quot;NwV+&quot;</span>, <span class="string">&quot;w7HDrcKtwpJawpZb&quot;</span>, <span class="string">&quot;wpQswqvDiHpuw6I=&quot;</span>, <span class="string">&quot;YMKUwqMJZQ==&quot;</span>, <span class="string">&quot;KH1VKcOqKsK1&quot;</span>, <span class="string">&quot;fQ5sFUkkwpI=&quot;</span>, <span class="string">&quot;wrvCrcOBR8Kk&quot;</span>, <span class="string">&quot;M3w0fQ==&quot;</span>, <span class="string">&quot;w6xXwqPDvMOFwo5d&quot;</span>, <span class="string">&quot;csKHwqMI&quot;</span>, <span class="string">&quot;ZsKJwr8VeAsy&quot;</span>, <span class="string">&quot;UcKiN8O/wplwMA==&quot;</span>, <span class="string">&quot;JR8CTg==&quot;</span>, <span class="string">&quot;YsOnbSEQw7ozwqZKesKUw7kwX8ORIQ==&quot;</span>, <span class="string">&quot;w7oVS8OSwoPCl3jChMKhw6HDlsKXw4s/YsOG&quot;</span>, <span class="string">&quot;fwVmI1AtwplaY8Otw5cNfSgpw6M=&quot;</span>, <span class="string">&quot;OcONwrjCqsKxTGTChsOjEWE8PcOcJ8K6&quot;</span>, <span class="string">&quot;U8K5LcOtwpV0EMOkw47DrMOX&quot;</span>, <span class="string">&quot;HMO2woHCiMK9SlXClcOoC1k=&quot;</span>, <span class="string">&quot;asKIwqMDdgMuPsOKBMKcwrrCtkLDrMKBw64d&quot;</span>]</span><br><span class="line"><span class="keyword">var</span> _0x55f3=<span class="function"><span class="keyword">function</span>(<span class="params">_0x4c97f0,_0x1742fd</span>)</span>&#123;<span class="keyword">var</span> _0x4c97f0=<span class="built_in">parseInt</span>(_0x4c97f0,<span class="number">0x10</span>);<span class="keyword">var</span> _0x48181e=_0x4818[_0x4c97f0];<span class="keyword">if</span>(!_0x55f3[<span class="string">&#x27;atobPolyfillAppended&#x27;</span>])&#123;(<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;<span class="keyword">var</span> _0xdf49c6=<span class="built_in">Function</span>(<span class="string">&#x27;return (function () &#123;&#125;.constructor(\&quot;return this\&quot;)());&#x27;</span>);<span class="keyword">var</span> _0xb8360b=_0xdf49c6();<span class="keyword">var</span> _0x389f44=<span class="string">&#x27;ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=&#x27;</span>;_0xb8360b[<span class="string">&#x27;atob&#x27;</span>]||(_0xb8360b[<span class="string">&#x27;atob&#x27;</span>]=<span class="function"><span class="keyword">function</span>(<span class="params">_0xba82f0</span>)</span>&#123;<span class="keyword">var</span> _0xec6bb4=<span class="built_in">String</span>(_0xba82f0)[<span class="string">&#x27;replace&#x27;</span>](<span class="regexp">/=+$/</span>,<span class="string">&#x27;&#x27;</span>);<span class="keyword">for</span>(<span class="keyword">var</span> _0x1a0f04=<span class="number">0x0</span>,_0x18c94e,_0x41b2ff,_0xd79219=<span class="number">0x0</span>,_0x5792f7=<span class="string">&#x27;&#x27;</span>;_0x41b2ff=_0xec6bb4[<span class="string">&#x27;charAt&#x27;</span>](_0xd79219++);~_0x41b2ff&amp;&amp;(_0x18c94e=_0x1a0f04%<span class="number">0x4</span>?_0x18c94e*<span class="number">0x40</span>+_0x41b2ff:_0x41b2ff,_0x1a0f04++%<span class="number">0x4</span>)?_0x5792f7+=<span class="built_in">String</span>[<span class="string">&#x27;fromCharCode&#x27;</span>](<span class="number">0xff</span>&amp;_0x18c94e&gt;&gt;(<span class="number">-0x2</span>*_0x1a0f04&amp;<span class="number">0x6</span>)):<span class="number">0x0</span>)&#123;_0x41b2ff=_0x389f44[<span class="string">&#x27;indexOf&#x27;</span>](_0x41b2ff)&#125;<span class="keyword">return</span> _0x5792f7&#125;)&#125;());_0x55f3[<span class="string">&#x27;atobPolyfillAppended&#x27;</span>]=!![]&#125;<span class="keyword">if</span>(!_0x55f3[<span class="string">&#x27;rc4&#x27;</span>])&#123;<span class="keyword">var</span> _0x232678=<span class="function"><span class="keyword">function</span>(<span class="params">_0x401af1,_0x532ac0</span>)</span>&#123;<span class="keyword">var</span> _0x45079a=[],_0x52d57c=<span class="number">0x0</span>,_0x105f59,_0x3fd789=<span class="string">&#x27;&#x27;</span>,_0x4a2aed=<span class="string">&#x27;&#x27;</span>;_0x401af1=atob(_0x401af1);<span class="keyword">for</span>(<span class="keyword">var</span> _0x124d17=<span class="number">0x0</span>,_0x1b9115=_0x401af1[<span class="string">&#x27;length&#x27;</span>];_0x124d17&lt;_0x1b9115;_0x124d17++)&#123;_0x4a2aed+=<span class="string">&#x27;%&#x27;</span>+(<span class="string">&#x27;00&#x27;</span>+_0x401af1[<span class="string">&#x27;charCodeAt&#x27;</span>](_0x124d17)[<span class="string">&#x27;toString&#x27;</span>](<span class="number">0x10</span>))[<span class="string">&#x27;slice&#x27;</span>](<span class="number">-0x2</span>)&#125;_0x401af1=<span class="built_in">decodeURIComponent</span>(_0x4a2aed);<span class="keyword">for</span>(<span class="keyword">var</span> _0x2d67ec=<span class="number">0x0</span>;_0x2d67ec&lt;<span class="number">0x100</span>;_0x2d67ec++)&#123;_0x45079a[_0x2d67ec]=_0x2d67ec&#125;<span class="keyword">for</span>(_0x2d67ec=<span class="number">0x0</span>;_0x2d67ec&lt;<span class="number">0x100</span>;_0x2d67ec++)&#123;_0x52d57c=(_0x52d57c+_0x45079a[_0x2d67ec]+_0x532ac0[<span class="string">&#x27;charCodeAt&#x27;</span>](_0x2d67ec%_0x532ac0[<span class="string">&#x27;length&#x27;</span>]))%<span class="number">0x100</span>;_0x105f59=_0x45079a[_0x2d67ec];_0x45079a[_0x2d67ec]=_0x45079a[_0x52d57c];_0x45079a[_0x52d57c]=_0x105f59&#125;_0x2d67ec=<span class="number">0x0</span>;_0x52d57c=<span class="number">0x0</span>;<span class="keyword">for</span>(<span class="keyword">var</span> _0x4e5ce2=<span class="number">0x0</span>;_0x4e5ce2&lt;_0x401af1[<span class="string">&#x27;length&#x27;</span>];_0x4e5ce2++)&#123;_0x2d67ec=(_0x2d67ec+<span class="number">0x1</span>)%<span class="number">0x100</span>;_0x52d57c=(_0x52d57c+_0x45079a[_0x2d67ec])%<span class="number">0x100</span>;_0x105f59=_0x45079a[_0x2d67ec];_0x45079a[_0x2d67ec]=_0x45079a[_0x52d57c];_0x45079a[_0x52d57c]=_0x105f59;_0x3fd789+=<span class="built_in">String</span>[<span class="string">&#x27;fromCharCode&#x27;</span>](_0x401af1[<span class="string">&#x27;charCodeAt&#x27;</span>](_0x4e5ce2)^_0x45079a[(_0x45079a[_0x2d67ec]+_0x45079a[_0x52d57c])%<span class="number">0x100</span>])&#125;<span class="keyword">return</span> _0x3fd789&#125;;_0x55f3[<span class="string">&#x27;rc4&#x27;</span>]=_0x232678&#125;<span class="keyword">if</span>(!_0x55f3[<span class="string">&#x27;data&#x27;</span>])&#123;_0x55f3[<span class="string">&#x27;data&#x27;</span>]=&#123;&#125;&#125;<span class="keyword">if</span>(_0x55f3[<span class="string">&#x27;data&#x27;</span>][_0x4c97f0]===<span class="literal">undefined</span>)&#123;<span class="keyword">if</span>(!_0x55f3[<span class="string">&#x27;once&#x27;</span>])&#123;<span class="keyword">var</span> _0x5f325c=<span class="function"><span class="keyword">function</span>(<span class="params">_0x23a392</span>)</span>&#123;<span class="built_in">this</span>[<span class="string">&#x27;rc4Bytes&#x27;</span>]=_0x23a392;<span class="built_in">this</span>[<span class="string">&#x27;states&#x27;</span>]=[<span class="number">0x1</span>,<span class="number">0x0</span>,<span class="number">0x0</span>];<span class="built_in">this</span>[<span class="string">&#x27;newState&#x27;</span>]=<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;<span class="keyword">return</span><span class="string">&#x27;newState&#x27;</span>&#125;;<span class="built_in">this</span>[<span class="string">&#x27;firstState&#x27;</span>]=<span class="string">&#x27;\\w+ *\\(\\) *&#123;\\w+ *&#x27;</span>;<span class="built_in">this</span>[<span class="string">&#x27;secondState&#x27;</span>]=<span class="string">&#x27;[\&#x27;|\&quot;].+[\&#x27;|\&quot;];? *&#125;&#x27;</span>&#125;;_0x5f325c[<span class="string">&#x27;prototype&#x27;</span>][<span class="string">&#x27;checkState&#x27;</span>]=<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;<span class="keyword">var</span> _0x19f809=<span class="keyword">new</span> <span class="built_in">RegExp</span>(<span class="built_in">this</span>[<span class="string">&#x27;firstState&#x27;</span>]+<span class="built_in">this</span>[<span class="string">&#x27;secondState&#x27;</span>]);<span class="keyword">return</span> <span class="built_in">this</span>[<span class="string">&#x27;runState&#x27;</span>](_0x19f809[<span class="string">&#x27;test&#x27;</span>](<span class="built_in">this</span>[<span class="string">&#x27;newState&#x27;</span>][<span class="string">&#x27;toString&#x27;</span>]())?--<span class="built_in">this</span>[<span class="string">&#x27;states&#x27;</span>][<span class="number">0x1</span>]:--<span class="built_in">this</span>[<span class="string">&#x27;states&#x27;</span>][<span class="number">0x0</span>])&#125;;_0x5f325c[<span class="string">&#x27;prototype&#x27;</span>][<span class="string">&#x27;runState&#x27;</span>]=<span class="function"><span class="keyword">function</span>(<span class="params">_0x4380bd</span>)</span>&#123;<span class="keyword">if</span>(!<span class="built_in">Boolean</span>(~_0x4380bd))&#123;<span class="keyword">return</span> _0x4380bd&#125;<span class="keyword">return</span> <span class="built_in">this</span>[<span class="string">&#x27;getState&#x27;</span>](<span class="built_in">this</span>[<span class="string">&#x27;rc4Bytes&#x27;</span>])&#125;;_0x5f325c[<span class="string">&#x27;prototype&#x27;</span>][<span class="string">&#x27;getState&#x27;</span>]=<span class="function"><span class="keyword">function</span>(<span class="params">_0x58d85e</span>)</span>&#123;<span class="keyword">for</span>(<span class="keyword">var</span> _0x1c9f5b=<span class="number">0x0</span>,_0x1ce9e0=<span class="built_in">this</span>[<span class="string">&#x27;states&#x27;</span>][<span class="string">&#x27;length&#x27;</span>];_0x1c9f5b&lt;_0x1ce9e0;_0x1c9f5b++)&#123;<span class="built_in">this</span>[<span class="string">&#x27;states&#x27;</span>][<span class="string">&#x27;push&#x27;</span>](<span class="built_in">Math</span>[<span class="string">&#x27;round&#x27;</span>](<span class="built_in">Math</span>[<span class="string">&#x27;random&#x27;</span>]()));_0x1ce9e0=<span class="built_in">this</span>[<span class="string">&#x27;states&#x27;</span>][<span class="string">&#x27;length&#x27;</span>]&#125;<span class="keyword">return</span> _0x58d85e(<span class="built_in">this</span>[<span class="string">&#x27;states&#x27;</span>][<span class="number">0x0</span>])&#125;;<span class="keyword">new</span> _0x5f325c(_0x55f3)[<span class="string">&#x27;checkState&#x27;</span>]();_0x55f3[<span class="string">&#x27;once&#x27;</span>]=!![]&#125;_0x48181e=_0x55f3[<span class="string">&#x27;rc4&#x27;</span>](_0x48181e,_0x1742fd);_0x55f3[<span class="string">&#x27;data&#x27;</span>][_0x4c97f0]=_0x48181e&#125;<span class="keyword">else</span>&#123;_0x48181e=_0x55f3[<span class="string">&#x27;data&#x27;</span>][_0x4c97f0]&#125;<span class="keyword">return</span> _0x48181e&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> l = <span class="function"><span class="keyword">function</span> (<span class="params">arg1</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> _0x5e8b26 = <span class="string">&quot;3000176000856006061501533003690027800375&quot;</span>;</span><br><span class="line">    <span class="built_in">String</span>[<span class="string">&quot;prototype&quot;</span>][<span class="string">&quot;hexXor&quot;</span>] = <span class="function"><span class="keyword">function</span> (<span class="params">_0x4e08d8</span>) </span>&#123;</span><br><span class="line">        <span class="keyword">var</span> _0x5a5d3b = <span class="string">&#x27;&#x27;</span>;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">var</span> _0xe89588 = <span class="number">0x0</span>; _0xe89588 &lt; <span class="built_in">this</span>[_0x55f3(<span class="string">&#x27;0x8&#x27;</span>, <span class="string">&#x27;)hRc&#x27;</span>)] &amp;&amp; _0xe89588 &lt; _0x4e08d8[_0x55f3(<span class="string">&#x27;0xa&#x27;</span>, <span class="string">&#x27;jE&amp;^&#x27;</span>)]; _0xe89588 += <span class="number">0x2</span>) &#123;</span><br><span class="line">            <span class="keyword">var</span> _0x401af1 = <span class="built_in">parseInt</span>(<span class="built_in">this</span>[_0x55f3(<span class="string">&#x27;0xb&#x27;</span>, <span class="string">&#x27;V2KE&#x27;</span>)](_0xe89588, _0xe89588 + <span class="number">0x2</span>), <span class="number">0x10</span>);</span><br><span class="line">            <span class="keyword">var</span> _0x105f59 = <span class="built_in">parseInt</span>(_0x4e08d8[_0x55f3(<span class="string">&#x27;0xd&#x27;</span>, <span class="string">&#x27;XMW^&#x27;</span>)](_0xe89588, _0xe89588 + <span class="number">0x2</span>), <span class="number">0x10</span>);</span><br><span class="line">            <span class="keyword">var</span> _0x189e2c = (_0x401af1 ^ _0x105f59)[_0x55f3(<span class="string">&#x27;0xf&#x27;</span>, <span class="string">&#x27;W1FE&#x27;</span>)](<span class="number">0x10</span>);</span><br><span class="line">            <span class="keyword">if</span> (_0x189e2c[_0x55f3(<span class="string">&#x27;0x11&#x27;</span>, <span class="string">&#x27;MGrv&#x27;</span>)] == <span class="number">0x1</span>) &#123;</span><br><span class="line">                _0x189e2c = <span class="string">&#x27;0&#x27;</span> + _0x189e2c;</span><br><span class="line">            &#125;</span><br><span class="line">            _0x5a5d3b += _0x189e2c;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> _0x5a5d3b;</span><br><span class="line">    &#125;;</span><br><span class="line">    <span class="built_in">String</span>[<span class="string">&#x27;prototype&#x27;</span>][_0x55f3(<span class="string">&#x27;0x14&#x27;</span>, <span class="string">&#x27;Z*DM&#x27;</span>)] = <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">        <span class="keyword">var</span> _0x4b082b = [<span class="number">0xf</span>, <span class="number">0x23</span>, <span class="number">0x1d</span>, <span class="number">0x18</span>, <span class="number">0x21</span>, <span class="number">0x10</span>, <span class="number">0x1</span>, <span class="number">0x26</span>, <span class="number">0xa</span>, <span class="number">0x9</span>, <span class="number">0x13</span>, <span class="number">0x1f</span>, <span class="number">0x28</span>, <span class="number">0x1b</span>, <span class="number">0x16</span>, <span class="number">0x17</span>, <span class="number">0x19</span>, <span class="number">0xd</span>, <span class="number">0x6</span>, <span class="number">0xb</span>, <span class="number">0x27</span>, <span class="number">0x12</span>, <span class="number">0x14</span>, <span class="number">0x8</span>, <span class="number">0xe</span>, <span class="number">0x15</span>, <span class="number">0x20</span>, <span class="number">0x1a</span>, <span class="number">0x2</span>, <span class="number">0x1e</span>, <span class="number">0x7</span>, <span class="number">0x4</span>, <span class="number">0x11</span>, <span class="number">0x5</span>, <span class="number">0x3</span>, <span class="number">0x1c</span>, <span class="number">0x22</span>, <span class="number">0x25</span>, <span class="number">0xc</span>, <span class="number">0x24</span>];</span><br><span class="line">        <span class="keyword">var</span> _0x4da0dc = [];</span><br><span class="line">        <span class="keyword">var</span> _0x12605e = <span class="string">&#x27;&#x27;</span>;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">var</span> _0x20a7bf = <span class="number">0x0</span>; _0x20a7bf &lt; <span class="built_in">this</span>[<span class="string">&#x27;length&#x27;</span>]; _0x20a7bf++) &#123;</span><br><span class="line">            <span class="keyword">var</span> _0x385ee3 = <span class="built_in">this</span>[_0x20a7bf];</span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">var</span> _0x217721 = <span class="number">0x0</span>; _0x217721 &lt; _0x4b082b[_0x55f3(<span class="string">&#x27;0x16&#x27;</span>, <span class="string">&#x27;aH*N&#x27;</span>)]; _0x217721++) &#123;</span><br><span class="line">                <span class="keyword">if</span> (_0x4b082b[_0x217721] == _0x20a7bf + <span class="number">0x1</span>) &#123;</span><br><span class="line">                    _0x4da0dc[_0x217721] = _0x385ee3;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        _0x12605e = _0x4da0dc[<span class="string">&#x27;join&#x27;</span>](<span class="string">&#x27;&#x27;</span>);</span><br><span class="line">        <span class="keyword">return</span> _0x12605e;</span><br><span class="line">    &#125;;</span><br><span class="line">    <span class="keyword">var</span> _0x23a392 = arg1[_0x55f3(<span class="string">&#x27;0x19&#x27;</span>, <span class="string">&#x27;Pg54&#x27;</span>)]();</span><br><span class="line">    arg2 = _0x23a392[_0x55f3(<span class="string">&#x27;0x1b&#x27;</span>, <span class="string">&#x27;z5O&amp;&#x27;</span>)](_0x5e8b26);</span><br><span class="line">    <span class="comment">// console.info(arg2)</span></span><br><span class="line">    <span class="keyword">return</span> arg2;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.info(l(arg1));</span><br></pre></td></tr></table></figure>
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2019/10/06/JsCrack%20%E7%88%B1%E5%A5%87%E8%89%BA%E7%99%BB%E5%BD%95/" rel="prev" title="JsCrack 爱奇艺登录">
+      <i class="fa fa-chevron-left"></i> JsCrack 爱奇艺登录
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2019/10/07/JsCrack%20%E7%9F%A5%E4%B9%8E%E6%A8%A1%E6%8B%9F%E7%99%BB%E5%BD%95/" rel="next" title="JsCrack 知乎模拟登录">
+      JsCrack 知乎模拟登录 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%89%8D%E8%A8%80"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%8D%E8%B0%83%E8%AF%95%E5%A4%84%E7%90%86"><span class="nav-number">2.</span> <span class="nav-text">反调试处理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%A3%E7%A0%81%E6%A0%BC%E5%BC%8F%E5%8C%96"><span class="nav-number">3.</span> <span class="nav-text">代码格式化</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Cookie%E5%88%86%E6%9E%90"><span class="nav-number">4.</span> <span class="nav-text">Cookie分析</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#acw-sc-v2%E5%A6%82%E4%BD%95%E7%94%9F%E6%88%90"><span class="nav-number">5.</span> <span class="nav-text">acw_sc__v2如何生成</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AC%AC%E4%B8%80%E9%83%A8%E5%88%86%EF%BC%88%E5%8C%BF%E5%90%8D%E5%87%BD%E6%95%B0%EF%BC%89%EF%BC%9A%E6%AD%A4%E5%87%BD%E6%95%B0%E6%98%AF%E7%94%A8%E4%BA%8E%E5%AF%B9%E5%A4%A7%E6%95%B0%E7%BB%84-0x4818-%E8%BF%9B%E8%A1%8C%E6%93%8D%E4%BD%9C%E3%80%82"><span class="nav-number">5.1.</span> <span class="nav-text">第一部分（匿名函数）：此函数是用于对大数组 _0x4818 进行操作。</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AC%AC%E4%BA%8C%E9%83%A8%E5%88%86%EF%BC%88%E8%A7%A3%E5%AF%86%E5%AD%97%E7%AC%A6%E4%B8%B2%E5%87%BD%E6%95%B0%EF%BC%89"><span class="nav-number">5.2.</span> <span class="nav-text">第二部分（解密字符串函数）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AC%AC%E4%B8%89%E9%83%A8%E5%88%86-%E7%94%9F%E6%88%90arg2"><span class="nav-number">5.3.</span> <span class="nav-text">第三部分 生成arg2</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AC%AC%E5%9B%9B%E9%83%A8%E5%88%86-%E5%8F%8D%E8%B0%83%E8%AF%95"><span class="nav-number">5.4.</span> <span class="nav-text">第四部分 反调试</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%94%B9%E5%86%99%E5%90%8E%E7%9A%84JS%E6%96%87%E4%BB%B6"><span class="nav-number">6.</span> <span class="nav-text">改写后的JS文件</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Leo Lin"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Leo Lin</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">104</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">11</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Leo Lin</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+
+    <script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"model":{"jsonPath":"/live2dw/assets/hijiki.model.json"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":false},"log":false});</script></body>
+</html>

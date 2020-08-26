@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.1.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"yoursite.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="机器学习导图 决策树原理每一层选择了指定的特征之后，我们就可以继续由该特征的不同属性值进行划分，依次一直到叶子结点。优点：计算复杂度不高，不用归一化，适用数据类型：数值型和标称型。缺点：过拟合-决策树学习者可以创建不能很好地推广数据的过于复杂的树。改进：1、减枝cart算法(决策树API当中已经实现) 2、随机森林 1、信息熵H(x)信息熵是考虑该随机变量的所有可能取值，即所有可能发生事件带来的信">
+<meta property="og:type" content="article">
+<meta property="og:title" content="sklearn 决策树介绍">
+<meta property="og:url" content="http://yoursite.com/2019/12/22/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0-sklearn%20%E5%86%B3%E7%AD%96%E6%A0%91/index.html">
+<meta property="og:site_name" content="江湖の林九">
+<meta property="og:description" content="机器学习导图 决策树原理每一层选择了指定的特征之后，我们就可以继续由该特征的不同属性值进行划分，依次一直到叶子结点。优点：计算复杂度不高，不用归一化，适用数据类型：数值型和标称型。缺点：过拟合-决策树学习者可以创建不能很好地推广数据的过于复杂的树。改进：1、减枝cart算法(决策树API当中已经实现) 2、随机森林 1、信息熵H(x)信息熵是考虑该随机变量的所有可能取值，即所有可能发生事件带来的信">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://yoursite.com/images/18-ml/4-mlguide.png">
+<meta property="og:image" content="http://yoursite.com/images/18-ml/5-condition.png">
+<meta property="og:image" content="http://yoursite.com/images/18-ml/6-calculate.png">
+<meta property="article:published_time" content="2019-12-22T02:00:00.000Z">
+<meta property="article:modified_time" content="2020-04-24T08:27:11.932Z">
+<meta property="article:author" content="Leo Lin">
+<meta property="article:tag" content="机器学习">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://yoursite.com/images/18-ml/4-mlguide.png">
+
+<link rel="canonical" href="http://yoursite.com/2019/12/22/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0-sklearn%20%E5%86%B3%E7%AD%96%E6%A0%91/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>sklearn 决策树介绍 | 江湖の林九</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">江湖の林九</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">相逢何必曾相识！</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/12/22/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0-sklearn%20%E5%86%B3%E7%AD%96%E6%A0%91/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Leo Lin">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="江湖の林九">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          sklearn 决策树介绍
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-12-22 10:00:00" itemprop="dateCreated datePublished" datetime="2019-12-22T10:00:00+08:00">2019-12-22</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-04-24 16:27:11" itemprop="dateModified" datetime="2020-04-24T16:27:11+08:00">2020-04-24</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E4%BA%BA%E5%B7%A5%E6%99%BA%E8%83%BD/" itemprop="url" rel="index"><span itemprop="name">人工智能</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="机器学习导图"><a href="#机器学习导图" class="headerlink" title="机器学习导图"></a>机器学习导图</h2><p><img src="/images/18-ml/4-mlguide.png"></p>
+<h2 id="决策树原理"><a href="#决策树原理" class="headerlink" title="决策树原理"></a>决策树原理</h2><p>每一层选择了指定的特征之后，我们就可以继续由该特征的不同属性值进行划分，依次一直到叶子结点。<br><strong>优点</strong>：计算复杂度不高，不用归一化，适用数据类型：数值型和标称型。<br><strong>缺点</strong>：过拟合-决策树学习者可以创建不能很好地推广数据的过于复杂的树。<br><strong>改进</strong>：1、减枝cart算法(决策树API当中已经实现) 2、随机森林</p>
+<p>1、信息熵H(x)<br>信息熵是考虑该随机变量的所有可能取值，即所有可能发生事件带来的信息量的期望。<br>随机变量的取值个数越多，不确定性越大，则信息量越大，熵越大。当随机分布为均匀分布时，熵最大。<br>公式：H(x) = E[I(xi)] = E[ log(2,1/P(xi)) ] = -∑P(xi)log(2,P(xi)) (i=1,2,..n) 单位为bits。</p>
+<p>2、条件熵H(Y|X)<br>条件熵 H(Y|X)表示在已知随机变量 X 的条件下随机变量 Y 的不确定性。<br>条件熵 H(Y|X)定义为 X 给定条件下 Y 的条件概率分布的熵对 X 的数学期望，相当于联合熵 H(X,Y)减去单独的熵 H(X)，即H(Y|X)=H(X,Y)−H(X)<br><img src="/images/18-ml/5-condition.png"></p>
+<p>3、信息增益(ID3)<br>决策树分类依据之一。<br>信息增益 = 信息熵 - 条件熵，代表了在一个条件下，信息复杂度（不确定性）减少的程度。<br>特征A对训练数据集D的信息增益g(D,A)定义为集合D的信息熵H(D)与特征A给定条件下D的信息条件熵H(D|A)之差,g(D,A) = H(D) - H(D|A)。</p>
+<p>4、计算示例<br><img src="/images/18-ml/6-calculate.png"></p>
+<p>5、分类树gini系数，在sklearn中选择划分的默认原则。</p>
+<h2 id="sklearn-API"><a href="#sklearn-API" class="headerlink" title="sklearn API"></a>sklearn API</h2><h3 id="1、特征抽取"><a href="#1、特征抽取" class="headerlink" title="1、特征抽取"></a>1、特征抽取</h3><figure class="highlight reasonml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> sklearn.feature_extraction.<span class="constructor">DictVectorizer(<span class="params">dtype</span>=&lt;<span class="params">class</span>‘<span class="params">numpy</span>.<span class="params">float64</span>’&gt;, <span class="params">separator</span>=’=’, <span class="params">sparse</span>=True, <span class="params">sort</span>=True)</span></span><br><span class="line"></span><br><span class="line">dtype：callable, 可选参数, 默认为<span class="built_in">float</span>。特征值的类型，传递给<span class="module-access"><span class="module"><span class="identifier">Numpy</span>.</span></span><span class="built_in">array</span>或者<span class="module-access"><span class="module"><span class="identifier">Scipy</span>.</span></span>sparse矩阵构造器作为dtype参数。</span><br><span class="line">separator: <span class="built_in">string</span>, 可选参数, 默认为<span class="string">&quot;=&quot;</span>。当构造One-hot编码的特征值时要使用的分割字符串。分割传入字典数据的键与值的字符串，生成的字符串会作为特征矩阵的列名。</span><br><span class="line">sparse: boolearn, 可选参数,默认为True。transform是否要使用scipy产生一个sparse矩阵。DictVectorizer的内部实现是将数据直接转换成sparse矩阵，如果sparse为False， 再把sparse矩阵转换成numpy.ndarray型数组。</span><br><span class="line">sort：boolearn,可选参数,默认为True。在拟合时是否要多feature_names和vocabulary_进行排序。</span><br></pre></td></tr></table></figure>
+
+<p>方法:</p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="title">fit</span><span class="params">(X,y=None)</span></span>: 计算出转换结果中feature name与 列索引之间的对照字典vocabulary_，同时会计算出特征名称列表　feature_names_。这里的参数y没有任何作用。</span><br><span class="line"><span class="function"><span class="title">fit_transform</span><span class="params">(X,y=None)</span></span>: 包含fit函数的功能，并且会将X转换成矩阵。</span><br><span class="line"><span class="function"><span class="title">get_feature_names</span><span class="params">()</span></span>: 返回feature_names_</span><br><span class="line"><span class="function"><span class="title">get_params</span><span class="params">(deep=True)</span></span>: 返回当前DictVectorizer对象的构造参数。</span><br><span class="line"><span class="function"><span class="title">inverse_transform</span><span class="params">(X[,dict_type])</span></span>: 将矩阵还原成特征字典列表。还原出来的字典跟原数据并不是完全一样。传入的X必须是这个DictVectorizer经过<span class="attribute">transform</span>或者fit_transform产生的X。</span><br><span class="line"><span class="function"><span class="title">restrict</span><span class="params">(support, indicies=False)</span></span>: 根据传入的support参数，对特征矩阵进行筛选。</span><br><span class="line"><span class="function"><span class="title">set_params</span><span class="params">(**params)</span></span>: 设置DictVectorizer的参数</span><br><span class="line"><span class="function"><span class="title">transform</span><span class="params">(X)</span></span>: 将X转换为numpy.ndarray或者Scipy.sparse</span><br></pre></td></tr></table></figure>
+
+<p>One-hot编码是将特征所有可能的字符串值构造成布尔型值。<br>DictVectorizer对非数字化的处理方式是，借助原特征的名称，组合成新的特征，并采用0/1的方式进行量化，而数值型的特征转化比较方便，一般情况维持原值即可。例如: 特征f有一个值ham，一个值spam，转换后会变成两个特征f=ham和f=spam。</p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#学习目标：使用DictVectorizer对使用字典存储的数据进行特征抽取和向量化</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#定义一组字典列表，用来表示多个数据样本（每个字典代表一个数据样本）</span></span><br><span class="line">measurements = [&#123;<span class="string">&#x27;city&#x27;</span>:<span class="string">&#x27;Beijing&#x27;</span>,<span class="string">&#x27;temperature&#x27;</span>:33.&#125;,&#123;<span class="string">&#x27;city&#x27;</span>:<span class="string">&#x27;London&#x27;</span>,<span class="string">&#x27;temperature&#x27;</span>:12.&#125;,&#123;<span class="string">&#x27;city&#x27;</span>:<span class="string">&#x27;San Fransisco&#x27;</span>,<span class="string">&#x27;temperature&#x27;</span>:18.&#125;]</span><br><span class="line"><span class="comment">#从sklearn.feature_extraction导入DictVectorizer</span></span><br><span class="line"><span class="keyword">from</span> sklearn.feature_extraction import DictVectorizer</span><br><span class="line">vec = DictVectorizer()</span><br><span class="line"><span class="comment">#输出转化后的特征矩阵</span></span><br><span class="line"><span class="builtin-name">print</span> vec.fit_transform(measurements).toarray()</span><br><span class="line"><span class="comment">#输出各个维度的特征含义,即特征列名</span></span><br><span class="line"><span class="builtin-name">print</span> vec.get_feature_names()</span><br></pre></td></tr></table></figure>
+<p>输出结果：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">[[  <span class="number">1.</span>   <span class="number">0.</span>   <span class="number">0.</span>  <span class="number">33.</span>]</span><br><span class="line"> [  <span class="number">0.</span>   <span class="number">1.</span>   <span class="number">0.</span>  <span class="number">12.</span>]</span><br><span class="line"> [  <span class="number">0.</span>   <span class="number">0.</span>   <span class="number">1.</span>  <span class="number">18.</span>]]</span><br><span class="line"> </span><br><span class="line">[&#x27;city=Dubai&#x27;, &#x27;city=London&#x27;, &#x27;city=San Fransisco&#x27;, &#x27;temperature&#x27;]</span><br></pre></td></tr></table></figure>
+
+<h3 id="2、分类决策树"><a href="#2、分类决策树" class="headerlink" title="2、分类决策树"></a>2、分类决策树</h3><figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">class sklearn.tree.DecisionTreeClassifier(<span class="attribute">criterion</span>=<span class="string">&#x27;gini&#x27;</span>, <span class="attribute">splitter</span>=<span class="string">&#x27;best&#x27;</span>, <span class="attribute">max_depth</span>=None, <span class="attribute">min_samples_split</span>=2, <span class="attribute">min_samples_leaf</span>=1, <span class="attribute">min_weight_fraction_leaf</span>=0.0, <span class="attribute">max_features</span>=None, <span class="attribute">random_state</span>=None, <span class="attribute">max_leaf_nodes</span>=None, <span class="attribute">min_impurity_decrease</span>=0.0, <span class="attribute">min_impurity_split</span>=None, <span class="attribute">class_weight</span>=None, <span class="attribute">presort</span>=<span class="string">&#x27;deprecated&#x27;</span>, <span class="attribute">ccp_alpha</span>=0.0)</span><br><span class="line"></span><br><span class="line">criterion:选值&#123;“gini”, “entropy”&#125;，即基尼指数和信息熵，默认<span class="string">&#x27;gini&#x27;</span></span><br><span class="line"></span><br><span class="line">max_depth:树的最大深度，如果不给定则会用进所有特征构建树，或者满足参数minsamples_split时停止</span><br><span class="line"></span><br><span class="line">random_state: 随机种子，int或RandomState。</span><br><span class="line"></span><br><span class="line">class_weight ：样本权重</span><br></pre></td></tr></table></figure>
+
+<h3 id="3、决策树结构和本地保存"><a href="#3、决策树结构和本地保存" class="headerlink" title="3、决策树结构和本地保存"></a>3、决策树结构和本地保存</h3><figure class="highlight reasonml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">1</span>、sklearn.tree.export<span class="constructor">_graphviz()</span> 该函数能够导出DOT格式</span><br><span class="line">tree.export<span class="constructor">_graphviz(<span class="params">estimator</span>,<span class="params">out_file</span>=&#x27;<span class="params">tree</span>.<span class="params">dot</span>’,<span class="params">feature_names</span>=[‘’,’’])</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="number">2</span>、工具:(能够将dot文件转换为pdf、png)</span><br><span class="line">安装graphviz</span><br><span class="line">ubuntu:sudo apt-get install graphviz  </span><br><span class="line"></span><br><span class="line"><span class="number">3</span>、运行命令</span><br><span class="line">然后我们运行这个命令</span><br><span class="line">$ dot -Tpng tree.dot -o tree.png</span><br></pre></td></tr></table></figure>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/" rel="tag"># 机器学习</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2019/12/22/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0-Scikit-Learn%E5%BA%93%E7%9A%84%E5%88%86%E7%B1%BB%E6%96%B9%E6%B3%95%E6%80%BB%E8%A7%88/" rel="prev" title="Scikit-Learn库的分类方法总览">
+      <i class="fa fa-chevron-left"></i> Scikit-Learn库的分类方法总览
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2019/12/22/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0-KNN%E5%8E%9F%E7%90%86%E4%B8%8E%E5%AE%9E%E8%B7%B5/" rel="next" title="KNN原理与实践">
+      KNN原理与实践 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%E5%AF%BC%E5%9B%BE"><span class="nav-number">1.</span> <span class="nav-text">机器学习导图</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%86%B3%E7%AD%96%E6%A0%91%E5%8E%9F%E7%90%86"><span class="nav-number">2.</span> <span class="nav-text">决策树原理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#sklearn-API"><span class="nav-number">3.</span> <span class="nav-text">sklearn API</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1%E3%80%81%E7%89%B9%E5%BE%81%E6%8A%BD%E5%8F%96"><span class="nav-number">3.1.</span> <span class="nav-text">1、特征抽取</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2%E3%80%81%E5%88%86%E7%B1%BB%E5%86%B3%E7%AD%96%E6%A0%91"><span class="nav-number">3.2.</span> <span class="nav-text">2、分类决策树</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3%E3%80%81%E5%86%B3%E7%AD%96%E6%A0%91%E7%BB%93%E6%9E%84%E5%92%8C%E6%9C%AC%E5%9C%B0%E4%BF%9D%E5%AD%98"><span class="nav-number">3.3.</span> <span class="nav-text">3、决策树结构和本地保存</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Leo Lin"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Leo Lin</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">104</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">11</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Leo Lin</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+
+    <script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"model":{"jsonPath":"/live2dw/assets/hijiki.model.json"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":false},"log":false});</script></body>
+</html>

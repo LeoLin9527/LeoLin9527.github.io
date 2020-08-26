@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.1.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"yoursite.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="sourceTree实例演示1、构造冲突（1）修改了某文件某行内容并且提交推送到远程库上；（2）另一个工作目录下也修改该文件该行内容，并且也要推送到远程库上去。推送的时候出现如下问题：提示远程已经有更新了，本地版本太低，让我们先pull拉取最新的代码然后再次推送。 2、解决冲突 (1)在本地副本的已暂存文件 —-&gt; 右键 —-&gt; 解决冲突 —-&gt; 打开外部合并工具。 (2)接着关">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Git 界面化操作-sourceTree">
+<meta property="og:url" content="http://yoursite.com/2020/03/16/Git%20%E7%95%8C%E9%9D%A2%E5%8C%96%E6%93%8D%E4%BD%9C-sourceTree/index.html">
+<meta property="og:site_name" content="江湖の林九">
+<meta property="og:description" content="sourceTree实例演示1、构造冲突（1）修改了某文件某行内容并且提交推送到远程库上；（2）另一个工作目录下也修改该文件该行内容，并且也要推送到远程库上去。推送的时候出现如下问题：提示远程已经有更新了，本地版本太低，让我们先pull拉取最新的代码然后再次推送。 2、解决冲突 (1)在本地副本的已暂存文件 —-&gt; 右键 —-&gt; 解决冲突 —-&gt; 打开外部合并工具。 (2)接着关">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://yoursite.com/images/4-git/5-solveconflict.png">
+<meta property="og:image" content="http://yoursite.com/images/4-git/6-gitconfig.png">
+<meta property="article:published_time" content="2020-03-16T02:00:00.000Z">
+<meta property="article:modified_time" content="2020-04-23T08:34:29.609Z">
+<meta property="article:author" content="Leo Lin">
+<meta property="article:tag" content="版本控制">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://yoursite.com/images/4-git/5-solveconflict.png">
+
+<link rel="canonical" href="http://yoursite.com/2020/03/16/Git%20%E7%95%8C%E9%9D%A2%E5%8C%96%E6%93%8D%E4%BD%9C-sourceTree/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>Git 界面化操作-sourceTree | 江湖の林九</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">江湖の林九</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">相逢何必曾相识！</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/03/16/Git%20%E7%95%8C%E9%9D%A2%E5%8C%96%E6%93%8D%E4%BD%9C-sourceTree/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Leo Lin">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="江湖の林九">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Git 界面化操作-sourceTree
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-03-16 10:00:00" itemprop="dateCreated datePublished" datetime="2020-03-16T10:00:00+08:00">2020-03-16</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-04-23 16:34:29" itemprop="dateModified" datetime="2020-04-23T16:34:29+08:00">2020-04-23</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E8%BF%90%E7%BB%B4%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">运维笔记</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="sourceTree实例演示"><a href="#sourceTree实例演示" class="headerlink" title="sourceTree实例演示"></a>sourceTree实例演示</h2><p>1、构造冲突<br>（1）修改了某文件某行内容并且提交推送到远程库上；<br>（2）另一个工作目录下也修改该文件该行内容，并且也要推送到远程库上去。<br>推送的时候出现如下问题：提示远程已经有更新了，本地版本太低，让我们先pull拉取最新的代码然后再次推送。</p>
+<p>2、解决冲突<br> (1)在本地副本的已暂存文件 —-&gt; 右键 —-&gt; 解决冲突 —-&gt; 打开外部合并工具。<br> (2)接着关闭Beynod Compare工具，冲突感叹号没有了，并且会有一个 .orig 的文件生成。<br> (3)接着选中.orig文件，单击右键 —-&gt; 移除。</p>
+<p><img src="/images/4-git/5-solveconflict.png"></p>
+<p><strong>补充说明</strong>：<br>当清理文件并得到最终代码后，剩下的工作就是将这个结果保存起来，并且马上退出这个合并工具，Git 会在后台对那个文件自动地执行 “git add” 命令，这也标志着冲突已经解决了。<br>如果你不使用合并工具，而是手动在文本编辑器中清理这些冲突，你必须手动地将文件标记为已解决状态（通过执行命令 “git add filename”）。<br>最终，当所有的冲突被解决后，你必须通过一个正常的提交操作来完成这个清理合并冲突的工作。</p>
+<h2 id="Beyond-Compare"><a href="#Beyond-Compare" class="headerlink" title="Beyond Compare"></a>Beyond Compare</h2><p>1、注册码</p>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">w4G</span>-in<span class="number">5</span>u<span class="number">3</span>SH<span class="number">75</span>RoB<span class="number">3</span>VZIX<span class="number">8</span>htiZgw<span class="number">4</span>ELilwvPcHAIQWfwfXv<span class="number">5</span>n<span class="number">0</span>IHDp<span class="number">5</span>hv</span><br><span class="line"><span class="attribute">1BM3</span>+H<span class="number">1</span>XygMtiE<span class="number">0</span>-JBgacjE<span class="number">9</span>tz<span class="number">33</span>sIh<span class="number">542</span>EmsGs<span class="number">1</span>yg<span class="number">638</span>UxVfmWqNLqu-</span><br><span class="line"><span class="attribute">Zw91XxNEiZF7DC7</span>-iV<span class="number">1</span>XbSfsgxI<span class="number">8</span>Tvqr-ZMTxlGCJU+<span class="number">2</span>YLveAc-YXs<span class="number">8</span>ci</span><br><span class="line"><span class="attribute">RTtssts7leEbJ979H5v</span>+G<span class="number">0</span>sw-FwP<span class="number">9</span>bjvE<span class="number">4</span>GCJ<span class="number">8</span>oj+jtlp<span class="number">7</span>wFmpVdzovEh</span><br><span class="line"><span class="attribute">v5Vg3dMqhqTiQHKfmHjYbb0o5OUxq0jOWxg5NKim9dhCVF</span>+avO<span class="number">6</span>mDeRNc</span><br><span class="line"><span class="attribute">OYpl7BatIcd6tsiwdhHKRnyGshyVEjSgRCRY11IgyvdRPnbW8UOVULuTE</span></span><br></pre></td></tr></table></figure>
+<p>2、永久使用需删除该目录文件</p>
+<figure class="highlight latex"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">C:<span class="tag">\<span class="name">Users</span></span><span class="tag">\<span class="name">*</span></span>**<span class="tag">\<span class="name">AppData</span></span><span class="tag">\<span class="name">Roaming</span></span><span class="tag">\<span class="name">Scooter</span></span> Software<span class="tag">\<span class="name">Beyond</span></span> Compare 4</span><br></pre></td></tr></table></figure>
+
+<h2 id="Git配置difftool和mergetool"><a href="#Git配置difftool和mergetool" class="headerlink" title="Git配置difftool和mergetool"></a>Git配置difftool和mergetool</h2><p>1、命令行配置</p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#difftool 配置</span></span><br><span class="line">git<span class="built_in"> config </span>--global diff.tool bc4</span><br><span class="line">git<span class="built_in"> config </span>--global difftool.bc4.cmd <span class="string">&quot;\&quot;c:/program files (x86)/beyond compare 4/bcomp.exe\&quot; \&quot;<span class="variable">$LOCAL</span>\&quot; \&quot;<span class="variable">$REMOTE</span>\&quot;&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#mergeftool 配置</span></span><br><span class="line">git<span class="built_in"> config </span>--global merge.tool bc4</span><br><span class="line">git<span class="built_in"> config </span>--global mergetool.bc4.cmd  <span class="string">&quot;\&quot;c:/program files (x86)/beyond compare 4/bcomp.exe\&quot; \&quot;<span class="variable">$LOCAL</span>\&quot; \&quot;<span class="variable">$REMOTE</span>\&quot; \&quot;<span class="variable">$BASE</span>\&quot; \&quot;<span class="variable">$MERGED</span>\&quot;&quot;</span></span><br><span class="line">git<span class="built_in"> config </span>--global mergetool.bc4.trustExitCode <span class="literal">true</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#让git mergetool不再生成备份文件（*.orig）</span></span><br><span class="line">git<span class="built_in"> config </span>--global mergetool.keepBackup <span class="literal">false</span></span><br></pre></td></tr></table></figure>
+<p>2、文件配置<br><img src="/images/4-git/6-gitconfig.png"></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E7%89%88%E6%9C%AC%E6%8E%A7%E5%88%B6/" rel="tag"># 版本控制</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/03/16/Git-Rebase%E5%BD%BB%E5%BA%95%E6%90%9E%E6%87%82%20/" rel="prev" title="Git-Rebase彻底搞懂">
+      <i class="fa fa-chevron-left"></i> Git-Rebase彻底搞懂
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/03/17/Gitlab%20%E4%B8%8EGitflow%E8%A7%84%E8%8C%83/" rel="next" title="Gitlab与Gitflow规范">
+      Gitlab与Gitflow规范 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#sourceTree%E5%AE%9E%E4%BE%8B%E6%BC%94%E7%A4%BA"><span class="nav-number">1.</span> <span class="nav-text">sourceTree实例演示</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Beyond-Compare"><span class="nav-number">2.</span> <span class="nav-text">Beyond Compare</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Git%E9%85%8D%E7%BD%AEdifftool%E5%92%8Cmergetool"><span class="nav-number">3.</span> <span class="nav-text">Git配置difftool和mergetool</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Leo Lin"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Leo Lin</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">104</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">11</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Leo Lin</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+
+    <script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"model":{"jsonPath":"/live2dw/assets/hijiki.model.json"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":false},"log":false});</script></body>
+</html>

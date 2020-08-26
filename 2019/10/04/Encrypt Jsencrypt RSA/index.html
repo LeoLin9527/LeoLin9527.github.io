@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.1.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"yoursite.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="How to use this library安装openssl使用命令行进行动态生成 Within your terminal (Unix based OS) type the following: openssl genrsa -out rsa_1024_priv.pem 1024 This generates a private key, which you can see by doing">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Encrypt Jsencrypt RSA">
+<meta property="og:url" content="http://yoursite.com/2019/10/04/Encrypt%20Jsencrypt%20RSA/index.html">
+<meta property="og:site_name" content="江湖の林九">
+<meta property="og:description" content="How to use this library安装openssl使用命令行进行动态生成 Within your terminal (Unix based OS) type the following: openssl genrsa -out rsa_1024_priv.pem 1024 This generates a private key, which you can see by doing">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2019-10-04T01:00:00.000Z">
+<meta property="article:modified_time" content="2020-04-24T07:18:12.515Z">
+<meta property="article:author" content="Leo Lin">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://yoursite.com/2019/10/04/Encrypt%20Jsencrypt%20RSA/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>Encrypt Jsencrypt RSA | 江湖の林九</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">江湖の林九</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">相逢何必曾相识！</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/10/04/Encrypt%20Jsencrypt%20RSA/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Leo Lin">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="江湖の林九">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Encrypt Jsencrypt RSA
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-10-04 09:00:00" itemprop="dateCreated datePublished" datetime="2019-10-04T09:00:00+08:00">2019-10-04</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-04-24 15:18:12" itemprop="dateModified" datetime="2020-04-24T15:18:12+08:00">2020-04-24</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%8A%A0%E5%AF%86%E7%AE%97%E6%B3%95/" itemprop="url" rel="index"><span itemprop="name">加密算法</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="How-to-use-this-library"><a href="#How-to-use-this-library" class="headerlink" title="How to use this library"></a>How to use this library</h2><p>安装openssl使用命令行进行动态生成</p>
+<p>Within your terminal (Unix based OS) type the following:</p>
+<p><code>openssl genrsa -out rsa_1024_priv.pem 1024</code></p>
+<p>This generates a private key, which you can see by doing the following…</p>
+<p><code>cat rsa_1024_priv.pem #if you are on mac you can | pbcopy to copy to the clipboard</code></p>
+<p>You can then copy and paste this in the Private Key section of the demo page.</p>
+<p>Next, you can then get the public key by executing the following command.</p>
+<p><code>openssl rsa -pubout -in rsa_1024_priv.pem -out rsa_1024_pub.pem</code></p>
+<p>You can see the public key by typing…</p>
+<p><code>cat rsa_1024_pub.pem</code></p>
+<h2 id="Example"><a href="#Example" class="headerlink" title="Example"></a>Example</h2><p>jsencrypt在加密或者解密的时候需要用到密钥，所以需要先生成一对密钥：公钥（加密），私钥（解密），自身使用的是pkcs1加密方案。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br></pre></td><td class="code"><pre><span class="line">&lt;!doctype html&gt;</span><br><span class="line">&lt;html&gt;</span><br><span class="line">  &lt;head&gt;</span><br><span class="line">    &lt;title&gt;JavaScript RSA Encryption&lt;/title&gt;</span><br><span class="line">    &lt;script src=<span class="string">&quot;http://code.jquery.com/jquery-1.8.3.min.js&quot;</span>&gt;&lt;/script&gt;</span><br><span class="line">    &lt;script src=<span class="string">&quot;bin/jsencrypt.min.js&quot;</span>&gt;&lt;/script&gt;</span><br><span class="line">    &lt;script type=<span class="string">&quot;text/javascript&quot;</span>&gt;</span><br><span class="line"></span><br><span class="line">      <span class="comment">// Call this code when the page is done loading.</span></span><br><span class="line">      $(<span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Run a quick encryption/decryption when they click.</span></span><br><span class="line">        $(<span class="string">&#x27;#testme&#x27;</span>).click(<span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">          <span class="comment">// Encrypt with the public key...</span></span><br><span class="line">          <span class="keyword">var</span> encrypt = <span class="keyword">new</span> JSEncrypt();</span><br><span class="line">          encrypt.setPublicKey($(<span class="string">&#x27;#pubkey&#x27;</span>).val());</span><br><span class="line">          <span class="keyword">var</span> encrypted = encrypt.encrypt($(<span class="string">&#x27;#input&#x27;</span>).val());</span><br><span class="line"></span><br><span class="line">          <span class="comment">// Decrypt with the private key...</span></span><br><span class="line">          <span class="keyword">var</span> decrypt = <span class="keyword">new</span> JSEncrypt();</span><br><span class="line">          decrypt.setPrivateKey($(<span class="string">&#x27;#privkey&#x27;</span>).val());</span><br><span class="line">          <span class="keyword">var</span> uncrypted = decrypt.decrypt(encrypted);</span><br><span class="line"></span><br><span class="line">          <span class="comment">// Now a simple check to see if the round-trip worked.</span></span><br><span class="line">          <span class="keyword">if</span> (uncrypted == $(<span class="string">&#x27;#input&#x27;</span>).val()) &#123;</span><br><span class="line">            alert(<span class="string">&#x27;It works!!!&#x27;</span>);</span><br><span class="line">          &#125;</span><br><span class="line">          <span class="keyword">else</span> &#123;</span><br><span class="line">            alert(<span class="string">&#x27;Something went wrong....&#x27;</span>);</span><br><span class="line">          &#125;</span><br><span class="line">        &#125;);</span><br><span class="line">      &#125;);</span><br><span class="line">    &lt;/script&gt;</span><br><span class="line">  &lt;/head&gt;</span><br><span class="line">  &lt;body&gt;</span><br><span class="line">    &lt;label <span class="keyword">for</span>=<span class="string">&quot;privkey&quot;</span>&gt;Private Key&lt;<span class="regexp">/label&gt;&lt;br/</span>&gt;</span><br><span class="line">    &lt;textarea id=<span class="string">&quot;privkey&quot;</span> rows=<span class="string">&quot;15&quot;</span> cols=<span class="string">&quot;65&quot;</span>&gt;-----BEGIN PRIVATE KEY-----</span><br><span class="line">MIICeQIBADANBgkqhkiG9w0BAQEFAASCAmMwggJfAgEAAoGBAMDl6LIyW/Wu0cdl</span><br><span class="line">ZMlUcBTwTJnfDv2sydVzhNP4EXQK/Cx8682SZUpcWLkqVwDc3wii69gXdNJbx+TH</span><br><span class="line">ILiI8phtCiOmVWMB/<span class="number">8</span>lch8uCQKnvrwE/xfsPbieOoeauG0a24k0bhLWUwb1t9ha5</span><br><span class="line">W1NY+gA7CiEy7hrtB<span class="comment">//y9y1BS+PvAgMBAAECgYEAhJzKd891NxcDc0B6pIqfL1Xw</span></span><br><span class="line">Y4xc4vrqGwt60rrlTNDMgs0y0zYE2rVX7Zx1CcvOrUJMP1gI4SFl8BsRnKvRktUS</span><br><span class="line">SnkDO+<span class="number">4</span>ePUe0NykW8lk6eCpzx9Awd8bPSjtTWXCgJJNS1cf45pUlEe/<span class="number">2</span>jm5BibqG</span><br><span class="line">csG3K8YDc2ficZz7otECQQDl79JA0loXNNcQJd5D/CKVKjtUK0Ks0xxLjn2YaRuk</span><br><span class="line"><span class="number">4</span>m1JW+JmtMTp2IBYTmsE64UrRhAiOvCIWP9binhKPtx3AkEA1sNRkLUpSQKCCOsB</span><br><span class="line">INiRvTtqv5BdwiJzWolD4Dm/Fz2aD6FN5NinaWgfaQ2wfL1NiCR+S0OagLBKK7fz</span><br><span class="line">NsiqSQJBAIBGPyRcdVf26XefuJRyx5QxoDF/hM3HZESedGCfWoWsr806Dl6/wA64</span><br><span class="line"><span class="number">8</span>jjRXpC7F2qhxoRiHyfhhmu6HwtEcFcCQQDM0GcoT205ILgskxp3XbLXuiOa365a</span><br><span class="line"><span class="number">54</span>oFbOUboVbZbjlP8LCdr/UwtElIYfLPc6XOUadUVfuyAO4rdXnw5DxpAkEAhG6O</span><br><span class="line">ibo8nSlcYn6Co60IIx/cARqC1J1pRMnYpB062eoLrHpRBW8G5Y8XBfETFMHU6WzY</span><br><span class="line">+SZwal49Jf9+FiG2qQ==</span><br><span class="line">-----END PRIVATE KEY-----&lt;<span class="regexp">/textarea&gt;&lt;br/</span>&gt;</span><br><span class="line">    &lt;label <span class="keyword">for</span>=<span class="string">&quot;pubkey&quot;</span>&gt;Public Key&lt;<span class="regexp">/label&gt;&lt;br/</span>&gt;</span><br><span class="line">    &lt;textarea id=<span class="string">&quot;pubkey&quot;</span> rows=<span class="string">&quot;15&quot;</span> cols=<span class="string">&quot;65&quot;</span>&gt;-----BEGIN PUBLIC KEY-----</span><br><span class="line">MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDA5eiyMlv1rtHHZWTJVHAU8EyZ</span><br><span class="line"><span class="number">3</span>w79rMnVc4TT+BF0CvwsfOvNkmVKXFi5KlcA3N8IouvYF3TSW8fkxyC4iPKYbQoj</span><br><span class="line">plVjAf/JXIfLgkCp768BP8X7D24njqHmrhtGtuJNG4S1lMG9bfYWuVtTWPoAOwoh</span><br><span class="line">Mu4a7Qf/<span class="number">8</span>vctQUvj7wIDAQAB</span><br><span class="line">-----END PUBLIC KEY-----&lt;<span class="regexp">/textarea&gt;&lt;br/</span>&gt;</span><br><span class="line">    &lt;label <span class="keyword">for</span>=<span class="string">&quot;input&quot;</span>&gt;Text to encrypt:&lt;<span class="regexp">/label&gt;&lt;br/</span>&gt;</span><br><span class="line">    &lt;textarea id=<span class="string">&quot;input&quot;</span> name=<span class="string">&quot;input&quot;</span> type=<span class="string">&quot;text&quot;</span> rows=<span class="number">4</span> cols=<span class="number">70</span>&gt;This is a test!&lt;<span class="regexp">/textarea&gt;&lt;br/</span>&gt;</span><br><span class="line">    &lt;input id=<span class="string">&quot;testme&quot;</span> type=<span class="string">&quot;button&quot;</span> value=<span class="string">&quot;Test Me!!!&quot;</span> /&gt;<span class="xml"><span class="tag">&lt;<span class="name">br</span>/&gt;</span></span></span><br><span class="line">  &lt;/body&gt;</span><br><span class="line">&lt;/html&gt;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h2 id="长字符分段加解密"><a href="#长字符分段加解密" class="headerlink" title="长字符分段加解密"></a>长字符分段加解密</h2><p>由于RSA的特性，一个1024位的密钥只能加密117位字节数据，当数据量超过117位字节的时候，程序就会抛出异常。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br></pre></td><td class="code"><pre><span class="line">JSEncrypt.prototype.encryptLong = <span class="function"><span class="keyword">function</span> (<span class="params">string</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> k = <span class="built_in">this</span>.getKey();</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        <span class="keyword">var</span> lt = <span class="string">&quot;&quot;</span>;</span><br><span class="line">        <span class="keyword">var</span> ct = <span class="string">&quot;&quot;</span>;</span><br><span class="line">        <span class="comment">//RSA每次加密117bytes，需要辅助方法判断字符串截取位置</span></span><br><span class="line">        <span class="comment">//1.获取字符串截取点</span></span><br><span class="line">        <span class="keyword">var</span> bytes = <span class="keyword">new</span> <span class="built_in">Array</span>();</span><br><span class="line">        bytes.push(<span class="number">0</span>);</span><br><span class="line">        <span class="keyword">var</span> byteNo = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">var</span> len, c;</span><br><span class="line">        len = string.length;</span><br><span class="line">        <span class="keyword">var</span> temp = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">var</span> i = <span class="number">0</span>; i &lt; len; i++) &#123;</span><br><span class="line">            c = string.charCodeAt(i);</span><br><span class="line">            <span class="keyword">if</span> (c &gt;= <span class="number">0x010000</span> &amp;&amp; c &lt;= <span class="number">0x10FFFF</span>) &#123;</span><br><span class="line">                byteNo += <span class="number">4</span>;</span><br><span class="line">            &#125; <span class="keyword">else</span> <span class="keyword">if</span> (c &gt;= <span class="number">0x000800</span> &amp;&amp; c &lt;= <span class="number">0x00FFFF</span>) &#123;</span><br><span class="line">                byteNo += <span class="number">3</span>;</span><br><span class="line">            &#125; <span class="keyword">else</span> <span class="keyword">if</span> (c &gt;= <span class="number">0x000080</span> &amp;&amp; c &lt;= <span class="number">0x0007FF</span>) &#123;</span><br><span class="line">                byteNo += <span class="number">2</span>;</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                byteNo += <span class="number">1</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">if</span> ((byteNo % <span class="number">117</span>) &gt;= <span class="number">114</span> || (byteNo % <span class="number">117</span>) == <span class="number">0</span>) &#123;</span><br><span class="line">                <span class="keyword">if</span> (byteNo - temp &gt;= <span class="number">114</span>) &#123;</span><br><span class="line">                    bytes.push(i);</span><br><span class="line">                    temp = byteNo;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">//2.截取字符串并分段加密</span></span><br><span class="line">        <span class="keyword">if</span> (bytes.length &gt; <span class="number">1</span>) &#123;</span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">var</span> i = <span class="number">0</span>; i &lt; bytes.length - <span class="number">1</span>; i++) &#123;</span><br><span class="line">                <span class="keyword">var</span> str;</span><br><span class="line">                <span class="keyword">if</span> (i == <span class="number">0</span>) &#123;</span><br><span class="line">                    str = string.substring(<span class="number">0</span>, bytes[i + <span class="number">1</span>] + <span class="number">1</span>);</span><br><span class="line">                &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                    str = string.substring(bytes[i] + <span class="number">1</span>, bytes[i + <span class="number">1</span>] + <span class="number">1</span>);</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">var</span> t1 = k.encrypt(str);</span><br><span class="line">                ct += t1;</span><br><span class="line">            &#125;</span><br><span class="line">            ;</span><br><span class="line">            <span class="keyword">if</span> (bytes[bytes.length - <span class="number">1</span>] != string.length - <span class="number">1</span>) &#123;</span><br><span class="line">                <span class="keyword">var</span> lastStr = string.substring(bytes[bytes.length - <span class="number">1</span>] + <span class="number">1</span>);</span><br><span class="line">                ct += k.encrypt(lastStr);</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">return</span> hexToBytes(ct);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">var</span> t = k.encrypt(string);</span><br><span class="line">        <span class="keyword">var</span> y = hexToBytes(t);</span><br><span class="line">        <span class="keyword">return</span> y;</span><br><span class="line">    &#125; <span class="keyword">catch</span> (ex) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">JSEncrypt.prototype.decryptLong = <span class="function"><span class="keyword">function</span> (<span class="params">string</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> k = <span class="built_in">this</span>.getKey();</span><br><span class="line">    <span class="comment">// var maxLength = ((k.n.bitLength()+7)&gt;&gt;3);</span></span><br><span class="line">    <span class="keyword">var</span> MAX_DECRYPT_BLOCK = <span class="number">128</span>;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        <span class="keyword">var</span> ct = <span class="string">&quot;&quot;</span>;</span><br><span class="line">        <span class="keyword">var</span> t1;</span><br><span class="line">        <span class="keyword">var</span> bufTmp;</span><br><span class="line">        <span class="keyword">var</span> hexTmp;</span><br><span class="line">        <span class="keyword">var</span> str = bytesToHex(string);</span><br><span class="line">        <span class="keyword">var</span> buf = hexToBytes(str);</span><br><span class="line">        <span class="keyword">var</span> inputLen = buf.length;</span><br><span class="line">        <span class="comment">//开始长度</span></span><br><span class="line">        <span class="keyword">var</span> offSet = <span class="number">0</span>;</span><br><span class="line">        <span class="comment">//结束长度</span></span><br><span class="line">        <span class="keyword">var</span> endOffSet = MAX_DECRYPT_BLOCK;</span><br><span class="line"></span><br><span class="line">        <span class="comment">//分段加密</span></span><br><span class="line">        <span class="keyword">while</span> (inputLen - offSet &gt; <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="keyword">if</span> (inputLen - offSet &gt; MAX_DECRYPT_BLOCK) &#123;</span><br><span class="line">                bufTmp = buf.slice(offSet, endOffSet);</span><br><span class="line">                hexTmp = bytesToHex(bufTmp);</span><br><span class="line">                t1 = k.decrypt(hexTmp);</span><br><span class="line">                ct += t1;</span><br><span class="line">                </span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                bufTmp = buf.slice(offSet, inputLen);</span><br><span class="line">                hexTmp = bytesToHex(bufTmp);</span><br><span class="line">                t1 = k.decrypt(hexTmp);</span><br><span class="line">                ct += t1;</span><br><span class="line">             </span><br><span class="line">            &#125;</span><br><span class="line">            offSet += MAX_DECRYPT_BLOCK;</span><br><span class="line">            endOffSet += MAX_DECRYPT_BLOCK;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> ct;</span><br><span class="line">    &#125; <span class="keyword">catch</span> (ex) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<h2 id="Python简易实现"><a href="#Python简易实现" class="headerlink" title="Python简易实现"></a>Python简易实现</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> base64</span><br><span class="line"><span class="keyword">from</span> Cryptodome <span class="keyword">import</span> Random</span><br><span class="line"><span class="keyword">from</span> Cryptodome.Cipher <span class="keyword">import</span> PKCS1_v1_5 <span class="keyword">as</span> Cipher_pkcs1_v1_5</span><br><span class="line"><span class="keyword">from</span> Cryptodome.PublicKey <span class="keyword">import</span> RSA</span><br><span class="line"></span><br><span class="line"><span class="comment"># 伪随机数生成器</span></span><br><span class="line">random_generator = Random.new().read</span><br><span class="line"></span><br><span class="line"><span class="comment"># rsa算法生成实例</span></span><br><span class="line">rsa = RSA.generate(<span class="number">1024</span>, random_generator)</span><br><span class="line"></span><br><span class="line"><span class="comment"># master的秘钥对的生成</span></span><br><span class="line">private_pem = rsa.exportKey()</span><br><span class="line"></span><br><span class="line"><span class="comment"># 生产私钥私钥并放到文件里</span></span><br><span class="line"><span class="keyword">with</span> open(<span class="string">&#x27;master-private.pem&#x27;</span>, <span class="string">&#x27;wb&#x27;</span>) <span class="keyword">as</span> f:</span><br><span class="line">    f.write(private_pem)</span><br><span class="line">public_pem = rsa.publickey().exportKey()</span><br><span class="line"><span class="keyword">with</span> open(<span class="string">&#x27;master-public.pem&#x27;</span>, <span class="string">&#x27;wb&#x27;</span>) <span class="keyword">as</span> f:</span><br><span class="line">    f.write(public_pem)</span><br><span class="line"></span><br><span class="line">message = <span class="string">&#x27;I_LOVE_YAYA&#x27;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 打开公钥文件</span></span><br><span class="line"><span class="keyword">with</span> open(<span class="string">&#x27;master-public.pem&#x27;</span>) <span class="keyword">as</span> f:</span><br><span class="line">    key = f.read()</span><br><span class="line">rsakey = RSA.importKey(key)</span><br><span class="line">cipher = Cipher_pkcs1_v1_5.new(rsakey)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 加密时使用base64加密</span></span><br><span class="line">cipher_text = base64.b64encode(cipher.encrypt(bytes(message, <span class="string">&quot;utf8&quot;</span>)))</span><br><span class="line"></span><br><span class="line"><span class="comment"># 用私钥解密</span></span><br><span class="line"><span class="keyword">with</span> open(<span class="string">&#x27;master-private.pem&#x27;</span>) <span class="keyword">as</span> f:</span><br><span class="line">    key = f.read()</span><br><span class="line">rsakey = RSA.importKey(key)</span><br><span class="line">cipher = Cipher_pkcs1_v1_5.new(rsakey)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 使用base64解密，(在前端js加密时自动是base64加密)</span></span><br><span class="line">text = cipher.decrypt(base64.b64decode(cipher_text), random_generator)</span><br><span class="line">print(str(text, <span class="string">&quot;utf8&quot;</span>))</span><br></pre></td></tr></table></figure>
+
+<h2 id="注意事项"><a href="#注意事项" class="headerlink" title="注意事项"></a>注意事项</h2><figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="regexp">//</span> base64传输到后台的时候<span class="string">&quot;+&quot;</span>号被会转为空格，故而需要先替换，后台解析的时候转回来</span><br><span class="line">var rr =&#123;imfor:btoa(encryptoPasswd).replace(<span class="regexp">/\+/g</span>,<span class="string">&quot;%$#%&quot;</span>)&#125;</span><br></pre></td></tr></table></figure>
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2019/10/04/Encrypt%20MD5%20%E6%A1%88%E4%BE%8B/" rel="prev" title="Encrypt MD5 案例">
+      <i class="fa fa-chevron-left"></i> Encrypt MD5 案例
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2019/10/04/Encrypt%20Base64%E7%BC%96%E7%A0%81/" rel="next" title="Encrypt Base64编码">
+      Encrypt Base64编码 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#How-to-use-this-library"><span class="nav-number">1.</span> <span class="nav-text">How to use this library</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Example"><span class="nav-number">2.</span> <span class="nav-text">Example</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%95%BF%E5%AD%97%E7%AC%A6%E5%88%86%E6%AE%B5%E5%8A%A0%E8%A7%A3%E5%AF%86"><span class="nav-number">3.</span> <span class="nav-text">长字符分段加解密</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Python%E7%AE%80%E6%98%93%E5%AE%9E%E7%8E%B0"><span class="nav-number">4.</span> <span class="nav-text">Python简易实现</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9"><span class="nav-number">5.</span> <span class="nav-text">注意事项</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Leo Lin"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Leo Lin</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">104</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">11</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Leo Lin</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+
+    <script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"model":{"jsonPath":"/live2dw/assets/hijiki.model.json"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":false},"log":false});</script></body>
+</html>

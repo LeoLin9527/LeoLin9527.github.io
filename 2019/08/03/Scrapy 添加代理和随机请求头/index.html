@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.1.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"yoursite.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="随机请求头123456789101112131415161718import randomfrom scrapy import signalsfrom fake_useragent import UserAgentclass RandomUserAgentMiddleware(object):    def __init__(self):        self.agent &#x3D; UserAgent">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Scrapy 添加代理和随机请求头">
+<meta property="og:url" content="http://yoursite.com/2019/08/03/Scrapy%20%E6%B7%BB%E5%8A%A0%E4%BB%A3%E7%90%86%E5%92%8C%E9%9A%8F%E6%9C%BA%E8%AF%B7%E6%B1%82%E5%A4%B4/index.html">
+<meta property="og:site_name" content="江湖の林九">
+<meta property="og:description" content="随机请求头123456789101112131415161718import randomfrom scrapy import signalsfrom fake_useragent import UserAgentclass RandomUserAgentMiddleware(object):    def __init__(self):        self.agent &#x3D; UserAgent">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2019-08-03T00:00:00.000Z">
+<meta property="article:modified_time" content="2020-04-23T09:22:47.982Z">
+<meta property="article:author" content="Leo Lin">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://yoursite.com/2019/08/03/Scrapy%20%E6%B7%BB%E5%8A%A0%E4%BB%A3%E7%90%86%E5%92%8C%E9%9A%8F%E6%9C%BA%E8%AF%B7%E6%B1%82%E5%A4%B4/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>Scrapy 添加代理和随机请求头 | 江湖の林九</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">江湖の林九</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">相逢何必曾相识！</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/08/03/Scrapy%20%E6%B7%BB%E5%8A%A0%E4%BB%A3%E7%90%86%E5%92%8C%E9%9A%8F%E6%9C%BA%E8%AF%B7%E6%B1%82%E5%A4%B4/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Leo Lin">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="江湖の林九">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Scrapy 添加代理和随机请求头
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-08-03 08:00:00" itemprop="dateCreated datePublished" datetime="2019-08-03T08:00:00+08:00">2019-08-03</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-04-23 17:22:47" itemprop="dateModified" datetime="2020-04-23T17:22:47+08:00">2020-04-23</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%BD%91%E7%BB%9C%E7%88%AC%E8%99%AB/" itemprop="url" rel="index"><span itemprop="name">网络爬虫</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="随机请求头"><a href="#随机请求头" class="headerlink" title="随机请求头"></a>随机请求头</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> random</span><br><span class="line"><span class="keyword">from</span> scrapy <span class="keyword">import</span> signals</span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> fake_useragent <span class="keyword">import</span> UserAgent</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">RandomUserAgentMiddleware</span>(<span class="params">object</span>):</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span>(<span class="params">self</span>):</span></span><br><span class="line">        self.agent = UserAgent()</span><br><span class="line"></span><br><span class="line"><span class="meta">    @classmethod</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">from_crawler</span>(<span class="params">cls, crawler</span>):</span></span><br><span class="line">        <span class="keyword">return</span> cls()</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">process_request</span>(<span class="params">self, request, spider</span>):</span></span><br><span class="line">        request.headers.setdefault(<span class="string">&#x27;User-Agent&#x27;</span>, self.agent.random)</span><br><span class="line">		<span class="comment"># request.headers[&#x27;User-Agent&#x27;] = random.choice(self.user_agents)</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="添加代理"><a href="#添加代理" class="headerlink" title="添加代理"></a>添加代理</h2><p>1、对接芝麻代理</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> redis</span><br><span class="line"><span class="keyword">import</span> random</span><br><span class="line"></span><br><span class="line"><span class="comment"># 在scrapy中使用 代理池的demo</span></span><br><span class="line"></span><br><span class="line"><span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">middleware中代码如下</span></span><br><span class="line"><span class="string">&quot;&quot;&quot;</span></span><br><span class="line">pool = redis.ConnectionPool(decode_responses=<span class="literal">True</span>)  <span class="comment"># redis 池</span></span><br><span class="line">r = redis.Redis(connection_pool=pool)</span><br><span class="line"></span><br><span class="line"><span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">middleware中配置代理中间键</span></span><br><span class="line"><span class="string">注意，根据爬取网址是http 还是https 来设置</span></span><br><span class="line"><span class="string">&quot;&quot;&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MyProxy</span>(<span class="params">object</span>):</span></span><br><span class="line">    <span class="string">&quot;&quot;&quot;代理IP设置&quot;&quot;&quot;</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">process_request</span>(<span class="params">self, request, spider</span>):</span></span><br><span class="line">        <span class="comment"># 此处对接redis</span></span><br><span class="line">        data = r.zrangebyscore(<span class="string">&#x27;XDLProxy&#x27;</span>, <span class="number">1</span>, <span class="number">100</span>, withscores=<span class="literal">True</span>)</span><br><span class="line">        ip, score = random.choice(data)</span><br><span class="line">        request.meta[<span class="string">&#x27;proxy&#x27;</span>] = <span class="string">&#x27;http://&#x27;</span>+ip  <span class="comment"># 根据自己情况填写</span></span><br><span class="line"></span><br><span class="line"><span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">拦截中间键中配置如下，写入计分器，满分20分</span></span><br><span class="line"><span class="string">&quot;&quot;&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">DownloaderMiddleware</span>(<span class="params">object</span>):</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">process_response</span>(<span class="params">self, request, response, spider</span>):</span></span><br><span class="line">        <span class="comment"># 对代理ip进行清洗</span></span><br><span class="line">        proxy = request._meta.get(<span class="string">&#x27;proxy&#x27;</span>)</span><br><span class="line">        <span class="keyword">if</span> <span class="keyword">not</span> response.status == <span class="number">200</span>:</span><br><span class="line">            print(<span class="string">&#x27;IP访问失败&#x27;</span>)</span><br><span class="line">            <span class="keyword">if</span> proxy:</span><br><span class="line">                proxy = proxy[proxy.find(<span class="string">&#x27;/&#x27;</span>)+<span class="number">2</span>:]  <span class="comment"># 提取当此访问proxy</span></span><br><span class="line">                r.zincrby(<span class="string">&#x27;XDLProxy&#x27;</span>, <span class="number">-1</span>, proxy)  <span class="comment"># redis 命令修改</span></span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            <span class="keyword">if</span> proxy:</span><br><span class="line">                proxy = proxy[proxy.find(<span class="string">&#x27;/&#x27;</span>) + <span class="number">2</span>:]  <span class="comment"># 提取当此访问proxy</span></span><br><span class="line">                score = r.zscore(<span class="string">&#x27;XDLProxy&#x27;</span>, proxy)  <span class="comment"># 取出分数</span></span><br><span class="line">                <span class="keyword">if</span> score &lt; <span class="number">20</span>:</span><br><span class="line">                    r.zincrby(<span class="string">&#x27;XDLProxy&#x27;</span>, <span class="number">1</span>, proxy)  <span class="comment"># redis 新版本命令更改这样了</span></span><br><span class="line">        <span class="keyword">return</span> response</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">process_exception</span>(<span class="params">self, request, exception, spider</span>):</span>  <span class="comment"># 可能由于IP质量问题无法访问超时</span></span><br><span class="line">        print(<span class="string">&#x27;超时异常&#x27;</span>)</span><br><span class="line">        proxy = request._meta.get(<span class="string">&#x27;proxy&#x27;</span>)</span><br><span class="line">        <span class="keyword">if</span> proxy:</span><br><span class="line">            proxy = proxy[proxy.find(<span class="string">&#x27;/&#x27;</span>) + <span class="number">2</span>:]</span><br><span class="line">            r.zincrby(<span class="string">&#x27;XDLProxy&#x27;</span>, <span class="number">-1</span>, proxy)  <span class="comment"># redis 新版本命令更改这样了</span></span><br><span class="line">            <span class="keyword">return</span> request</span><br><span class="line"></span><br><span class="line"><span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">setting中配置</span></span><br><span class="line"><span class="string">&quot;&quot;&quot;</span></span><br><span class="line">DOWNLOAD_TIMEOUT = <span class="number">5</span>  <span class="comment"># 有的时候代理ip失效，会导致一直卡在那里 ，也有可能是用http 访问https</span></span><br><span class="line">DOWNLOADER_MIDDLEWARES = &#123;</span><br><span class="line">    <span class="string">&#x27;middlewares.MyProxy&#x27;</span>: <span class="number">543</span>,  <span class="comment"># 自定义代理IP</span></span><br><span class="line">    <span class="string">&#x27;middlewares.spiderDownloaderMiddleware&#x27;</span>: <span class="number">600</span>,  <span class="comment"># 拦截301、302等跳转  必须设置到600</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>2、对接阿布云代理：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> base64</span><br><span class="line"></span><br><span class="line"><span class="comment"># 代理服务器</span></span><br><span class="line">proxyServer = <span class="string">&quot;http://http-pro.abuyun.com:9010&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 代理隧道验证信息</span></span><br><span class="line">proxyUser = <span class="string">&quot;H01234567890123P&quot;</span></span><br><span class="line">proxyPass = <span class="string">&quot;0123456789012345&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># for Python2</span></span><br><span class="line">proxyAuth = <span class="string">&quot;Basic &quot;</span> + base64.b64encode(proxyUser + <span class="string">&quot;:&quot;</span> + proxyPass)</span><br><span class="line"></span><br><span class="line"><span class="comment"># for Python3</span></span><br><span class="line"><span class="comment">#proxyAuth = &quot;Basic &quot; + base64.urlsafe_b64encode(bytes((proxyUser + &quot;:&quot; + proxyPass), &quot;ascii&quot;)).decode(&quot;utf8&quot;)</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ProxyMiddleware</span>(<span class="params">object</span>):</span></span><br><span class="line">	<span class="function"><span class="keyword">def</span> <span class="title">process_request</span>(<span class="params">self, request, spider</span>):</span></span><br><span class="line">		request.meta[<span class="string">&quot;proxy&quot;</span>] = proxyServer</span><br><span class="line"></span><br><span class="line">		request.headers[<span class="string">&quot;Proxy-Authorization&quot;</span>] = proxyAuth   </span><br></pre></td></tr></table></figure>
+<h2 id="Cookie中间件"><a href="#Cookie中间件" class="headerlink" title="Cookie中间件"></a>Cookie中间件</h2><p>cookie池原理：<br>不断地用不同的账号登录网站，就可以得到很多不同的cookies，可以将其放在Redis里。爬虫请求网页时，可以从Redis中读取Cookies并添加。<br>例如：登录以后的Cookies转换为JSON格式的字符串并保存到Redis中。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">LoginMiddleware</span>(<span class="params">object</span>):</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span>(<span class="params">self</span>):</span></span><br><span class="line">        self.client = redis.StrictRedis()</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">process_request</span>(<span class="params">self, request, spider</span>):</span></span><br><span class="line">        <span class="keyword">if</span> spider.name == <span class="string">&#x27;loginSpider&#x27;</span>:</span><br><span class="line">            cookies = json.loads(self.client.lpop(<span class="string">&#x27;cookies&#x27;</span>).decode())</span><br><span class="line">            request.cookies = cookies</span><br></pre></td></tr></table></figure>
+
+<h2 id="内容补充"><a href="#内容补充" class="headerlink" title="内容补充"></a>内容补充</h2><p>1、from_crawler何时被调用?<br>Downloadmiddleware、Pipeline还有扩展EXTENSIONS的实例化Manager都是继承scrapy.middleware下的MiddlewareManager，逐个通过<code>load_object</code>方法导入模块，再调用每个模块的<code>from_crawler</code>或<code>from_settings</code>方法。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@classmethod</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">from_crawler</span>(<span class="params">cls, crawler</span>):</span></span><br><span class="line">	<span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">		1、用给定的参数创建了一个cls类的实例spider</span></span><br><span class="line"><span class="string">		2、用crawler实例的crawler.signals.connect方法将实例s的spider_opened方法与spider_opened信号绑定起来</span></span><br><span class="line"><span class="string">	&quot;&quot;&quot;</span></span><br><span class="line">	<span class="comment"># This method is used by Scrapy to create your spiders.</span></span><br><span class="line">	s = cls()</span><br><span class="line">	crawler.signals.connect(s.spider_opened, signal=signals.spider_opened)</span><br><span class="line">	<span class="keyword">return</span> s</span><br></pre></td></tr></table></figure>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2019/08/02/Python%20%E8%99%9A%E6%8B%9F%E7%8E%AF%E5%A2%83%E4%B8%8E%E9%87%8D%E5%BB%BA%E4%BE%9D%E8%B5%96/" rel="prev" title="Python 虚拟环境与重建依赖">
+      <i class="fa fa-chevron-left"></i> Python 虚拟环境与重建依赖
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2019/08/03/Scrapy%20%E5%AF%B9%E6%8E%A5%E6%A8%A1%E6%8B%9F%E6%B5%8F%E8%A7%88%E5%99%A8/" rel="next" title="Scrapy 对接模拟浏览器">
+      Scrapy 对接模拟浏览器 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%9A%8F%E6%9C%BA%E8%AF%B7%E6%B1%82%E5%A4%B4"><span class="nav-number">1.</span> <span class="nav-text">随机请求头</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B7%BB%E5%8A%A0%E4%BB%A3%E7%90%86"><span class="nav-number">2.</span> <span class="nav-text">添加代理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Cookie%E4%B8%AD%E9%97%B4%E4%BB%B6"><span class="nav-number">3.</span> <span class="nav-text">Cookie中间件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%86%85%E5%AE%B9%E8%A1%A5%E5%85%85"><span class="nav-number">4.</span> <span class="nav-text">内容补充</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Leo Lin"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Leo Lin</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">104</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">11</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Leo Lin</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+
+    <script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"model":{"jsonPath":"/live2dw/assets/hijiki.model.json"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":false},"log":false});</script></body>
+</html>

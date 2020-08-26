@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.1.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"yoursite.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="前言1、准备:安装MySQL Yum Repository，下载地址https:&#x2F;&#x2F;dev.mysql.com&#x2F;downloads&#x2F;repo&#x2F;yum&#x2F;2、查看当前Linux(red hat)版本号:cat &#x2F;proc&#x2F;version3、查看CentOs版本号: cat &#x2F;etc&#x2F;redhat-release4、glibc升级:yum update glibc 安装流程1、新开的云服务器，需要检测系">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Mysql安装基于Centos7">
+<meta property="og:url" content="http://yoursite.com/2020/05/01/Mysql%E5%AE%89%E8%A3%85%E5%9F%BA%E4%BA%8ECentos7/index.html">
+<meta property="og:site_name" content="江湖の林九">
+<meta property="og:description" content="前言1、准备:安装MySQL Yum Repository，下载地址https:&#x2F;&#x2F;dev.mysql.com&#x2F;downloads&#x2F;repo&#x2F;yum&#x2F;2、查看当前Linux(red hat)版本号:cat &#x2F;proc&#x2F;version3、查看CentOs版本号: cat &#x2F;etc&#x2F;redhat-release4、glibc升级:yum update glibc 安装流程1、新开的云服务器，需要检测系">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2020-05-01T02:00:00.000Z">
+<meta property="article:modified_time" content="2020-05-20T07:06:04.313Z">
+<meta property="article:author" content="Leo Lin">
+<meta property="article:tag" content="数据库">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://yoursite.com/2020/05/01/Mysql%E5%AE%89%E8%A3%85%E5%9F%BA%E4%BA%8ECentos7/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>Mysql安装基于Centos7 | 江湖の林九</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">江湖の林九</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">相逢何必曾相识！</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/05/01/Mysql%E5%AE%89%E8%A3%85%E5%9F%BA%E4%BA%8ECentos7/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Leo Lin">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="江湖の林九">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Mysql安装基于Centos7
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-05-01 10:00:00" itemprop="dateCreated datePublished" datetime="2020-05-01T10:00:00+08:00">2020-05-01</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-05-20 15:06:04" itemprop="dateModified" datetime="2020-05-20T15:06:04+08:00">2020-05-20</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E8%BF%90%E7%BB%B4%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">运维笔记</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>1、准备:安装MySQL Yum Repository，下载地址<a target="_blank" rel="noopener" href="https://dev.mysql.com/downloads/repo/yum/">https://dev.mysql.com/downloads/repo/yum/</a><br>2、查看当前Linux(red hat)版本号:cat /proc/version<br>3、查看CentOs版本号: cat /etc/redhat-release<br>4、glibc升级:yum update glibc</p>
+<h2 id="安装流程"><a href="#安装流程" class="headerlink" title="安装流程"></a>安装流程</h2><p>1、新开的云服务器，需要检测系统是否自带安装mysql</p>
+<figure class="highlight vim"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yum <span class="keyword">list</span> installed | <span class="keyword">grep</span> mysql</span><br></pre></td></tr></table></figure>
+<p>2、如果发现有系统自带mysql，果断这么干</p>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">yum</span> -y remove mysql-libs.x<span class="number">86</span>_<span class="number">64</span></span><br></pre></td></tr></table></figure>
+<p>3、接着执行这句，这个rpm还不是mysql的安装文件，只是两个yum源文件，执行后，在/etc/yum.repos.d/ 目录下多出mysql-community-source.repo和mysql-community.repo</p>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">rpm</span> -ivh mysql-community-release-el<span class="number">6</span>-<span class="number">5</span>.noarch.rpm</span><br></pre></td></tr></table></figure>
+<p>4、查看是否已经有mysql可安装文件</p>
+<figure class="highlight lasso"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">#yum repolist <span class="literal">all</span> | grep mysql</span><br></pre></td></tr></table></figure>
+<p>5、选择要安装版本，比如mysql 5.7，修改/etc/yum.repos.d/mysql-community.repo文件，设置mysql 5.7下的enabled=1</p>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">vim</span> /etc/yum.repos.d/mysql-community.repo(装哪个版本启用哪个,例:mysql<span class="number">5</span>.<span class="number">7</span>--enable=<span class="number">1</span>,其他设置成<span class="number">0</span>)</span><br></pre></td></tr></table></figure>
+<p>6、再次查看可安装的版本</p>
+<figure class="highlight 1c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yum repolist enabled <span class="string">| grep mysql</span></span><br></pre></td></tr></table></figure>
+<p>7、安装过程可能出现镜像服务器连接失败, 重新执行安装命令即可</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yum <span class="keyword">install</span> mysql-community-<span class="keyword">server</span></span><br></pre></td></tr></table></figure>
+<p>8、查看安装版本以及是否安装成功</p>
+<figure class="highlight vim"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yum <span class="keyword">list</span> installed | <span class="keyword">grep</span> mysql</span><br></pre></td></tr></table></figure>
+
+<h2 id="启动配置"><a href="#启动配置" class="headerlink" title="启动配置"></a>启动配置</h2><p>1、修改mysql的配置文件（默认为/etc/my.cnf），在[mysqld]下添加一行 skip-grant-tables(跳过权限验证)<br>2、启动mysql: systemctl start mysqld<br>3、查看mysql版本: mysql -V<br>4、登录mysql: mysql<br>5、修改root密码: </p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># mysql 5.7 user表里的password字段改成了authentication_string,antspeed为本人所设密码</span></span><br><span class="line">update mysql.user <span class="builtin-name">set</span> authentication_string = password(<span class="string">&#x27;antspeed&#x27;</span>) where<span class="built_in"> user </span>= <span class="string">&#x27;root&#x27;</span><span class="keyword">and</span> host = <span class="string">&#x27;%&#x27;</span>; --修改对应的用户远程访问权限下的密码 mysql 5.7</span><br><span class="line">update mysql.user <span class="builtin-name">set</span> authentication_string = password(<span class="string">&#x27;antspeed&#x27;</span>) where<span class="built_in"> user </span>= <span class="string">&#x27;root&#x27;</span>; -- 修改指定用户下所有访问路径的密码 mysql 5.7</span><br><span class="line">flush privileges;</span><br><span class="line"></span><br><span class="line">推荐方式：</span><br><span class="line">alter<span class="built_in"> user </span><span class="string">&#x27;root&#x27;</span>@<span class="string">&#x27;localhost&#x27;</span> identified by <span class="string">&#x27;antspeed&#x27;</span>;</span><br><span class="line"><span class="builtin-name">ERROR</span> 1819 (HY000): Your password does <span class="keyword">not</span> satisfy the current<span class="built_in"> policy </span>requirements 出现如上错误，是因为密码太简单了。</span><br></pre></td></tr></table></figure>
+<p>6、编辑/etc/my.cnf 将[mysqld]下的skip-grant-tables 调整为：<br>    # skip-grant-tables<br>    添加一行（mysql数据库忽略表名大小写）：<br>    lower_case_table_names=1<br>7、重启mysql: systemctl restart mysqld</p>
+<h2 id="基本操作"><a href="#基本操作" class="headerlink" title="基本操作"></a>基本操作</h2><p>1、创建用户<br>新创建的用户，默认情况下是没有任何权限的。</p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">create<span class="built_in"> user </span><span class="string">&#x27;ant1@localhost&#x27;</span> identified by <span class="string">&#x27;Bnm,./321&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment"># 创建可远程连接的用户</span></span><br><span class="line">create<span class="built_in"> user </span><span class="string">&#x27;ant1&#x27;</span>@<span class="string">&#x27;%&#x27;</span> identified by <span class="string">&#x27;Bnm,./321&#x27;</span>;</span><br></pre></td></tr></table></figure>
+<p>2、分配权限<br>格式：grant 权限 on 数据库.* to 用户名@登录主机 identified by “密码”;　<br>all privileges：表示将所有权限授予给用户。也可指定具体的权限，如：SELECT、CREATE、DROP等。<br>on：表示这些权限对哪些数据库和表生效，格式：数据库名.表名，这里写“*”表示所有数据库，所有表。如果我要指定将权限应用到test库的user表中，可以这么写：test.user<br>to：将权限授予哪个用户。格式：”用户名”@”登录IP或域名”。%表示没有限制，在任何主机都可以登录。比如：”yangxin”@”192.168.0.%”，表示yangxin这个用户只能在192.168.0IP段登录<br>identified by：指定用户的登录密码<br>with grant option：表示允许用户将自己的权限授权给其它用户</p>
+<figure class="highlight pgsql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">grant</span> <span class="keyword">select</span>,<span class="keyword">insert</span>,<span class="keyword">update</span>,<span class="keyword">create</span> <span class="keyword">on</span> antspeed.* <span class="keyword">to</span> pig@&quot;%&quot; identified <span class="keyword">by</span> <span class="string">&#x27;Antspeed1/&#x27;</span>;</span><br><span class="line"></span><br><span class="line"># 带有<span class="keyword">WITH</span> <span class="keyword">ADMIN</span> <span class="keyword">OPTION</span>的权限授予方式，可传递授权。</span><br><span class="line">mysql&gt;  <span class="keyword">GRANT</span> <span class="keyword">ALL</span> <span class="keyword">PRIVILEGES</span> <span class="keyword">ON</span> *.*(数据库) <span class="keyword">TO</span> 用户@&quot;特定ip&quot;（示例：root@%） IDENTIFIED <span class="keyword">BY</span> &quot;youpassword&quot; <span class="keyword">WITH</span> <span class="keyword">GRANT</span> <span class="keyword">OPTION</span>;</span><br><span class="line">mysql&gt;  flush <span class="keyword">privileges</span>;</span><br><span class="line">mysql&gt;  <span class="keyword">exit</span>;</span><br></pre></td></tr></table></figure>
+<p>3、权限查看</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> <span class="keyword">user</span>(); <span class="comment"># 查看当前用户 如&#x27;pig&#x27;@&#x27;%&#x27;</span></span><br><span class="line"><span class="keyword">show</span> <span class="keyword">grants</span> <span class="keyword">for</span> <span class="string">&#x27;pig&#x27;</span>@<span class="string">&#x27;%&#x27;</span>;</span><br></pre></td></tr></table></figure>
+<p>4、用户权限列表</p>
+<table>
+<thead>
+<tr>
+<th>Privilege</th>
+<th>Grant Table Column</th>
+<th>Context</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>ALL [PRIVILEGES]</td>
+<td>Synonym for “all privileges”</td>
+<td>Server administration</td>
+</tr>
+<tr>
+<td>ALTER</td>
+<td>Alter_priv</td>
+<td>Tables</td>
+</tr>
+<tr>
+<td>ALTER ROUTINE</td>
+<td>Alter_routine_priv</td>
+<td>Stored routines</td>
+</tr>
+<tr>
+<td>CREATE</td>
+<td>Create_priv</td>
+<td>Databases, tables, or indexes</td>
+</tr>
+<tr>
+<td>CREATE ROUTINE</td>
+<td>Create_routine_priv</td>
+<td>Stored routines</td>
+</tr>
+<tr>
+<td>CREATE TABLESPACE</td>
+<td>Create_tablespace_priv</td>
+<td>Server administration</td>
+</tr>
+<tr>
+<td>CREATE TEMPORARY TABLES</td>
+<td>Create_tmp_table_priv</td>
+<td>Tables</td>
+</tr>
+<tr>
+<td>CREATE USER</td>
+<td>Create_user_priv</td>
+<td>Server administration</td>
+</tr>
+<tr>
+<td>CREATE VIEW</td>
+<td>Create_view_priv</td>
+<td>Views</td>
+</tr>
+<tr>
+<td>DELETE</td>
+<td>Delete_priv</td>
+<td>Tables</td>
+</tr>
+<tr>
+<td>DROP</td>
+<td>Drop_priv</td>
+<td>Databases, tables, or views</td>
+</tr>
+<tr>
+<td>EVENT</td>
+<td>Event_priv</td>
+<td>Databases</td>
+</tr>
+<tr>
+<td>EXECUTE</td>
+<td>Execute_priv</td>
+<td>Stored routines</td>
+</tr>
+<tr>
+<td>FILE</td>
+<td>File_priv</td>
+<td>File access on server host</td>
+</tr>
+<tr>
+<td>GRANT OPTION</td>
+<td>Grant_priv</td>
+<td>Databases, tables, or stored routines</td>
+</tr>
+<tr>
+<td>INDEX</td>
+<td>Index_priv</td>
+<td>Tables</td>
+</tr>
+<tr>
+<td>INSERT</td>
+<td>Insert_priv</td>
+<td>Tables or columns</td>
+</tr>
+<tr>
+<td>LOCK TABLES</td>
+<td>Lock_tables_priv</td>
+<td>Databases</td>
+</tr>
+<tr>
+<td>PROCESS</td>
+<td>Process_priv</td>
+<td>Server administration</td>
+</tr>
+<tr>
+<td>PROXY</td>
+<td>See proxies_priv table</td>
+<td>Server administration</td>
+</tr>
+<tr>
+<td>REFERENCES</td>
+<td>References_priv</td>
+<td>Databases or tables</td>
+</tr>
+<tr>
+<td>RELOAD</td>
+<td>Reload_priv</td>
+<td>Server administration</td>
+</tr>
+<tr>
+<td>REPLICATION CLIENT</td>
+<td>Repl_client_priv</td>
+<td>Server administration</td>
+</tr>
+<tr>
+<td>REPLICATION SLAVE</td>
+<td>Repl_slave_priv</td>
+<td>Server administration</td>
+</tr>
+<tr>
+<td>SELECT</td>
+<td>Select_priv</td>
+<td>Tables or columns</td>
+</tr>
+<tr>
+<td>SHOW DATABASES</td>
+<td>Show_db_priv</td>
+<td>Server administration</td>
+</tr>
+<tr>
+<td>SHOW VIEW</td>
+<td>Show_view_priv</td>
+<td>Views</td>
+</tr>
+<tr>
+<td>SHUTDOWN</td>
+<td>Shutdown_priv</td>
+<td>Server administration</td>
+</tr>
+<tr>
+<td>SUPER</td>
+<td>Super_priv</td>
+<td>Server administration</td>
+</tr>
+<tr>
+<td>TRIGGER</td>
+<td>Trigger_priv</td>
+<td>Tables</td>
+</tr>
+<tr>
+<td>UPDATE</td>
+<td>Update_priv</td>
+<td>Tables or columns</td>
+</tr>
+<tr>
+<td>USAGE</td>
+<td>Synonym for “no privileges”</td>
+<td>Server administration</td>
+</tr>
+</tbody></table>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/" rel="tag"># 数据库</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/03/18/Gitlab%20%E7%A7%81%E6%9C%8D%E5%9F%BA%E4%BA%8Ecentos7%E6%90%AD%E5%BB%BA/" rel="prev" title="Gitlab私服基于centos7搭建">
+      <i class="fa fa-chevron-left"></i> Gitlab私服基于centos7搭建
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/05/01/Linux%20%E7%A3%81%E7%9B%98%E7%9B%B8%E5%85%B3%E5%91%BD%E4%BB%A4%E7%AE%80%E4%BB%8B%EF%BC%9Adf%E3%80%81du%E3%80%81hdparm/" rel="next" title="Linux 磁盘相关命令简介：df、du、hdparm">
+      Linux 磁盘相关命令简介：df、du、hdparm <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%89%8D%E8%A8%80"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%89%E8%A3%85%E6%B5%81%E7%A8%8B"><span class="nav-number">2.</span> <span class="nav-text">安装流程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%90%AF%E5%8A%A8%E9%85%8D%E7%BD%AE"><span class="nav-number">3.</span> <span class="nav-text">启动配置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9F%BA%E6%9C%AC%E6%93%8D%E4%BD%9C"><span class="nav-number">4.</span> <span class="nav-text">基本操作</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Leo Lin"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Leo Lin</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">104</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">11</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Leo Lin</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+
+    <script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"model":{"jsonPath":"/live2dw/assets/hijiki.model.json"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":false},"log":false});</script></body>
+</html>

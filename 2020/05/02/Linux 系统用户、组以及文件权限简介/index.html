@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.1.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"yoursite.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="Linux 安全性模型概述Linux使用User（用户）和Group（组）控制使用者对文件的存取权限，在Linux系统中被创建的用户，可以使用账号和口令登录Linux。Linux系统将一切视为文件，每个文件都有owner,并且owner属于某个Group。 用户Linux 系统的每个用户都有一个唯一的 User ID，Use r的信息存储在 &#x2F;etc&#x2F;passwd 中，该文件的格式示例如下： 1r">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Linux 系统用户、组以及文件权限简介">
+<meta property="og:url" content="http://yoursite.com/2020/05/02/Linux%20%E7%B3%BB%E7%BB%9F%E7%94%A8%E6%88%B7%E3%80%81%E7%BB%84%E4%BB%A5%E5%8F%8A%E6%96%87%E4%BB%B6%E6%9D%83%E9%99%90%E7%AE%80%E4%BB%8B/index.html">
+<meta property="og:site_name" content="江湖の林九">
+<meta property="og:description" content="Linux 安全性模型概述Linux使用User（用户）和Group（组）控制使用者对文件的存取权限，在Linux系统中被创建的用户，可以使用账号和口令登录Linux。Linux系统将一切视为文件，每个文件都有owner,并且owner属于某个Group。 用户Linux 系统的每个用户都有一个唯一的 User ID，Use r的信息存储在 &#x2F;etc&#x2F;passwd 中，该文件的格式示例如下： 1r">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2020-05-02T04:00:00.000Z">
+<meta property="article:modified_time" content="2020-05-06T12:56:27.184Z">
+<meta property="article:author" content="Leo Lin">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://yoursite.com/2020/05/02/Linux%20%E7%B3%BB%E7%BB%9F%E7%94%A8%E6%88%B7%E3%80%81%E7%BB%84%E4%BB%A5%E5%8F%8A%E6%96%87%E4%BB%B6%E6%9D%83%E9%99%90%E7%AE%80%E4%BB%8B/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>Linux 系统用户、组以及文件权限简介 | 江湖の林九</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">江湖の林九</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">相逢何必曾相识！</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/05/02/Linux%20%E7%B3%BB%E7%BB%9F%E7%94%A8%E6%88%B7%E3%80%81%E7%BB%84%E4%BB%A5%E5%8F%8A%E6%96%87%E4%BB%B6%E6%9D%83%E9%99%90%E7%AE%80%E4%BB%8B/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Leo Lin">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="江湖の林九">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Linux 系统用户、组以及文件权限简介
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-05-02 12:00:00" itemprop="dateCreated datePublished" datetime="2020-05-02T12:00:00+08:00">2020-05-02</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-05-06 20:56:27" itemprop="dateModified" datetime="2020-05-06T20:56:27+08:00">2020-05-06</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E8%BF%90%E7%BB%B4%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">运维笔记</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="Linux-安全性模型概述"><a href="#Linux-安全性模型概述" class="headerlink" title="Linux 安全性模型概述"></a>Linux 安全性模型概述</h2><p>Linux使用User（用户）和Group（组）控制使用者对文件的存取权限，在Linux系统中被创建的用户，可以使用账号和口令登录Linux。Linux系统将一切视为文件，每个文件都有owner,并且owner属于某个Group。</p>
+<h2 id="用户"><a href="#用户" class="headerlink" title="用户"></a>用户</h2><p>Linux 系统的每个用户都有一个唯一的 User ID，Use r的信息存储在 /etc/passwd 中，该文件的格式示例如下：</p>
+<figure class="highlight elixir"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="symbol">root:</span><span class="symbol">x:</span>0<span class="symbol">:</span>0<span class="symbol">:root</span><span class="symbol">:/root</span><span class="symbol">:/bin/bash</span></span><br></pre></td></tr></table></figure>
+<p>每一位对应的含义为：</p>
+<figure class="highlight dockerfile"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">用户名:密码:用户ID:组ID:用户全名:主目录:登录<span class="keyword">shell</span></span><br></pre></td></tr></table></figure>
+<p>在旧的系统中，直接将用户的密码存在第二位。由于 /etc/passwd 文件所有用户都有读权限，出于安全性考虑，后来的系统将密码单独拿出来存放在了 /etc/shadow 文件中， 而 /etc/passwd 文件的第二位只用于存储用户是否需要密码，如果用户存在密码，这该位用 ‘x’ 标记，如果是 “!” 或者为空则说明此用户不能用密码登录。</p>
+<p>一般情况下只有拥有 HOME 目录和指定 shell 的用户才能登录系统。User 未经授权将禁止读写或执行其他 User 的文件。Linux 的 root 用户拥有至高无上的权限，可以无条件的对系统中的所有文件进行访问、修改和删除。一般不要随便用 root 登录并操作系统。</p>
+<p>有两个命令可以用于添加新的用户，即 useradd 和 adduser。useradd 是系统原生命令，而 adduser 则是一个 perl 脚本，是对 useradd 的封装，已提供更好的创建用户的接口。adduser 命令的参数选项如下：</p>
+<figure class="highlight jboss-cli"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">-b, <span class="params">--base-dir</span> BASE_DIR       指定主目录的基目录，一般默认为 <span class="string">/home</span></span><br><span class="line">-c, <span class="params">--comment</span> COMMENT         用户注释，即用户的详细信息（如姓名，年龄，电话等）</span><br><span class="line">-d, <span class="params">--home-dir</span> HOME_DIR       为用户指定一个 HOME 目录</span><br><span class="line">-D, <span class="params">--defaults</span>                查看或者改变创建用户时的配置，默认配置在 <span class="string">/etc/default/useradd</span> 中</span><br><span class="line">-e, <span class="params">--expiredate</span> EXPIRE_DATE  指定账户失效日期，格式为 YYYY-MM-DD</span><br><span class="line">-f, <span class="params">--inactive</span> INACTIVE       缓冲时间，指定在密码过期后多少天即关闭该帐号</span><br><span class="line">-g, <span class="params">--gid</span> GROUP               为用户指定一个组或者组 ID</span><br><span class="line">-G, <span class="params">--groups</span> GROUPS           将用户添加到其它的组，多个组时用逗号分隔</span><br><span class="line">-k, <span class="params">--skel</span> SKEL_DIR           指定创建 HOME 目录的模板目录，一般默认为 <span class="string">/etc/skel</span></span><br><span class="line">-K, <span class="params">--key</span> KEY=VALUE           覆盖 <span class="string">/etc/login.defs</span> 中的缺省配置</span><br><span class="line">-l, <span class="params">--no-log-init</span>             不要将此用户添加到最近登录和登录失败数据库</span><br><span class="line">-m, <span class="params">--create-home</span>             创建用户时一并创建用户的主目录</span><br><span class="line">-M, <span class="params">--no-create-home</span>          不要创建用户主目录</span><br><span class="line">-N, <span class="params">--no-user-group</span>           不创建与用户同名的组</span><br><span class="line">-o, <span class="params">--non-unique</span>              允许 UID 与其他用户相同</span><br><span class="line">-p, <span class="params">--password</span> PASSWORD       指定用户密码</span><br><span class="line">-r, <span class="params">--system</span>                  创建为一个系统账户</span><br><span class="line">-s, <span class="params">--shell</span> SHELL             指定用户的登录 Shell</span><br><span class="line">-u, <span class="params">--uid</span> UID                 为用户指定一个 UID</span><br><span class="line">-U, <span class="params">--user-group</span>              创建一个与用户同名的组</span><br></pre></td></tr></table></figure>
+<p><code>userdel</code> 命令用于删除用户，常用的选项是-r，它的作用是把用户的主目录一起删除。</p>
+<p><code>usermod</code>命令用于修改账户信息，常用的选项包括 -c, -d, -m, -g, -G, -s, -u 以及 -o 等，这些选项的意义与useradd命令中的选项一样，可以为用户指定新的资源值。</p>
+<p>管理用户相关的命令工具汇总：</p>
+<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">useradd   ：添加用户</span><br><span class="line">adduser   ：添加用户</span><br><span class="line">passwd    ：为用户设置密码</span><br><span class="line">usermod   ：修改用户命令，可以通过 usermod 来修改登录名、用户的家目录等等</span><br><span class="line">pwcov     ：同步用户从 <span class="regexp">/etc/</span>passwd 到 <span class="regexp">/etc/</span>shadow</span><br><span class="line">pwck      ：pwck是校验用户配置文件 <span class="regexp">/etc/</span>passwd 和<span class="regexp">/etc/</span>shadow 文件内容是否合法或完整</span><br><span class="line">pwunconv  ：是 pwcov 的立逆向操作，是从 <span class="regexp">/etc/</span>shadow 和 <span class="regexp">/etc/</span>passwd 创建 <span class="regexp">/etc/</span>passwd ，然后会删除 <span class="regexp">/etc/</span>shadow 文件</span><br><span class="line">finger    ：查看用户信息工具</span><br><span class="line">id        ：查看用户的 UID、GID 及所归属的用户组</span><br><span class="line">chfn      ：更改用户信息工具</span><br><span class="line">su        ：用户切换工具</span><br><span class="line">sudo      ：sudo 是通过另一个用户来执行命令（execute a command as another user）</span><br><span class="line">visudo    ：visodo 是编辑 <span class="regexp">/etc/</span>sudoers 的命令；也可以不用这个命令，直接用vi 来编辑 <span class="regexp">/etc/</span>sudoers 的效果是一样的</span><br><span class="line">sudoedit  ：和 sudo 功能差不多</span><br></pre></td></tr></table></figure>
+<h2 id="用户群组概述"><a href="#用户群组概述" class="headerlink" title="用户群组概述"></a>用户群组概述</h2><p>Linux 系统的每个 User 都属于一个 Group，具有唯一的标识符 GID。Group 信息存储于 /etc/group 中，且可以为 group 创建密码，密码存放在 /etc/gshadow 文件中，但是一般情况下不需要为用户组创建密码。系统默认会为每个 User 关联一个和 User 同名的 Group，每个 User 也至少存在于自己同名的 Group 中，同时 User 也可以加入其他的 Group。在同一个 Group 中的成员可以共享其他成员的文件。增加一个新的用户组使用 groupadd 命令。 其格式如下：</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">用法：<span class="selector-tag">groupadd</span> <span class="selector-attr">[选项]</span> 组</span><br></pre></td></tr></table></figure>
+<p>可以使用的选项有：</p>
+<figure class="highlight jboss-cli"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">-f, <span class="params">--force</span>                如果组已经存在则成功退出，并且如果 GID 已经存在则取消 -g</span><br><span class="line">-g, <span class="params">--gid</span> GID              为新组使用 GID</span><br><span class="line">-h, <span class="params">--help</span>                 显示此帮助信息并推出</span><br><span class="line">-K, <span class="params">--key</span> KEY=VALUE        不使用 <span class="string">/etc/login.defs</span> 中的默认值</span><br><span class="line">-o, <span class="params">--non-unique</span>           允许创建有重复 GID 的组</span><br><span class="line">-p, <span class="params">--password</span> PASSWORD    为新组使用此加密过的密码</span><br><span class="line">-r, <span class="params">--system</span>               创建一个系统账户</span><br><span class="line">-R, <span class="params">--root</span> CHROOT_DIR      chroot 到的目录</span><br></pre></td></tr></table></figure>
+<p>如果要删除一个已有的用户组，使用groupdel命令，其格式为：<code>groupdel 用户组</code>。修改用户组的属性使用groupmod命令，其语法为：groupmod 选项 用户组</p>
+<p>如果需要将一个用户添加到某个用户组中，可以采用如下命令：</p>
+<figure class="highlight livecodeserver"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">usermod -<span class="keyword">a</span> -G 用户组 用户名</span><br></pre></td></tr></table></figure>
+<p>参数 -a 代表 append， 也就是将用户添加到新用户组中而不必离开原有的其他用户组，不过需要与 -G 选项配合使用， -G 表示指定用户组。如果仅仅只改变一个用户原有的用户组，则采用如下命令：</p>
+<figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">useradd</span> -g 用户组</span><br></pre></td></tr></table></figure>
+<p>管理用户组相关的命令工具汇总：</p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">groupadd   ：添加用户组；</span><br><span class="line">groupdel   ：删除用户组；</span><br><span class="line">groupmod   ：修改用户组信息</span><br><span class="line">groups     ：显示用户所属的用户组</span><br><span class="line">grpck</span><br><span class="line">grpconv    ：通过/etc/group和/etc/gshadow 的文件内容来同步或创建/etc/gshadow ，如果/etc/gshadow 不存在则创建；</span><br><span class="line">grpunconv  ：通过/etc<span class="built_in">/group </span>和/etc/gshadow 文件内容来同步或创建/etc<span class="built_in">/group </span>，然后删除gshadow文件；</span><br></pre></td></tr></table></figure>
+
+<h2 id="Linux-文件和目录权限解读"><a href="#Linux-文件和目录权限解读" class="headerlink" title="Linux 文件和目录权限解读"></a>Linux 文件和目录权限解读</h2><h3 id="1、三种基本权限"><a href="#1、三种基本权限" class="headerlink" title="1、三种基本权限"></a>1、三种基本权限</h3><p>（1）r (read) 读</p>
+<p>针对目录，有读（r）权限就代表能对此目录有列表功能，就是可以执行ls命令进行查看，另外还有cp的功能。 针对文件，有读（r）权限就代表能对此文件有阅读功能，可以通过cat等命令查看文件内容。</p>
+<p>（2）w (write) 写</p>
+<p>针对目录，有写（w）权限就代表着在此目录下创建文件和目录，可以通过touch，mkdir等命令创建文件和目录，另外还可以删除此目录下的文件。 针对文件，有写（w）权限就代表着对此文件可以写入新的内容和修改文件内容。</p>
+<p>（3）x (execute) 执行</p>
+<p>针对目录，有执行（x）权限就代表能进入此目录，利用cd等命令进入此目录 针对文件，有执行（x）权限就代表可以执行此文件。</p>
+<p>在 Linux 下每一文件或目录的访问权限都有三组，每组用三位表示，分别为文件属主的读、写和执行权限；和属主同组的用户的读、写和执行权限；系统中其他用户的读、写和执行权限。当用ls -l命令显示文件或目录的周详信息时，最左边的一列为文件的访问权限。最左边的一位为文件的类型，例如“-”表示普通文件，“d”表示目录等。ls -l所列出的信息各栏含义如下：</p>
+<figure class="highlight axapta"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">第一个栏位，表示文件的属性。</span><br><span class="line">第二个栏位，表示文件个数，即硬链接数。</span><br><span class="line">第三个栏位，表示该文件或目录的拥有者。</span><br><span class="line">第四个栏位，表示所属的组（<span class="keyword">group</span>）。</span><br><span class="line">第五栏位，表示文件大小。</span><br><span class="line">第六个栏位，表示创建日期。</span><br><span class="line">第七个栏位，表示文件名。</span><br></pre></td></tr></table></figure>
+<h3 id="2、特殊位导致权限变化一般有以下两种"><a href="#2、特殊位导致权限变化一般有以下两种" class="headerlink" title="2、特殊位导致权限变化一般有以下两种"></a>2、特殊位导致权限变化一般有以下两种</h3><p>（1）特权位（s）<br>特权位只针对文件有效，并且只能添加在权限位的前三位和中间三位。一个可执行文件拥有 s 位并且在前三位时，即有 SUID 特殊权限(SETUID)时，当别的用户来执行此文件，使用的权限是此可执行文件属主权限；如果一个可执行文件拥有 s 位并且在中间三位时，即有 SGID 特殊权限(SETGID) 当别的用户来执行此文件，使用的权限是此可执行文件属组的权限。</p>
+<p>例如，有普通用户 user1，当 user1 修改密码时，执行 passwd 命令时，passwd 文件权限为：</p>
+<figure class="highlight angelscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ll /usr/bin/passwd</span><br><span class="line">-rwsr-xr-x <span class="number">1</span> root root <span class="number">54256</span> May <span class="number">17</span>  <span class="number">2017</span> /usr/bin/passwd</span><br></pre></td></tr></table></figure>
+<p>那么：</p>
+<figure class="highlight angelscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">1.</span> user1 对于 /usr/bin/passwd 这个程序具有 x 权限，表示 user1 能执行 passwd</span><br><span class="line"><span class="number">2.</span> passwd 文件的所有者是 root </span><br><span class="line"><span class="number">3.</span> user1 执行 passwd 的过程中，会暂时获得 root 的权限</span><br><span class="line"><span class="number">4.</span> /etc/shadow 就可以被  user1 所执行的 passwd 所修改</span><br></pre></td></tr></table></figure>
+<p>（2）粘帖位（t）<br>粘帖位只针对目录有效。有 t 位的目录，任何用户在有权限的情况下是可以创建文件和目录，就算是有权限删除别人的文件或目录也不能删除，同时互相也不能强制保存修改，自己只能删除自己创建的目录，用于一些共享上传的文件服务器场合。粘滞位只能占用后三位权限位。</p>
+<p>例如 <code>/tmp</code> 目录，它的权限为：</p>
+<figure class="highlight angelscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ ll /tmp -d</span><br><span class="line">drwxrwxrwt <span class="number">8</span> root root <span class="number">4096</span> Apr  <span class="number">6</span> <span class="number">15</span>:<span class="number">29</span> /tmp</span><br></pre></td></tr></table></figure>
+<p>这表示任何人都可以在 /tmp 目录内新增、修改文件，但是只有该文件或目录的创建者与 root 用户能够删除自己的文件或目录。</p>
+<p>注： s 位和 t 位都是占用 x 位，那么是否有 x 位，主要是看 s 或 t 的大小写来判别：大写，表示没有执行权限 x 位；小写，表示有执行权限 x 位。对于不可执行文件来说，SETUID 和 SETGID 没有任何意义。</p>
+<h3 id="3、隐藏属性权限"><a href="#3、隐藏属性权限" class="headerlink" title="3、隐藏属性权限"></a>3、隐藏属性权限</h3><p>Linux 除了 9 个权限外，还有些隐藏属性，使用 lsattr 和 chattr 命令来查看和设置这些隐藏属性。</p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">lsattr -- listfile attributes on a Linux second extended file system</span><br><span class="line">chattr -- change file attributeson a Linux second extended file system</span><br></pre></td></tr></table></figure>
+<p>chattr命令语法格式：</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-tag">chattr</span> <span class="selector-attr">[-RVf]</span> <span class="selector-attr">[-+=aAcCdDeijsStTu]</span> <span class="selector-attr">[-v version]</span> <span class="selector-tag">files</span>…</span><br></pre></td></tr></table></figure>
+<p>参数说明：</p>
+<figure class="highlight asciidoc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">-R :  递归处理所有的文件及子目录</span><br><span class="line">-V :  详细显示修改内容，并打印输出</span><br><span class="line"><span class="bullet">- </span>:  失效属性</span><br><span class="line">+ :  激活属性</span><br><span class="line"><span class="section">= :  指定属性</span></span><br></pre></td></tr></table></figure>
+<p>属性:</p>
+<figure class="highlight properties"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">A</span>    <span class="string">no atime update, 不允许修改 atime</span></span><br><span class="line"><span class="attr">S</span>    <span class="string">synchronous updates, 实时写入文件，不使用缓冲区</span></span><br><span class="line"><span class="attr">D</span>    <span class="string">synchoronous directory updates, 实时同步到磁盘，针对目录设置</span></span><br><span class="line"><span class="attr">T</span>    <span class="string">top of directory hierarchy, Orlov 块分配器会将该目录视为目录层次结构的顶部</span></span><br><span class="line"><span class="attr">a</span>    <span class="string">append only, 只允许以 append 模式打开文件</span></span><br><span class="line"><span class="attr">c</span>    <span class="string">compressed, 自动压缩文件，读取时自动解压缩</span></span><br><span class="line"><span class="attr">d</span>    <span class="string">no dump, 当 dump 时，具有 d 属性的文件不加入 dump</span></span><br><span class="line"><span class="attr">e</span>    <span class="string">extent format, 在 ext 文件系统中，表示该文件使用区段(extents)映射磁盘上的块</span></span><br><span class="line"><span class="attr">i</span>    <span class="string">immuttbale, 不允许对文件执行删除，改名，增加软硬链接等操作，且无法写入</span></span><br><span class="line"><span class="attr">j</span>    <span class="string">data journalling, 写入记录 journal</span></span><br><span class="line"><span class="attr">s</span>    <span class="string">secure deletion, 可以安全删除，即硬盘空间被全部收回，不留痕迹</span></span><br><span class="line"><span class="attr">t</span>    <span class="string">no tail-merging, 与其它文件合并时末端不会存在局部块碎片</span></span><br><span class="line"><span class="attr">u</span>    <span class="string">undeletable, 与 s 相反，删除时数据还会存在磁盘中，可恢复</span></span><br></pre></td></tr></table></figure>
+<h3 id="4、chmod-命令"><a href="#4、chmod-命令" class="headerlink" title="4、chmod 命令"></a>4、chmod 命令</h3><p>chmod 命令是非常重要的，用于改动文件或目录的访问权限。用户用他控制文件或目录的访问权限。该命令有两种用法。一种是包含字母和操作符表达式的文字设定法；另一种是包含数字的数字设定法。</p>
+<p>文字设定法</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-tag">chmod</span> <span class="selector-attr">[who]</span> <span class="selector-attr">[+	-	=]</span> <span class="selector-attr">[mode]</span> <span class="selector-tag">file</span>…</span><br></pre></td></tr></table></figure>
+<p>命令中各选项的含义为：</p>
+<figure class="highlight properties"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">操作对象who可是下述字母中的任一个或他们的组合：</span></span><br><span class="line"><span class="attr">u</span> <span class="string">表示 “用户（user）”，即文件或目录的所有者</span></span><br><span class="line"><span class="attr">g</span> <span class="string">表示 “同组（group）用户”，即和文件属主有相同组 ID 的所有用户</span></span><br><span class="line"><span class="attr">o</span> <span class="string">表示 “其他（others）用户”</span></span><br><span class="line"><span class="attr">a</span> <span class="string">表示 “所有（all）用户”。此为系统默认值</span></span><br></pre></td></tr></table></figure>
+<p>操作符号可以是：</p>
+<figure class="highlight asciidoc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">+ 添加某个权限。</span><br><span class="line"><span class="bullet">- </span>取消某个权限。</span><br><span class="line"><span class="section">= 赋予给定权限并取消其他所有权限（如果有的话）。</span></span><br></pre></td></tr></table></figure>
+<p>设置 mode 所表示的权限可用下述字母的任意组合：</p>
+<figure class="highlight properties"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">r</span> <span class="string">可读</span></span><br><span class="line"><span class="attr">w</span> <span class="string">可写</span></span><br><span class="line"><span class="attr">x</span> <span class="string">可执行</span></span><br></pre></td></tr></table></figure>
+<p>x 只有目标文件对某些用户是可执行的或该目标文件是目录时才追加 x 属性。</p>
+<p>s 在文件执行时把进程的属主或组 ID 置为该文件的文件属主。方式<code>u+s</code>设置文件的用户 ID 位，g+s 设置组 ID 位。</p>
+<p>文件可以是以空格分开的要改动权限的文件列表，支持通配符。在一个命令行中可给出多个权限方式，其间用逗号隔开。例如：</p>
+<figure class="highlight livecodeserver"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 使同组和其他用户对文件有读权限</span></span><br><span class="line">chmod g+r, o+r <span class="built_in">file</span></span><br><span class="line">chmod go+r <span class="built_in">file</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 给文件加上 SETUID，并去掉同组和其他人的读权限</span></span><br><span class="line">chmod u+s, go-r <span class="built_in">file</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 给目录加上粘滞位（粘滞位只占用 others 权限位）</span></span><br><span class="line">chmod o+t <span class="built_in">directory</span></span><br></pre></td></tr></table></figure>
+<h3 id="数字设定法"><a href="#数字设定法" class="headerlink" title="数字设定法"></a>数字设定法</h3><p>数字表示的属性的含义：0表示没有权限，1表示可执行权限，2表示可写权限，4表示可读权限。通过将三个值相加来得到要设置的权限。所以数字属性的格式应为3 个从0到7的八进制数，其顺序是（u）（g）（o）。例如，如果想让某个文件的属主有“读/写”二种权限，需要把4（可读）+2（可写）=6（读/写）。数字设定法的一般形式为：</p>
+<figure class="highlight vim"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">chmod [<span class="keyword">mode</span>] <span class="keyword">file</span>…</span><br></pre></td></tr></table></figure>
+<p>例如，将一个文件的权限设置为属主可读可写，同组用户可读可写，其他用户可读，则命令为：</p>
+<figure class="highlight angelscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">chmod <span class="number">664</span> file</span><br></pre></td></tr></table></figure>
+
+<h3 id="5、chgrp和chown命令"><a href="#5、chgrp和chown命令" class="headerlink" title="5、chgrp和chown命令"></a>5、chgrp和chown命令</h3><p>chgrp 命令用于改动文件或目录所属的组。语法格式如下：</p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">chgrp [-R]<span class="built_in"> group </span>file…</span><br></pre></td></tr></table></figure>
+<p>该命令改动指定文件所属的用户组。其中 group 可以是用户组 ID，也可以是 /etc/group 文件中用户组的组名。文件名是以空格分开的要改动属组的文件列表，支持通配符。如果用户不是该文件的属主或终极用户，则不能改动该文件的组。-R 参数递归式地改动指定目录及其下的所有子目录和文件的属组。例如改动 /opt/local /book/ 及其子目录下的所有文件的属组为 book：</p>
+<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">chgrp –R book <span class="regexp">/opt/</span>local/book</span><br></pre></td></tr></table></figure>
+<p><code>chown</code> 命令用于更改某个文件或目录的属主和属组。这个命令也非常常用。例如 root 用户把自己的一个文件拷贝给用户 huoty，为了让用户 huoty 能够存取这个文件，root 用户应该把这个文件的属主设为 huoty，否则，用户 huoty 无法存取这个文件。语法格式如下：</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-tag">chown</span> <span class="selector-attr">[选项]</span> 用户或组 文件</span><br></pre></td></tr></table></figure>
+<p>chown 将指定文件的拥有者改为指定的用户或组。用户能是用户名或用户ID。组能是组名或组ID。文件是以空格分开的要改动权限的文件列表，支持通配符。该命令的各选项含义如下：</p>
+<figure class="highlight brainfuck"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="literal">-</span><span class="comment">c</span><span class="string">,</span> --<span class="comment">changes</span>          <span class="comment">显示更改的部分的信息</span></span><br><span class="line"><span class="comment"></span><span class="literal">-</span><span class="comment">f</span><span class="string">,</span> --<span class="comment">silent</span><span class="string">,</span> --<span class="comment">quiet</span>  <span class="comment">忽略错误信息</span></span><br><span class="line"><span class="comment"></span><span class="literal">-</span><span class="comment">R</span><span class="string">,</span> --<span class="comment">recursive</span>        <span class="comment">递归处理指定目录以及其子目录下的所有文件</span></span><br><span class="line"><span class="comment"></span>--<span class="comment">reference</span>            <span class="comment">参考指定文件或目录的用户和组</span></span><br><span class="line"><span class="comment"></span><span class="literal">-</span><span class="comment">h</span><span class="string">,</span> --<span class="comment">no</span><span class="literal">-</span><span class="comment">dereference</span>   <span class="comment">只对符号链接的文件本身做修改，而不更改其他任何相关文件</span></span><br><span class="line"><span class="comment"></span>--<span class="comment">dereference</span>          <span class="comment">作用于符号链接的指向，而不是链接文件本身，与</span> <span class="literal">-</span><span class="comment">h</span> <span class="comment">参数相反</span></span><br><span class="line"><span class="comment"></span><span class="literal">-</span><span class="comment">v</span><span class="string">,</span> --<span class="comment">verbose</span>          <span class="comment">显示详细的处理信息</span></span><br></pre></td></tr></table></figure>
+<p>使用例示：</p>
+<figure class="highlight haskell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta"># 改变文件的所有者：</span></span><br><span class="line"><span class="title">chown</span> www-<span class="class"><span class="keyword">data</span> test</span></span><br><span class="line"><span class="title">chown</span> www-<span class="class"><span class="keyword">data</span>: test</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># 改变文件的所属组：</span></span><br><span class="line"><span class="title">chown</span> :www-<span class="class"><span class="keyword">data</span> test</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># 同时改变文件的所有者和所属组：</span></span><br><span class="line"><span class="title">chown</span> huoty:huoty test</span><br></pre></td></tr></table></figure>
+
+<h3 id="getfacl和setfacl命令"><a href="#getfacl和setfacl命令" class="headerlink" title="getfacl和setfacl命令"></a>getfacl和setfacl命令</h3><p><code>setfacl</code>命令可以用来细分 Linux 下的文件权限。chmod 命令可以把文件权限分为 u,g,o 三个组，而 setfacl 可以对每一个文件或目录设置更精确的文件权限。 即 setfacl 可以更精确的控制权限的分配，如，让某一个用户对某一个文件具有某种权限。这种独立于传统的 u,g,o 的 rwx 权限之外的具体权限设置叫 ACL（Access Control List）。ACL 可以针对单一用户、单一文件或目录来进行 r,w,x 的权限控制，对于需要特殊权限控制的情况是有用的。</p>
+<figure class="highlight gams"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">setfacl [-bkndRLP] &#123; -m|-M|-x|-X ... &#125; <span class="keyword">file</span> ...</span><br><span class="line">-m, --modify-acl        更改文件的访问控制列表</span><br><span class="line">-M, --modify-<span class="keyword">file</span>=<span class="keyword">file</span>  从文件读取访问控制列表条目更改</span><br><span class="line">-x, --remove=acl        根据文件中访问控制列表移除条目</span><br><span class="line">-X, --remove-<span class="keyword">file</span>=<span class="keyword">file</span>  从文件读取访问控制列表条目并删除</span><br><span class="line">-b, --remove-<span class="keyword">all</span>        删除所有扩展访问控制列表条目</span><br><span class="line">-k, --remove-default    移除默认访问控制列表</span><br><span class="line">    --<span class="keyword">set</span>=acl           设定替换当前的文件访问控制列表</span><br><span class="line">    --<span class="keyword">set</span>-file=file     从文件中读取访问控制列表条目设定</span><br><span class="line">    --mask              重新计算有效权限掩码</span><br><span class="line">-n, --no-mask           不重新计算有效权限掩码</span><br><span class="line">-d, --default           应用到默认访问控制列表的操作</span><br><span class="line">-R, --recursive         递归操作子目录</span><br><span class="line">-L, --logical           依照系统逻辑，跟随符号链接</span><br><span class="line">-P, --physical          依照自然逻辑，不跟随符号链接</span><br><span class="line">    --restore=file      恢复访问控制列表，和<span class="comment"> getfacl -R</span> 作用相反</span><br><span class="line">    --test              测试模式，并不真正修改访问控制列表属性</span><br><span class="line">-v, --version           显示版本并退出</span><br><span class="line">-h, --help              显示本帮助信息</span><br></pre></td></tr></table></figure>
+<p>示例：</p>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 设置用户 user1 对 test 文件的访问权限</span></span><br><span class="line"><span class="attribute">setfacl</span> -m u:user<span class="number">1</span>:r-x test</span><br><span class="line"></span><br><span class="line"><span class="comment"># 设置用户组 group1 对 test/ 目录的访问权限</span></span><br><span class="line"><span class="attribute">setfacl</span> -m u:user<span class="number">1</span>:rwx test/</span><br></pre></td></tr></table></figure>
+<p><code>getfacl</code> 用于获取文件的 acl 权限控制：</p>
+<figure class="highlight livecodeserver"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">getfacl [-aceEsRLPtpndvh] <span class="built_in">file</span> ...</span><br><span class="line">-<span class="keyword">a</span>, <span class="comment">--access            仅显示文件访问控制列表</span></span><br><span class="line">-d, <span class="comment">--default           仅显示默认的访问控制列表</span></span><br><span class="line">-c, <span class="comment">--omit-header       不显示注释表头</span></span><br><span class="line">-e, <span class="comment">--all-effective     显示所有的有效权限</span></span><br><span class="line">-E, <span class="comment">--no-effective      显示无效权限</span></span><br><span class="line">-s, <span class="comment">--skip-base         跳过只有基条目(base entries)的文件</span></span><br><span class="line">-R, <span class="comment">--recursive         递归显示子目录</span></span><br><span class="line">-L, <span class="comment">--logical           逻辑遍历(跟随符号链接)</span></span><br><span class="line">-P, <span class="comment">--physical          物理遍历(不跟随符号链接)</span></span><br><span class="line">-t, <span class="comment">--tabular           使用制表符分隔的输出格式</span></span><br><span class="line">-n, <span class="comment">--numeric           显示数字的用户/组标识</span></span><br><span class="line">-p, <span class="comment">--absolute-names    不去除路径前的 &#x27;/&#x27; 符号</span></span><br><span class="line">-v, <span class="comment">--version           显示版本并退出</span></span><br><span class="line">-h, <span class="comment">--help              显示本帮助信息</span></span><br></pre></td></tr></table></figure>
+<p>使用示例<br>（1）管理 opt 目录<br>创建 readers 组，表示该组中的用户对文件有只读权限</p>
+<figure class="highlight ebnf"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">groupadd readers</span></span><br></pre></td></tr></table></figure>
+<p>创建 writers 组，表示改该组中的用户对文件用写权限</p>
+<figure class="highlight ebnf"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">groupadd writers</span></span><br></pre></td></tr></table></figure>
+<p>让 writers 组的用户对 /opt 目录可读写:</p>
+<figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">setfacl -m <span class="attr">g:</span><span class="attr">writers:</span>rwx /opt</span><br></pre></td></tr></table></figure>
+<p>给 /opt 目录添加 粘帖权限位（t）:</p>
+<figure class="highlight armasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="symbol">chmod</span> o+t /<span class="meta">opt</span></span><br></pre></td></tr></table></figure>
+<p>把需要的用户添加到 writers 组：</p>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">usermod</span> -a -G writers user<span class="number">1</span></span><br></pre></td></tr></table></figure>
+<p>把需要的用户添加到 readers 组：</p>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">usermod</span> -a -G readers user<span class="number">1</span></span><br></pre></td></tr></table></figure>
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/05/02/Vue%20%E6%8F%92%E6%A7%BD%E3%80%81%E5%85%B7%E5%90%8D%E6%8F%92%E6%A7%BD%E3%80%81%E4%BD%9C%E7%94%A8%E5%9F%9F%E6%8F%92%E6%A7%BD/" rel="prev" title="Vue 插槽、具名插槽、作用域插槽">
+      <i class="fa fa-chevron-left"></i> Vue 插槽、具名插槽、作用域插槽
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/05/05/Mysql%E5%9F%BA%E7%A1%80%E6%9F%A5%E8%AF%A2%E6%95%B0%E6%8D%AE%E6%9B%B4%E6%96%B0/" rel="next" title="Mysql基础查询数据更新">
+      Mysql基础查询数据更新 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Linux-%E5%AE%89%E5%85%A8%E6%80%A7%E6%A8%A1%E5%9E%8B%E6%A6%82%E8%BF%B0"><span class="nav-number">1.</span> <span class="nav-text">Linux 安全性模型概述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%94%A8%E6%88%B7"><span class="nav-number">2.</span> <span class="nav-text">用户</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%94%A8%E6%88%B7%E7%BE%A4%E7%BB%84%E6%A6%82%E8%BF%B0"><span class="nav-number">3.</span> <span class="nav-text">用户群组概述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Linux-%E6%96%87%E4%BB%B6%E5%92%8C%E7%9B%AE%E5%BD%95%E6%9D%83%E9%99%90%E8%A7%A3%E8%AF%BB"><span class="nav-number">4.</span> <span class="nav-text">Linux 文件和目录权限解读</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1%E3%80%81%E4%B8%89%E7%A7%8D%E5%9F%BA%E6%9C%AC%E6%9D%83%E9%99%90"><span class="nav-number">4.1.</span> <span class="nav-text">1、三种基本权限</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2%E3%80%81%E7%89%B9%E6%AE%8A%E4%BD%8D%E5%AF%BC%E8%87%B4%E6%9D%83%E9%99%90%E5%8F%98%E5%8C%96%E4%B8%80%E8%88%AC%E6%9C%89%E4%BB%A5%E4%B8%8B%E4%B8%A4%E7%A7%8D"><span class="nav-number">4.2.</span> <span class="nav-text">2、特殊位导致权限变化一般有以下两种</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3%E3%80%81%E9%9A%90%E8%97%8F%E5%B1%9E%E6%80%A7%E6%9D%83%E9%99%90"><span class="nav-number">4.3.</span> <span class="nav-text">3、隐藏属性权限</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4%E3%80%81chmod-%E5%91%BD%E4%BB%A4"><span class="nav-number">4.4.</span> <span class="nav-text">4、chmod 命令</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%95%B0%E5%AD%97%E8%AE%BE%E5%AE%9A%E6%B3%95"><span class="nav-number">4.5.</span> <span class="nav-text">数字设定法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5%E3%80%81chgrp%E5%92%8Cchown%E5%91%BD%E4%BB%A4"><span class="nav-number">4.6.</span> <span class="nav-text">5、chgrp和chown命令</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#getfacl%E5%92%8Csetfacl%E5%91%BD%E4%BB%A4"><span class="nav-number">4.7.</span> <span class="nav-text">getfacl和setfacl命令</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Leo Lin"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Leo Lin</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">104</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">11</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Leo Lin</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+
+    <script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"model":{"jsonPath":"/live2dw/assets/hijiki.model.json"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":false},"log":false});</script></body>
+</html>

@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.1.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"yoursite.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="前言QPS：Queries Per Second意思是“每秒查询率”，是一台服务器每秒能够相应的查询次数，是对一个特定的查询服务器在规定时间内所处理流量多少的衡量标准。 TPS：是TransactionsPerSecond的缩写，也就是事务数&#x2F;秒。它是软件测试结果的测量单位。一个事务是指一个客户机向服务器发送请求然后服务器做出反应的过程。客户机在发送请求时开始计时，收到服务器响应后结束计时，以此来">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Mysql 视图、事务、索引">
+<meta property="og:url" content="http://yoursite.com/2020/05/10/Mysql%20%E8%A7%86%E5%9B%BE%E3%80%81%E4%BA%8B%E5%8A%A1%E3%80%81%E7%B4%A2%E5%BC%95/index.html">
+<meta property="og:site_name" content="江湖の林九">
+<meta property="og:description" content="前言QPS：Queries Per Second意思是“每秒查询率”，是一台服务器每秒能够相应的查询次数，是对一个特定的查询服务器在规定时间内所处理流量多少的衡量标准。 TPS：是TransactionsPerSecond的缩写，也就是事务数&#x2F;秒。它是软件测试结果的测量单位。一个事务是指一个客户机向服务器发送请求然后服务器做出反应的过程。客户机在发送请求时开始计时，收到服务器响应后结束计时，以此来">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://yoursite.com/images/20-database/04-shiwu.png">
+<meta property="article:published_time" content="2020-05-10T02:00:00.000Z">
+<meta property="article:modified_time" content="2020-05-28T04:25:18.438Z">
+<meta property="article:author" content="Leo Lin">
+<meta property="article:tag" content="数据库">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://yoursite.com/images/20-database/04-shiwu.png">
+
+<link rel="canonical" href="http://yoursite.com/2020/05/10/Mysql%20%E8%A7%86%E5%9B%BE%E3%80%81%E4%BA%8B%E5%8A%A1%E3%80%81%E7%B4%A2%E5%BC%95/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>Mysql 视图、事务、索引 | 江湖の林九</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">江湖の林九</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">相逢何必曾相识！</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/05/10/Mysql%20%E8%A7%86%E5%9B%BE%E3%80%81%E4%BA%8B%E5%8A%A1%E3%80%81%E7%B4%A2%E5%BC%95/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Leo Lin">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="江湖の林九">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Mysql 视图、事务、索引
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-05-10 10:00:00" itemprop="dateCreated datePublished" datetime="2020-05-10T10:00:00+08:00">2020-05-10</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-05-28 12:25:18" itemprop="dateModified" datetime="2020-05-28T12:25:18+08:00">2020-05-28</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E8%BF%90%E7%BB%B4%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">运维笔记</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>QPS：Queries Per Second意思是“每秒查询率”，是一台服务器每秒能够相应的查询次数，是对一个特定的查询服务器在规定时间内所处理流量多少的衡量标准。</p>
+<p>TPS：是TransactionsPerSecond的缩写，也就是事务数/秒。它是软件测试结果的测量单位。一个事务是指一个客户机向服务器发送请求然后服务器做出反应的过程。客户机在发送请求时开始计时，收到服务器响应后结束计时，以此来计算使用的时间和完成的事务个数。</p>
+<h2 id="视图"><a href="#视图" class="headerlink" title="视图"></a>视图</h2><p>视图是基于 SQL 语句的结果集的可视化的表，即视图是一个虚拟存在的表，可以包含表的全部或者部分记录，也可以由一个表或者多个表来创建。</p>
+<figure class="highlight smali"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">## 一般创建语法</span></span><br><span class="line">create view &lt;视图名称&gt; [(column_list)]</span><br><span class="line">as select语句</span><br><span class="line">with<span class="built_in"> check </span>option;</span><br></pre></td></tr></table></figure>
+
+<h2 id="索引"><a href="#索引" class="headerlink" title="索引"></a>索引</h2><p>索引（Index）是帮助MySQL高效获取数据的数据结构，MySQL只对以下操作符才使用索引：&lt;，&lt;=，=，&gt;，&gt;=，between，in。</p>
+<p>设计索引的原则：</p>
+<ul>
+<li>最适合索引的列是出现在WHERE子句中的列，或连接子句（on语句）中指定的列。</li>
+<li>索引列的值中，不相同的数目越多，索引的效果越好。</li>
+<li>使用短索引：对于CHAR和VARCHAR列，只用它的一部分来创建索引，可以节省索引空间，也会使查询更快捷。</li>
+</ul>
+<p>优点：</p>
+<ul>
+<li>提高了检索速度，若没有索引，MYSQL不得不以第一条记录开始全表扫描直到找出相关的行。</li>
+</ul>
+<p>缺点：</p>
+<ul>
+<li>降低更新表的速度，如对表进行INSERT、UPDATE和DELETE。在执行这些操作时，DBMS（数据库管理系统）必须动态更新索引。</li>
+<li>占用磁盘空间。</li>
+</ul>
+<h3 id="索引的类型"><a href="#索引的类型" class="headerlink" title="索引的类型"></a>索引的类型</h3><p>1、从数据结构角度：</p>
+<ul>
+<li>B+树索引(O(log(n)))：关于B+树索引，可以参考 MySQL索引背后的数据结构及算法原理</li>
+<li>hash索引</li>
+<li>FULLTEXT索引（现在MyISAM和InnoDB引擎都支持了）</li>
+<li>R-Tree索引（用于对GIS数据类型创建SPATIAL索引）</li>
+</ul>
+<p>1.2 B+Tree索引和Hash索引区别？<br>哈希索引适合等值查询，但是无法进行范围查询<br>哈希索引没办法利用索引完成排序<br>哈希索引不支持多列联合索引的最左匹配规则<br>如果有大量重复键值的情况下，哈希索引的效率会很低，因为存在哈希碰撞问题</p>
+<p>2、从物理存储角度：</p>
+<ul>
+<li>聚簇索引（clustered index）</li>
+<li>非聚簇索引（non-clustered index）</li>
+</ul>
+<p>3、从逻辑角度：</p>
+<ul>
+<li><p>主键索引：主键索引是一种特殊的唯一索引，不允许有空值<br>在 MYSQL 中，当你建立主键时，主键索引同时也已经建立起来了，不必重复设置。</p>
+</li>
+<li><p>普通索引或者单列索引</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">## 直接创建索引</span></span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">INDEX</span> 索引名 <span class="keyword">ON</span> 表名(列名[(<span class="keyword">length</span>)]…); </span><br><span class="line"></span><br><span class="line"><span class="comment">## 修改表结构时添加普通索引，索引值可出现多</span></span><br><span class="line"><span class="keyword">ALTER</span> <span class="keyword">TABLE</span> tbl_name <span class="keyword">ADD</span> <span class="keyword">INDEX</span> index_name (column_list)</span><br><span class="line"></span><br><span class="line"><span class="comment">## 查看索引</span></span><br><span class="line"><span class="keyword">SHOW</span> <span class="keyword">INDEX</span> <span class="keyword">FROM</span> 表名</span><br><span class="line"></span><br><span class="line"><span class="comment">## 删除索引</span></span><br><span class="line"><span class="keyword">DROP</span> <span class="keyword">INDEX</span> 索引名称 <span class="keyword">ON</span> 表名</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>多列索引（复合索引）：复合索引指多个字段上创建的索引，只有在查询条件中使用了创建索引时的第一个字段，索引才会被使用，使用复合索引时遵循最左前缀集合。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">alter</span> <span class="keyword">table</span> student <span class="keyword">add</span> <span class="keyword">index</span> sy(<span class="keyword">name</span>，age，score); </span><br><span class="line"><span class="comment">## 最左前缀匹配</span></span><br><span class="line"><span class="keyword">select</span> * <span class="keyword">from</span> student <span class="keyword">where</span> <span class="keyword">name</span>=<span class="string">&#x27;jia&#x27;</span> <span class="keyword">and</span> age&gt;=<span class="number">12</span> //<span class="keyword">where</span>条件中含有索引的首列字段和第二个字段 </span><br><span class="line"><span class="keyword">select</span> * <span class="keyword">from</span> student <span class="keyword">where</span> <span class="keyword">name</span>=<span class="string">&#x27;jia&#x27;</span> //<span class="keyword">where</span>条件中只含有首列字段 </span><br><span class="line"><span class="keyword">select</span> * <span class="keyword">from</span> student <span class="keyword">where</span> <span class="keyword">name</span>=<span class="string">&#x27;jia&#x27;</span> <span class="keyword">and</span> age=<span class="number">12</span> <span class="keyword">and</span> score &gt; <span class="number">60</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>唯一索引或者非唯一索引<br>创建方式和上方的普通索引类似，即将普通索引的’index’改为’unique index’。</p>
+</li>
+<li><p>空间索引：空间索引是对空间数据类型的字段建立的索引，MYSQL中的空间数据类型有4种，分别是GEOMETRY、POINT、LINESTRING、POLYGON。MYSQL使用SPATIAL关键字进行扩展，使得能够用于创建正规索引类型的语法创建空间索引。创建空间索引的列，必须将其声明为NOT NULL，空间索引只能在存储引擎为MYISAM的表中创建</p>
+</li>
+</ul>
+<h2 id="事务"><a href="#事务" class="headerlink" title="事务"></a>事务</h2><p>1、四大特性(ACID)<br>原子性（Atomicity）<br>一致性（Consistency）<br>隔离性（lsolation）<br>持久性（Durability）</p>
+<p>2、自动提交<br>MySQL 默认开启事务自动提交模式，即除非显式的开启事务（BEGIN 或 START TRANSACTION），否则每条 SOL 语句都会被当做一个单独的事务自动执行。</p>
+<p>3、事务隔离级别<br>如果事务没有隔离性，就容易出现脏读、不可重复读和幻读等情况。<br><strong>脏读</strong><br>脏读是指一个事务正在访问数据，并且对数据进行了修改，但是这种修改还没有提交到数据库中，这时，另外一个事务也访问这个数据，然后使用了这个数据。<br><strong>不可重复读</strong><br>不可重复读是指在一个事务内，多次读取同一个数据。<br>在这个事务还没有结束时，另外一个事务也访问了该同一数据。那么，在第一个事务中的两次读数据之间，由于第二个事务的修改，那么第一个事务两次读到的的数据可能是不一样的。这样在一个事务内两次读到的数据是不一样的，因此称为是不可重复读。<br><strong>幻读</strong><br>幻读是指当事务不是独立执行时发生的一种现象，例如第一个事务对一个表中的数据进行了修改，这种修改涉及到表中的全部数据行。同时，第二个事务也修改这个表中的数据，这种修改是向表中插入一行新数据。那么，以后就会发生操作第一个事务的用户发现表中还有没有修改的数据行，就好象发生了幻觉一样。<br>为了解决以上这些问题，标准 SQL 定义了 4 类事务隔离级别，用来指定事务中的哪些数据改变是可见的，哪些数据改变是不可见的。</p>
+<figure class="highlight asciidoc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">如何查看事务隔离级别：</span><br><span class="line"></span><br><span class="line">mysql&gt; show variables  like <span class="emphasis">&#x27;%iso%&#x27;</span>;</span><br><span class="line"><span class="code">+---------------+</span>-----------------+</span><br><span class="line">| Variable<span class="emphasis">_name | Value           |</span></span><br><span class="line"><span class="emphasis">+---------------+-----------------+</span></span><br><span class="line"><span class="emphasis">| tx_</span>isolation  | REPEATABLE-READ |</span><br><span class="line"><span class="code">+---------------+</span>-----------------+</span><br><span class="line">1 row in set, 1 warning (0.40 sec)</span><br><span class="line">如何设置事务隔离级别：</span><br><span class="line"></span><br><span class="line">mysql&gt; set session tx<span class="emphasis">_isolation=&#x27;REPEATABLE-READ&#x27;;</span></span><br><span class="line"><span class="emphasis">Query OK, 0 rows affected (0.32 sec)</span></span><br></pre></td></tr></table></figure>
+<p><img src="/images/20-database/04-shiwu.png"></p>
+<p>4、事务开启与提交</p>
+<figure class="highlight pgsql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">begin</span> 或者 <span class="keyword">start</span>  <span class="keyword">transaction</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">commit</span> 将缓存的数据变更到物理表钟</span><br><span class="line"></span><br><span class="line"><span class="keyword">rollback</span> 放弃缓存的变更数据</span><br></pre></td></tr></table></figure>
+
+<p>5、大事务<br>定义：运行时间长比较长，操作的数据比较多的事务<br>风险：<br>锁定太多的数据，造成大量的阻塞和锁超时<br>回滚时间所需时间长，回滚的时候，数据同样是处于锁定状态<br>执行时间长，容易造成主从延迟（需要先在主服务器进行）</p>
+<p>如何处理大事务？<br>避免一次处理太多的数据（分批处理）<br>移除不必要在事务中的SELECT操作（只有必要的写操作）</p>
+<h2 id="查询优化神器-explain"><a href="#查询优化神器-explain" class="headerlink" title="查询优化神器-explain"></a>查询优化神器-explain</h2><figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">EXPLAIN SELECT * <span class="keyword">FROM</span> cnarea_2018 WHERE id = 1;</span><br><span class="line">1<span class="built_in">	SIMPLE	</span>cnarea_2018	const(走索引)	PRIMARY	PRIMARY	3	const	1	</span><br><span class="line"></span><br><span class="line">EXPLAIN SELECT * <span class="keyword">FROM</span> cnarea_2018 WHERE <span class="attribute">pinyin</span>=<span class="string">&quot;KangYingJiaYuanSiSheQu&quot;</span></span><br><span class="line">1<span class="built_in">	SIMPLE	</span>cnarea_2018	ALL(全表扫描)					778092	Using where</span><br></pre></td></tr></table></figure>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/" rel="tag"># 数据库</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/05/05/Mysql%E5%9F%BA%E7%A1%80%E6%9F%A5%E8%AF%A2%E6%95%B0%E6%8D%AE%E6%9B%B4%E6%96%B0/" rel="prev" title="Mysql基础查询数据更新">
+      <i class="fa fa-chevron-left"></i> Mysql基础查询数据更新
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/06/01/%E7%BB%8F%E6%B5%8E%E6%9C%BA%E5%99%A8%E6%98%AF%E5%A6%82%E4%BD%95%E8%BF%90%E8%A1%8C%E7%9A%84/" rel="next" title="经济机器是如何运行的">
+      经济机器是如何运行的 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%89%8D%E8%A8%80"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%A7%86%E5%9B%BE"><span class="nav-number">2.</span> <span class="nav-text">视图</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%B4%A2%E5%BC%95"><span class="nav-number">3.</span> <span class="nav-text">索引</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%B4%A2%E5%BC%95%E7%9A%84%E7%B1%BB%E5%9E%8B"><span class="nav-number">3.1.</span> <span class="nav-text">索引的类型</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8B%E5%8A%A1"><span class="nav-number">4.</span> <span class="nav-text">事务</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9F%A5%E8%AF%A2%E4%BC%98%E5%8C%96%E7%A5%9E%E5%99%A8-explain"><span class="nav-number">5.</span> <span class="nav-text">查询优化神器-explain</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Leo Lin"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Leo Lin</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">104</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">11</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Leo Lin</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+
+    <script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"model":{"jsonPath":"/live2dw/assets/hijiki.model.json"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":false},"log":false});</script></body>
+</html>

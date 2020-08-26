@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.1.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"yoursite.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="前言一个函数一次性定义的代码块可以多次调用。在JavaScript中，一个函数有很多元素组成，同时也受很多元素影响：  函数体的代码 函数的参数列表 接受外部变量域的变量 返回值 当函数被调用时，this指上下文 命名和匿名函数 函数对象作为变量声明 arguments对象(在ES6中的箭头函数中将丢弃这个)这些元素都会影响到函数，但具体影响函数的行为还是取决于函数的声明类型。在JavaScrip">
+<meta property="og:type" content="article">
+<meta property="og:title" content="JavaScript函数声明的六种方法">
+<meta property="og:url" content="http://yoursite.com/2019/10/05/JavaScript%E5%87%BD%E6%95%B0%E5%A3%B0%E6%98%8E%E7%9A%84%E5%85%AD%E7%A7%8D%E6%96%B9%E6%B3%95/index.html">
+<meta property="og:site_name" content="江湖の林九">
+<meta property="og:description" content="前言一个函数一次性定义的代码块可以多次调用。在JavaScript中，一个函数有很多元素组成，同时也受很多元素影响：  函数体的代码 函数的参数列表 接受外部变量域的变量 返回值 当函数被调用时，this指上下文 命名和匿名函数 函数对象作为变量声明 arguments对象(在ES6中的箭头函数中将丢弃这个)这些元素都会影响到函数，但具体影响函数的行为还是取决于函数的声明类型。在JavaScrip">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2019-10-05T14:30:00.000Z">
+<meta property="article:modified_time" content="2020-04-24T02:49:54.876Z">
+<meta property="article:author" content="Leo Lin">
+<meta property="article:tag" content="Javascript">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://yoursite.com/2019/10/05/JavaScript%E5%87%BD%E6%95%B0%E5%A3%B0%E6%98%8E%E7%9A%84%E5%85%AD%E7%A7%8D%E6%96%B9%E6%B3%95/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>JavaScript函数声明的六种方法 | 江湖の林九</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">江湖の林九</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">相逢何必曾相识！</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/10/05/JavaScript%E5%87%BD%E6%95%B0%E5%A3%B0%E6%98%8E%E7%9A%84%E5%85%AD%E7%A7%8D%E6%96%B9%E6%B3%95/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Leo Lin">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="江湖の林九">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          JavaScript函数声明的六种方法
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-10-05 22:30:00" itemprop="dateCreated datePublished" datetime="2019-10-05T22:30:00+08:00">2019-10-05</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-04-24 10:49:54" itemprop="dateModified" datetime="2020-04-24T10:49:54+08:00">2020-04-24</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%89%8D%E7%AB%AF%E8%BF%9B%E9%98%B6/" itemprop="url" rel="index"><span itemprop="name">前端进阶</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>一个函数一次性定义的代码块可以多次调用。在JavaScript中，一个函数有很多元素组成，同时也受很多元素影响：</p>
+<ul>
+<li>函数体的代码</li>
+<li>函数的参数列表</li>
+<li>接受外部变量域的变量</li>
+<li>返回值</li>
+<li>当函数被调用时，this指上下文</li>
+<li>命名和匿名函数</li>
+<li>函数对象作为变量声明</li>
+<li>arguments对象(在ES6中的箭头函数中将丢弃这个)<br>这些元素都会影响到函数，但具体影响函数的行为还是取决于函数的声明类型。在JavaScript中常见的声明类型有以下几种方法：</li>
+</ul>
+<p>函数声明类型对函数代码的影响只是轻微的。重要的是函数如何与外部组件交互功能（比如外部作用域、闭包、对象自身拥有的方法等）和调用方式（普通函数调用、方法调用和构造函数调用等）。</p>
+<p>例如，你需要通过this在一个函数调用封闭的下下文（即this从外部函数继承过来）。最好的选择是使用箭头函数，很清楚的提供了必要的下下文。</p>
+<p>比如下面示例：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Names</span> </span>&#123;  </span><br><span class="line">    <span class="keyword">constructor</span> (names) &#123;</span><br><span class="line">        <span class="built_in">this</span>.names = names;</span><br><span class="line">    &#125;</span><br><span class="line">    contains(names) &#123;</span><br><span class="line">        <span class="keyword">return</span> names.every(<span class="function">(<span class="params">name</span>) =&gt;</span> <span class="built_in">this</span>.names.indexOf(name) !== <span class="number">-1</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">var</span> countries = <span class="keyword">new</span> Names([<span class="string">&#x27;UK&#x27;</span>, <span class="string">&#x27;Italy&#x27;</span>, <span class="string">&#x27;Germany&#x27;</span>, <span class="string">&#x27;France&#x27;</span>]);  </span><br><span class="line">countries.contains([<span class="string">&#x27;UK&#x27;</span>, <span class="string">&#x27;Germany&#x27;</span>]); <span class="comment">// =&gt; true  </span></span><br><span class="line">countries.contains([<span class="string">&#x27;USA&#x27;</span>, <span class="string">&#x27;Italy&#x27;</span>]);  <span class="comment">// =&gt; false  </span></span><br></pre></td></tr></table></figure>
+<p>箭头函数传给.every()的this（一个替代Names类）其实就是一个contains()方法。使用一个箭头(=&gt;)来声明一个函数是最适当的声明方式，特别是在这个案例中，上下文需要继承来自外部的方法.contains()。</p>
+<p>如果试图使用一个函数表达式来调用.every()，这将需要更多的手工去配置上下文。有两种方式，第一种就是给.every(function(){…}, this)第二个参数，来表示上下文。或者在function(){…}.bind(this)使用.bind()作为回调函数。这是额外的代码，而箭头函数提供的上下文透明度更容易让人理解。</p>
+<p>这篇文章介绍了如何在JavaScript中声明一个函数的六种方法。每一种类型都将会通过简短代码来阐述。感偿趣？</p>
+<h2 id="函数声明-Function-declaration"><a href="#函数声明-Function-declaration" class="headerlink" title="函数声明(Function declaration)"></a>函数声明(Function declaration)</h2><p>函数声明通过关键词function来声明，关键词后面紧跟的是函数的名称，名称后面有一个小括号(()),括号里面放置了函数的参数(para1,…,paramN)和一对大括号{…}，函数的代码块就放在这个大括号内。</p>
+<figure class="highlight actionscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">name</span><span class="params">([param,[, param,[<span class="rest_arg">..., param</span>]]])</span> </span>&#123;</span><br><span class="line">   [statements]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>来看一个函数声明的示例：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// function declaration</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">isEven</span> (<span class="params">num</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> num % <span class="number">2</span> === <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line">isEven(<span class="number">24</span>); <span class="comment">// =&gt; true</span></span><br><span class="line">isEven(<span class="number">11</span>); <span class="comment">// =&gt; false</span></span><br></pre></td></tr></table></figure>
+<p>function isEven(num) {…}是一个函数声明，定义了一个isEven函数。用来判断一个数是不是偶数。</p>
+<p>函数声明创建了一个变量，在当前作用域，这个变量就是函数的名称，而且是一个函数对象。这个函数变量存在变量生命提升，它会提到当前作用域的顶部，也就是说，在函数声明之前可以调用。</p>
+<p>函数声明创建的函数已经被命名，也就是说函数对的name属性就是他声明的名称。在调试或者错误信息阅读的时候，其很有用。</p>
+<p>下面的示例，演示了这些属性：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Hoisted variable</span></span><br><span class="line"><span class="built_in">console</span>.log(hello(<span class="string">&#x27;Aliens&#x27;</span>)); <span class="comment">// =&gt; &#x27;Hello Aliens!&#x27;</span></span><br><span class="line"><span class="comment">// Named function</span></span><br><span class="line"><span class="built_in">console</span>.log(hello.name); <span class="comment">// =&gt; &#x27;hello&#x27;</span></span><br><span class="line"><span class="comment">// Variable holds the function object</span></span><br><span class="line"><span class="built_in">console</span>.log(<span class="keyword">typeof</span> hello); <span class="comment">// =&gt; &#x27;function&#x27;</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">hello</span>(<span class="params">name</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="string">`Hello <span class="subst">$&#123;name&#125;</span>!`</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>函数声明function hello(name) {…}创建了一个hello变量，并且提升到当前作用域最顶部。hello变量是一个函数对象，以及hello.name包括了函数的名称hello。</p>
+<h2 id="一个普通函数"><a href="#一个普通函数" class="headerlink" title="一个普通函数"></a>一个普通函数</h2><p>函数声明匹配的情况应该是创建一个普通函数。普通的意思意味着你声明的函数只是一次声明，但在后面可以多次调用它。它下的示例就是最基本的使用场景：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">sum</span> (<span class="params">a, b</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> a + b;</span><br><span class="line">&#125;</span><br><span class="line">sum(<span class="number">5</span>, <span class="number">6</span>); <span class="comment">// =&gt; 11</span></span><br><span class="line">([<span class="number">3</span>, <span class="number">7</span>]).reduce(sum); <span class="comment">// =&gt; 10</span></span><br></pre></td></tr></table></figure>
+<p>因为函数声明在当前作用域内创建了一个变量，其除了可以当作普通函数调用之外，还常用于递归或分离的事件侦听。函数表达式或箭头函数是无法创建绑定函数名称作为函数变量。</p>
+<p>下面的示例演示了一递归的阶乘计算：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">factorial</span>(<span class="params">n</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (n === <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> n * factorial(n - <span class="number">1</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">factorial(<span class="number">4</span>); <span class="comment">// =&gt; 24</span></span><br></pre></td></tr></table></figure>
+<p>有关于阶乘(Factorial)相关的详细介绍，可以点击这里。</p>
+<p>在factorial()函数做递归计算时调用了开始声明的函数，将函数当作一个变量：factorial(n - 1)。当然也可以使用一个函数表达式，将其赋值给一个普能的变量，比如:var factorial = function (n) {…}。但函数声明function factorial(n)看起来更紧凑（不需要var和=）。</p>
+<p>函数声明的一个重要属性是它的提升机制。它允许在相同的作用域范围内之前使用声明的函数。提升机制在很多情况下是有用的。例如，当你一个脚本内先看到了被调用的函数，但又没有仔细阅读函数的功能。而函数的功能实现可以位于下面的文件，你甚至都不用滚动代码。</p>
+<p>你可以在这里了解函数声明的提升机制。</p>
+<h2 id="与函数表达式区别"><a href="#与函数表达式区别" class="headerlink" title="与函数表达式区别"></a>与函数表达式区别</h2><p>函数声明和函数表达式很容易混淆。他们看起来非常相似，但他们具有不同的属性。</p>
+<p>一个容易记住的规则：函数声明总是以function关键词开始，如果不是，那它就是一个函数表达式。</p>
+<p>下面就是一个函数声明的示例，声明是以function关键词开始：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Function declaration: starts with &quot;function&quot;</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">isNil</span>(<span class="params">value</span>) </span>&#123;  </span><br><span class="line">    <span class="keyword">return</span> value == <span class="literal">null</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>函数表达式不是以function关键词开始（目前都一般出现在代码的中间地方）：</p>
+<figure class="highlight ada"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">// <span class="keyword">Function</span> <span class="title">expression:</span> starts <span class="keyword">with</span> <span class="string">&quot;var&quot;</span></span><br><span class="line">var isTruthy = <span class="keyword">function</span>(value) &#123;  </span><br><span class="line">    <span class="keyword">return</span> !!value;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">// <span class="keyword">Function</span> <span class="title">expression:</span> an argument for .filter()</span><br><span class="line">var numbers = ([1, false, 5]).filter(<span class="keyword">function</span>(item) &#123;  </span><br><span class="line">    <span class="keyword">return</span> <span class="type">typeof</span> item === <span class="symbol">&#x27;number</span>&#x27;;</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">// <span class="keyword">Function</span> <span class="title">expression</span> (IIFE): starts <span class="keyword">with</span> <span class="string">&quot;(&quot;</span></span><br><span class="line">(<span class="keyword">function</span> <span class="title">messageFunction</span>(message) &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="type">message</span> + &#x27; World!&#x27;;</span><br><span class="line">&#125;)(<span class="symbol">&#x27;Hello</span>&#x27;);</span><br></pre></td></tr></table></figure>
+<h2 id="条件中的函数声明"><a href="#条件中的函数声明" class="headerlink" title="条件中的函数声明"></a>条件中的函数声明</h2><p>当函数声明出现if、for或while这样的条件语句块{…}时，在一些JavaScript环境内可能会抛出一个引用错误。让我们来看看在严格模式下，函数声明出现在一个条件语句块中，看看会发生什么。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">(<span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line"><span class="meta">    &#x27;use strict&#x27;</span>;</span><br><span class="line">    <span class="keyword">if</span> (<span class="literal">true</span>) &#123;</span><br><span class="line">        <span class="function"><span class="keyword">function</span> <span class="title">ok</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="string">&#x27;true ok&#x27;</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="function"><span class="keyword">function</span> <span class="title">ok</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="string">&#x27;false ok&#x27;</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="keyword">typeof</span> ok === <span class="string">&#x27;undefined&#x27;</span>); <span class="comment">// =&gt; true</span></span><br><span class="line">    <span class="built_in">console</span>.log(ok()); <span class="comment">// Throws &quot;ReferenceError: ok is not defined&quot;</span></span><br><span class="line">&#125;)();</span><br></pre></td></tr></table></figure>
+<p>当调用ok()函数时，JavaScript抛出一个异常错误”ReferenceError: ok is not defined”,因为函数声明出现在一个条件语句块内。注意，这种情况适用于非严格模式环境下，这让人更感到困惑。</p>
+<p>一般来说，在这样的情况之下，当一个函数应该创建在基于某些条件内时，应该使用一个函数表达式，而不应该使用函数声明。比如下面这个示例：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">(<span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line"><span class="meta">    &#x27;use strict&#x27;</span>;</span><br><span class="line">    <span class="keyword">var</span> ok;</span><br><span class="line">    <span class="keyword">if</span> (<span class="literal">true</span>) &#123;</span><br><span class="line">        ok = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="string">&#x27;true ok&#x27;</span>;</span><br><span class="line">        &#125;;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        ok = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="string">&#x27;false ok&#x27;</span>;</span><br><span class="line">        &#125;;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="keyword">typeof</span> ok === <span class="string">&#x27;function&#x27;</span>); <span class="comment">// =&gt; true</span></span><br><span class="line">    <span class="built_in">console</span>.log(ok()); <span class="comment">// =&gt; &#x27;true ok&#x27;</span></span><br><span class="line">&#125;)();</span><br></pre></td></tr></table></figure>
+<p>因为函数是一个普通对象，根据不同的条件，将其分配给一个变量，是一个不错的选择。调用ok()函数也能正常工作，不会抛出任何错误。</p>
+<h2 id="函数表达式"><a href="#函数表达式" class="headerlink" title="函数表达式"></a>函数表达式</h2><p>函数表达式是由一个function关键词，紧随其后的是一个可选的函数名，一串参数(para1,…,paramN)放在小括号内和代码主体放在大括号内{…}。</p>
+<p>一些函数表达式的使用方法：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> count = <span class="function"><span class="keyword">function</span>(<span class="params">array</span>) </span>&#123; <span class="comment">// Function expression  </span></span><br><span class="line">    <span class="keyword">return</span> array.length;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> methods = &#123;  </span><br><span class="line">    numbers: [<span class="number">1</span>, <span class="number">5</span>, <span class="number">8</span>],</span><br><span class="line">    sum: <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123; <span class="comment">// Function expression</span></span><br><span class="line">        <span class="keyword">return</span> <span class="built_in">this</span>.numbers.reduce(<span class="function"><span class="keyword">function</span>(<span class="params">acc, num</span>) </span>&#123; <span class="comment">// func. expression</span></span><br><span class="line">            <span class="keyword">return</span> acc + num;</span><br><span class="line">        &#125;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">count([<span class="number">5</span>, <span class="number">7</span>, <span class="number">8</span>]); <span class="comment">// =&gt; 3  </span></span><br><span class="line">methods.sum();    <span class="comment">// =&gt; 14  </span></span><br></pre></td></tr></table></figure>
+<p>函数表达式创建了一个函数对象，可以用在不同的情况下：</p>
+<ul>
+<li>当作一个对象赋值给一个变量count = function(…) {…}</li>
+<li>在一个对象上创建一个方法sum: function() {…}</li>
+<li>当作一个回调函数.reduce(function(…) {…})<br>函数表达式在JavaScript中经常使用。大多数的时候，开发人员处理这种类型的函数，喜欢使用箭头函数。</li>
+</ul>
+<h2 id="命名函数表达式"><a href="#命名函数表达式" class="headerlink" title="命名函数表达式"></a>命名函数表达式</h2><p>当函数没有一个名称（名称属性是一个空字符串）时这个函数是一个匿名函数。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> getType = <span class="function"><span class="keyword">function</span>(<span class="params">variable</span>) </span>&#123;  </span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">typeof</span> variable;</span><br><span class="line">&#125;;</span><br><span class="line">getType.name <span class="comment">// =&gt; &#x27;&#x27; </span></span><br></pre></td></tr></table></figure>
+<p>getType就是一个匿名函数，其getType.name的值为’’。</p>
+<p>当表达式指定了一个名称时，这就是一个命名函数表达式。它和简单的函数表达式相比具有一些额外的属性。</p>
+<ul>
+<li>创建一个命名函数，其name属性就是函数名</li>
+<li>在函数体中具有和函数对象相同名称的一个变量<br>我们使用上面的例子，不同的是在函数表达式内指定了一个名称:<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> getType = <span class="function"><span class="keyword">function</span> <span class="title">funName</span>(<span class="params">variable</span>) </span>&#123;  </span><br><span class="line">    <span class="built_in">console</span>.log(<span class="keyword">typeof</span> funName === <span class="string">&#x27;function&#x27;</span>); <span class="comment">// =&gt; true</span></span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">typeof</span> variable;</span><br><span class="line">&#125;</span><br><span class="line"><span class="built_in">console</span>.log(getType(<span class="number">3</span>));                    <span class="comment">// =&gt; &#x27;number&#x27;  </span></span><br><span class="line"><span class="built_in">console</span>.log(getType.name);                  <span class="comment">// =&gt; &#x27;funName&#x27;  </span></span><br><span class="line"><span class="built_in">console</span>.log(<span class="keyword">typeof</span> funName === <span class="string">&#x27;function&#x27;</span>); <span class="comment">// =&gt; false</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">funName</span>(<span class="params">variable</span>) </span>&#123;...&#125;是一个命名函数表达式。在函数作用范围内存一个funName变量。函数对象的name属性就是函数的名称funName。</span><br></pre></td></tr></table></figure>
+<h2 id="支持命名函数表达式"><a href="#支持命名函数表达式" class="headerlink" title="支持命名函数表达式"></a>支持命名函数表达式</h2>当变量赋值时使用一个函数表达式var fun = function() {}，很多引擎可以推断这个变量的函数名。回调时常常给其传递的是一个匿名函数表达式，并没有存储到变量中，所以引擎不能确定它的名字。</li>
+</ul>
+<p>在很多情况之下，使用命名函数和避免匿名函数似乎是很在理的。而且这也会带来一系列的好处：</p>
+<ul>
+<li>在调试时，错误信息和调用堆栈时使用函数名能显示更详细的信息</li>
+<li>调试时更舒服，可以减少anonoymous堆栈的名字出现的次数</li>
+<li>函数名有助于快速理解其功能</li>
+<li>在函数递归调用的范围内或事件监听时可以按名称来访问函数</li>
+</ul>
+<h2 id="方法定义"><a href="#方法定义" class="headerlink" title="方法定义"></a>方法定义</h2><p>方法定义可以在object literals和ES6 class时定义。可以使用一个函数的名称，并紧随其后跟一对小括号放置参数列表(para1,…,paramN)和函数主体代码放在一个大括内{…}。</p>
+<p>下面的示例是基于object literals上使用方法定义函数。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> collection = &#123;  </span><br><span class="line">    items: [],</span><br><span class="line">    add(...items) &#123;</span><br><span class="line">        <span class="built_in">this</span>.items.push(...items);</span><br><span class="line">    &#125;,</span><br><span class="line">    get(index) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="built_in">this</span>.items[index];</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line">collection.add(<span class="string">&#x27;C&#x27;</span>, <span class="string">&#x27;Java&#x27;</span>, <span class="string">&#x27;PHP&#x27;</span>);  </span><br><span class="line">collection.get(<span class="number">1</span>) <span class="comment">// =&gt; &#x27;Java&#x27;</span></span><br></pre></td></tr></table></figure>
+<p>add()和get()方法在collection对象使用方法定义。这些方法可以像这样调用collection.add(…)和collection.get(…)。</p>
+<p>方法定义和传统的属性定义有点类似，通一个冒号:把名称和函数表达式连接在一起，比如add:function(…) {…}。</p>
+<ul>
+<li>更短的语法更易读和写</li>
+<li>方法定义创建命名函数，和函数表达式刚好相反。有利于用于调试<br>注意，使用class语法需要短形式方法来声明：<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Star</span> </span>&#123;  </span><br><span class="line">    <span class="keyword">constructor</span>(name) &#123;</span><br><span class="line">        <span class="built_in">this</span>.name = name;</span><br><span class="line">    &#125;</span><br><span class="line">    getMessage(message) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="built_in">this</span>.name + message;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">var</span> sun = <span class="keyword">new</span> Star(<span class="string">&#x27;Sun&#x27;</span>);  </span><br><span class="line">sun.getMessage(<span class="string">&#x27; is shining&#x27;</span>) <span class="comment">// =&gt; &#x27;Sun is shining&#x27;</span></span><br></pre></td></tr></table></figure>
+<h2 id="计算属性名和方法"><a href="#计算属性名和方法" class="headerlink" title="计算属性名和方法"></a>计算属性名和方法</h2>ES6中增加了一个很好的特性：在object literals和class中可以计算属性。</li>
+</ul>
+<p>计算属性的方法和[methodNmae(){…}]略有不同，其定义的方法这样的：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> addMethod = <span class="string">&#x27;add&#x27;</span>,  </span><br><span class="line">    getMethod = <span class="string">&#x27;get&#x27;</span>;</span><br><span class="line"><span class="keyword">var</span> collection = &#123;  </span><br><span class="line">    items: [],</span><br><span class="line">    [addMethod](...items) &#123;</span><br><span class="line">        <span class="built_in">this</span>.items.push(...items);</span><br><span class="line">    &#125;,</span><br><span class="line">    [getMethod](index) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="built_in">this</span>.items[index];</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line">collection[addMethod](<span class="string">&#x27;C&#x27;</span>, <span class="string">&#x27;Java&#x27;</span>, <span class="string">&#x27;PHP&#x27;</span>);  </span><br><span class="line">collection[getMethod](<span class="number">1</span>) <span class="comment">// =&gt; &#x27;Java&#x27;  </span></span><br></pre></td></tr></table></figure>
+<p><a href="...">addMethod</a> {…} 和 <a href="...">getMethod</a> {…}使用了计算属性名快速方法声明。</p>
+<h2 id="箭头函数"><a href="#箭头函数" class="headerlink" title="箭头函数"></a>箭头函数</h2><p>箭头函数的定义是使用一对小括号，括号内是一系列的参数(param1,param2,…,paramN),后面紧跟=&gt;符号和{…}，代码主体放置在这对大括号内。</p>
+<p>当箭头函数只有一个参数时，可以省略这对小括号，另外它只包含一个声明时，大括号都可以省略。</p>
+<p>下面的示例就是一个箭头函数的基本用法：</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> absValue = <span class="function">(<span class="params"><span class="built_in">number</span></span>) =&gt;</span> &#123;  </span><br><span class="line">    <span class="keyword">if</span> (<span class="built_in">number</span> &lt; <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> -<span class="built_in">number</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">number</span>;</span><br><span class="line">&#125;</span><br><span class="line">absValue(<span class="number">-10</span>); <span class="comment">// =&gt; 10  </span></span><br><span class="line">absValue(<span class="number">5</span>);   <span class="comment">// =&gt; 5</span></span><br></pre></td></tr></table></figure>
+<p>absValue是一个箭头函数，这个函数主要功能就是计算一个数的绝对值。</p>
+<p>函数声明使用箭头函数，其中=&gt;具有以下属性：</p>
+<ul>
+<li>箭头函数不创建执行自己的上下文（函数表达式或函数声明式相反，创建不创建取决于this的调用）</li>
+<li>箭头函数是一个匿名函数：name是一个空字符串’’（函数声明式相反，它有一个名字）</li>
+<li>arguments对象不可使用箭头函数（与其它声明类型相反，其他类型提供arguments对象）<h2 id="Context-transparency"><a href="#Context-transparency" class="headerlink" title="Context transparency"></a>Context transparency</h2>this关键词的使用在JavaScript中让很多同学都感到困惑。(这篇文章详细介绍了this关键词的使用)。</li>
+</ul>
+<p>因为函数创建了自己的可执行的上下文(execution context)，这也造成一般情况很难确定this所指。</p>
+<p>ES6引用箭头函数改善了这种用法（context lexically）。这是一个很好的特性，因为从现在开始函数需要封闭的上下文时没有必要使用.bind(this)或者var self = this。</p>
+<p>来看一个示例，看this如何继承外部函数：</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> Numbers &#123;  </span><br><span class="line">    <span class="keyword">constructor</span>(<span class="params">array</span>) &#123;</span><br><span class="line">        <span class="built_in">this</span>.array = array;</span><br><span class="line">    &#125;</span><br><span class="line">    addNumber(<span class="built_in">number</span>) &#123;</span><br><span class="line">        <span class="keyword">if</span> (<span class="built_in">number</span> !== <span class="literal">undefined</span>) &#123;</span><br><span class="line">            <span class="built_in">this</span>.array.push(<span class="built_in">number</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="function">(<span class="params"><span class="built_in">number</span></span>) =&gt;</span> &#123; </span><br><span class="line">            <span class="built_in">console</span>.log(<span class="built_in">this</span> === numbersObject); <span class="comment">// =&gt; true</span></span><br><span class="line">            <span class="built_in">this</span>.array.push(<span class="built_in">number</span>);</span><br><span class="line">        &#125;;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">var</span> numbersObject = <span class="keyword">new</span> Numbers([]);  </span><br><span class="line">numbersObject.addNumber(<span class="number">1</span>);  </span><br><span class="line"><span class="keyword">var</span> addMethod = numbersObject.addNumber();  </span><br><span class="line">addMethod(<span class="number">5</span>);</span><br><span class="line"><span class="built_in">console</span>.log(numbersObject.array); <span class="comment">// =&gt; [1, 5]</span></span><br></pre></td></tr></table></figure>
+<p>Numbers类有一个数字数组，并且提供了一个addNumber()方法，将新数据插入到这个数组中。</p>
+<p>当addNumber()不带任何参数被调用时，则返回一个闭包，允许插入新的数据。这个闭包是一个箭头函数，它的this就相当于numbersObject。因为其上下文意思取自addNumbers()方法。</p>
+<p>如果没有箭头函数，那么需要我们自己手动去修复。这也意味着，要添加.bind()方法：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//...</span></span><br><span class="line">    <span class="keyword">return</span> <span class="function"><span class="keyword">function</span>(<span class="params">number</span>) </span>&#123; </span><br><span class="line">      <span class="built_in">console</span>.log(<span class="built_in">this</span> === numbersObject); <span class="comment">// =&gt; true</span></span><br><span class="line">      <span class="built_in">this</span>.array.push(number);</span><br><span class="line">    &#125;.bind(<span class="built_in">this</span>);</span><br><span class="line"><span class="comment">//...</span></span><br></pre></td></tr></table></figure>
+<p>或者将上下文(context)存给一个变量var self = this:</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//...</span></span><br><span class="line">    <span class="keyword">var</span> self = <span class="built_in">this</span>;</span><br><span class="line">    <span class="keyword">return</span> <span class="function"><span class="keyword">function</span>(<span class="params">number</span>) </span>&#123; </span><br><span class="line">      <span class="built_in">console</span>.log(self === numbersObject); <span class="comment">// =&gt; true</span></span><br><span class="line">      self.array.push(number);</span><br><span class="line">    &#125;;</span><br><span class="line"><span class="comment">//...</span></span><br></pre></td></tr></table></figure>
+<p>context transparency这个属性可以让你在一个封闭的环境内任意使用this。</p>
+<h2 id="短回调"><a href="#短回调" class="headerlink" title="短回调"></a>短回调</h2><p>前面也说过了，当创建的箭头函数只有一个参数，或者主体只有一个声明时，小括号()和花括号{}都可以省去。这有助于创建一个非常短的回调函数。</p>
+<p>让我们创建一个函数，如果数组只有0这个元素，将它找出来。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> numbers = [<span class="number">1</span>, <span class="number">5</span>, <span class="number">10</span>, <span class="number">0</span>];  </span><br><span class="line">numbers.some(<span class="function"><span class="params">item</span> =&gt;</span> item === <span class="number">0</span>); <span class="comment">// =&gt; true </span></span><br></pre></td></tr></table></figure>
+<p>item =&gt; item === 0是一个箭头函数，它看上去非常简单。</p>
+<p>有时候嵌套短的箭头函数会让代码阅读起来增加困难。所以最方便的方式是当这它是一个回调函数(没有嵌套)可以使用短的箭头函数方式。如果有必要，添加花括号之来，这样有利于代码的阅读。</p>
+<h2 id="函数生成器"><a href="#函数生成器" class="headerlink" title="函数生成器"></a>函数生成器</h2><p>生成函数在JavaScript中会返回一个Generator对象。其语法类似于函数表达式、函数声明式和方法声明，不同的是，它需要在function后添加一个*符号。</p>
+<p>生成器函数可以按以下这些方式来声明函数：</p>
+<p>函数声明function* <name>():</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span>* <span class="title">indexGenerator</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> index = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">while</span>(<span class="literal">true</span>) &#123;</span><br><span class="line">        <span class="keyword">yield</span> index++;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">var</span> g = indexGenerator();</span><br><span class="line"><span class="built_in">console</span>.log(g.next().value); <span class="comment">// =&gt; 0</span></span><br><span class="line"><span class="built_in">console</span>.log(g.next().value); <span class="comment">// =&gt; 1</span></span><br></pre></td></tr></table></figure>
+<p>函数表达式function* ():</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> indexGenerator = <span class="function"><span class="keyword">function</span>* (<span class="params"></span>) </span>&#123;  </span><br><span class="line">    <span class="keyword">var</span> index = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">while</span>(<span class="literal">true</span>) &#123;</span><br><span class="line">        <span class="keyword">yield</span> index++;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="keyword">var</span> g = indexGenerator();  </span><br><span class="line"><span class="built_in">console</span>.log(g.next().value); <span class="comment">// =&gt; 0  </span></span><br><span class="line"><span class="built_in">console</span>.log(g.next().value); <span class="comment">// =&gt; 1 </span></span><br></pre></td></tr></table></figure>
+<p>方法生成*<name>:</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> obj = &#123;  </span><br><span class="line">    *indexGenerator() &#123;</span><br><span class="line">        <span class="keyword">var</span> index = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">while</span>(<span class="literal">true</span>) &#123;</span><br><span class="line">            <span class="keyword">yield</span> index++;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">var</span> g = obj.indexGenerator();  </span><br><span class="line"><span class="built_in">console</span>.log(g.next().value); <span class="comment">// =&gt; 0  </span></span><br><span class="line"><span class="built_in">console</span>.log(g.next().value); <span class="comment">// =&gt; 1  </span></span><br></pre></td></tr></table></figure>
+<p>上面三种方式生成的函数都会返回一个生成器对象g。然后g可以生成一系列的数字。</p>
+<h2 id="函数构造器-new-Function"><a href="#函数构造器-new-Function" class="headerlink" title="函数构造器: new Function"></a>函数构造器: new Function</h2><p>在JavaScript函数中第一个类(class object)对象: 函数是一个普通的对象类型是function。</p>
+<p>这种声明的方式创建相同的函数对象类型，来看一个示例：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">sum1</span>(<span class="params">a, b</span>) </span>&#123;  </span><br><span class="line">    <span class="keyword">return</span> a + b;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">var</span> sum2 = <span class="function"><span class="keyword">function</span>(<span class="params">a, b</span>) </span>&#123;  </span><br><span class="line">    <span class="keyword">return</span> a + b;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">var</span> sum3 = <span class="function">(<span class="params">a, b</span>) =&gt;</span> a + b;  </span><br><span class="line"><span class="built_in">console</span>.log(<span class="keyword">typeof</span> sum1 === <span class="string">&#x27;function&#x27;</span>); <span class="comment">// =&gt; true  </span></span><br><span class="line"><span class="built_in">console</span>.log(<span class="keyword">typeof</span> sum2 === <span class="string">&#x27;function&#x27;</span>); <span class="comment">// =&gt; true  </span></span><br><span class="line"><span class="built_in">console</span>.log(<span class="keyword">typeof</span> sum3 === <span class="string">&#x27;function&#x27;</span>); <span class="comment">// =&gt; true  </span></span><br></pre></td></tr></table></figure>
+<p>函数对象类型有一个构造器(constructor):Function。</p>
+<p>当Function当作构造器(constructor)new Function(arg1,arg2,…,argN,bodyString),那么Function 构造器会创建一个新的 Function 对象(new Function)。其中参数arg1,arg2,…,argN会传递给构造器(constructor)成为新函数的参数，而且最后一个参数bodyString用作函数体代码。</p>
+<p>来看一个示例，创建一个函数，求两个数的和：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> numberA = <span class="string">&#x27;numberA&#x27;</span>, numberB = <span class="string">&#x27;numberB&#x27;</span>;  </span><br><span class="line"><span class="keyword">var</span> sumFunction = <span class="keyword">new</span> <span class="built_in">Function</span>(numberA, numberB,  </span><br><span class="line">   <span class="string">&#x27;return numberA + numberB&#x27;</span></span><br><span class="line">);</span><br><span class="line">sumFunction(<span class="number">10</span>, <span class="number">15</span>) <span class="comment">// =&gt; 25  </span></span><br></pre></td></tr></table></figure>
+<p>sumFunction创建的Function构造器调用了numberA和numberB两个参数，并且在函数主体内执行return numberA + numberB。</p>
+<p>这种方式创建的函数不能访问当前的作用域，因为没办法创建闭包。他们总是在全局作用域内创建的。</p>
+<p>一个可能就用new Function的最佳方式是浏览器或NodeJs脚本访问一个全局对象：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">(<span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line"><span class="meta">    &#x27;use strict&#x27;</span>;</span><br><span class="line">    <span class="keyword">var</span> <span class="built_in">global</span> = <span class="keyword">new</span> <span class="built_in">Function</span>(<span class="string">&#x27;return this&#x27;</span>)();</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="built_in">global</span> === <span class="built_in">window</span>); <span class="comment">// =&gt; true</span></span><br><span class="line">    <span class="built_in">console</span>.log(<span class="built_in">this</span> === <span class="built_in">window</span>);   <span class="comment">// =&gt; false</span></span><br><span class="line">&#125;)();</span><br></pre></td></tr></table></figure>
+<h2 id="哪种方式最好"><a href="#哪种方式最好" class="headerlink" title="哪种方式最好"></a>哪种方式最好</h2><p>没有孰好孰坏，函数的声明类型的决定要视实际情况而定。但有一些规则还是值得大家一起遵循。</p>
+<p>如果要在一个闭包内使用this，那么箭头函数是一个很好的解决方案。另外回调函数是一个简短声明时，箭头函数也是一个很好的选择，因为它的代码短。</p>
+<p>当在object literals上需要一个更短的语法时，方法声明是可取的。</p>
+<p>new Function这种方法一般不用来声明函数。主要因为它存在很多问题。</p>
+<p>我认为这篇文章另一个作用是让大家写出更具可读性的代码，和减少函数使用的bug。因为他们像细胞一样存在任何一个应用程序当中。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Javascript/" rel="tag"># Javascript</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2019/10/05/Javascript%E5%88%9B%E5%BB%BA%E5%AF%B9%E8%B1%A1%E7%9A%847%E7%A7%8D%E6%96%B9%E6%B3%95/" rel="prev" title="Javascript创建对象的7种方法">
+      <i class="fa fa-chevron-left"></i> Javascript创建对象的7种方法
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2019/10/05/Javascript%E5%BC%82%E6%AD%A5%E7%BC%96%E7%A8%8B%E7%9A%844%E7%A7%8D%E6%96%B9%E6%B3%95/" rel="next" title="Javascript异步编程的4种方法">
+      Javascript异步编程的4种方法 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%89%8D%E8%A8%80"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%87%BD%E6%95%B0%E5%A3%B0%E6%98%8E-Function-declaration"><span class="nav-number">2.</span> <span class="nav-text">函数声明(Function declaration)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80%E4%B8%AA%E6%99%AE%E9%80%9A%E5%87%BD%E6%95%B0"><span class="nav-number">3.</span> <span class="nav-text">一个普通函数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%8E%E5%87%BD%E6%95%B0%E8%A1%A8%E8%BE%BE%E5%BC%8F%E5%8C%BA%E5%88%AB"><span class="nav-number">4.</span> <span class="nav-text">与函数表达式区别</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9D%A1%E4%BB%B6%E4%B8%AD%E7%9A%84%E5%87%BD%E6%95%B0%E5%A3%B0%E6%98%8E"><span class="nav-number">5.</span> <span class="nav-text">条件中的函数声明</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%87%BD%E6%95%B0%E8%A1%A8%E8%BE%BE%E5%BC%8F"><span class="nav-number">6.</span> <span class="nav-text">函数表达式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%91%BD%E5%90%8D%E5%87%BD%E6%95%B0%E8%A1%A8%E8%BE%BE%E5%BC%8F"><span class="nav-number">7.</span> <span class="nav-text">命名函数表达式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%94%AF%E6%8C%81%E5%91%BD%E5%90%8D%E5%87%BD%E6%95%B0%E8%A1%A8%E8%BE%BE%E5%BC%8F"><span class="nav-number">8.</span> <span class="nav-text">支持命名函数表达式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%96%B9%E6%B3%95%E5%AE%9A%E4%B9%89"><span class="nav-number">9.</span> <span class="nav-text">方法定义</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AE%A1%E7%AE%97%E5%B1%9E%E6%80%A7%E5%90%8D%E5%92%8C%E6%96%B9%E6%B3%95"><span class="nav-number">10.</span> <span class="nav-text">计算属性名和方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AE%AD%E5%A4%B4%E5%87%BD%E6%95%B0"><span class="nav-number">11.</span> <span class="nav-text">箭头函数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Context-transparency"><span class="nav-number">12.</span> <span class="nav-text">Context transparency</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%9F%AD%E5%9B%9E%E8%B0%83"><span class="nav-number">13.</span> <span class="nav-text">短回调</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%87%BD%E6%95%B0%E7%94%9F%E6%88%90%E5%99%A8"><span class="nav-number">14.</span> <span class="nav-text">函数生成器</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%87%BD%E6%95%B0%E6%9E%84%E9%80%A0%E5%99%A8-new-Function"><span class="nav-number">15.</span> <span class="nav-text">函数构造器: new Function</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%93%AA%E7%A7%8D%E6%96%B9%E5%BC%8F%E6%9C%80%E5%A5%BD"><span class="nav-number">16.</span> <span class="nav-text">哪种方式最好</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Leo Lin"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Leo Lin</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">104</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">11</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Leo Lin</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+
+    <script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"model":{"jsonPath":"/live2dw/assets/hijiki.model.json"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":false},"log":false});</script></body>
+</html>

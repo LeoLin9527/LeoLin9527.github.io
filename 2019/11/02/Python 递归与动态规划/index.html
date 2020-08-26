@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.1.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"yoursite.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="递归 递归就是在过程或函数里调用自身 必须有一个明确的递归结束条件，称为递归出口要点在于放弃理解和跟踪递归全程的企图，只理解递归两层之间的交接。  利用递归获取斐波那契数列中的第 10 个数12345678def fun2(depth, a1, a2):    if depth &#x3D;&#x3D; 10:        return a1    a3 &#x3D; a1 + a2    r &#x3D; fun2(depth +">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Python 递归与动态规划">
+<meta property="og:url" content="http://yoursite.com/2019/11/02/Python%20%E9%80%92%E5%BD%92%E4%B8%8E%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92/index.html">
+<meta property="og:site_name" content="江湖の林九">
+<meta property="og:description" content="递归 递归就是在过程或函数里调用自身 必须有一个明确的递归结束条件，称为递归出口要点在于放弃理解和跟踪递归全程的企图，只理解递归两层之间的交接。  利用递归获取斐波那契数列中的第 10 个数12345678def fun2(depth, a1, a2):    if depth &#x3D;&#x3D; 10:        return a1    a3 &#x3D; a1 + a2    r &#x3D; fun2(depth +">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://yoursite.com/images/12-PythonOther/1-DP.png">
+<meta property="article:published_time" content="2019-11-02T04:00:00.000Z">
+<meta property="article:modified_time" content="2020-04-24T02:03:11.368Z">
+<meta property="article:author" content="Leo Lin">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://yoursite.com/images/12-PythonOther/1-DP.png">
+
+<link rel="canonical" href="http://yoursite.com/2019/11/02/Python%20%E9%80%92%E5%BD%92%E4%B8%8E%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>Python 递归与动态规划 | 江湖の林九</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">江湖の林九</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">相逢何必曾相识！</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/11/02/Python%20%E9%80%92%E5%BD%92%E4%B8%8E%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Leo Lin">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="江湖の林九">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Python 递归与动态规划
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-11-02 12:00:00" itemprop="dateCreated datePublished" datetime="2019-11-02T12:00:00+08:00">2019-11-02</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-04-24 10:03:11" itemprop="dateModified" datetime="2020-04-24T10:03:11+08:00">2020-04-24</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%BC%96%E7%A8%8B%E8%B6%B3%E8%BF%B9/" itemprop="url" rel="index"><span itemprop="name">编程足迹</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="递归"><a href="#递归" class="headerlink" title="递归"></a>递归</h2><ul>
+<li>递归就是在过程或函数里调用自身</li>
+<li>必须有一个明确的递归结束条件，称为递归出口<br>要点在于放弃理解和跟踪递归全程的企图，只理解递归两层之间的交接。</li>
+</ul>
+<h3 id="利用递归获取斐波那契数列中的第-10-个数"><a href="#利用递归获取斐波那契数列中的第-10-个数" class="headerlink" title="利用递归获取斐波那契数列中的第 10 个数"></a>利用递归获取斐波那契数列中的第 10 个数</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">fun2</span>(<span class="params">depth, a1, a2</span>):</span></span><br><span class="line">    <span class="keyword">if</span> depth == <span class="number">10</span>:</span><br><span class="line">        <span class="keyword">return</span> a1</span><br><span class="line">    a3 = a1 + a2</span><br><span class="line">    r = fun2(depth + <span class="number">1</span>, a2, a3)</span><br><span class="line">    <span class="keyword">return</span>  r</span><br><span class="line">ret = fun2(<span class="number">1</span>,<span class="number">0</span>,<span class="number">1</span>)</span><br><span class="line">print(ret)</span><br></pre></td></tr></table></figure>
+
+<h3 id="汉诺塔"><a href="#汉诺塔" class="headerlink" title="汉诺塔"></a>汉诺塔</h3><p>可把最底层和上层整体看作独立的两部分，那么逻辑就是把上层从a借c移到b，然后底层从a移到c最后上层从b移动到c。<br>那么怎么把上层从a移到b呢?再细分,把b的上层从a移到c,底座移到b。</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">move</span>(<span class="params">n, a, buffer, c</span>):</span></span><br><span class="line">    <span class="keyword">if</span>(n == <span class="number">1</span>):</span><br><span class="line">        print(a,<span class="string">&quot;-&gt;&quot;</span>,c)</span><br><span class="line">        <span class="keyword">return</span></span><br><span class="line">    move(n<span class="number">-1</span>, a, c, buffer)</span><br><span class="line">    move(<span class="number">1</span>, a, buffer, c)</span><br><span class="line">    move(n<span class="number">-1</span>, buffer, a, c)</span><br><span class="line">	</span><br><span class="line">move(<span class="number">3</span>, <span class="string">&quot;a&quot;</span>, <span class="string">&quot;b&quot;</span>, <span class="string">&quot;c&quot;</span>)</span><br><span class="line">a -&gt; c</span><br><span class="line">a -&gt; b</span><br><span class="line">c -&gt; b</span><br><span class="line">a -&gt; c</span><br><span class="line">b -&gt; a</span><br><span class="line">b -&gt; c</span><br><span class="line">a -&gt; c</span><br></pre></td></tr></table></figure>
+
+<h2 id="动态规划"><a href="#动态规划" class="headerlink" title="动态规划"></a>动态规划</h2><ul>
+<li>主问题的答案 包含了可分解的子问题答案。</li>
+<li>递归求解时，很多子问题的答案会被多次重复利用。<br>用动态规划寻找最优解,先解决子问题再逐步解决大问题。</li>
+</ul>
+<h3 id="案例解析"><a href="#案例解析" class="headerlink" title="案例解析"></a>案例解析</h3><p>4磅背包装下总价值最大的物品</p>
+<table>
+<thead>
+<tr>
+<th>物品</th>
+<th>价值</th>
+<th>重量</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>音响</td>
+<td>3000</td>
+<td>4</td>
+</tr>
+<tr>
+<td>笔记本</td>
+<td>2000</td>
+<td>3</td>
+</tr>
+<tr>
+<td>吉他</td>
+<td>1500</td>
+<td>1</td>
+</tr>
+<tr>
+<td><img src="/images/12-PythonOther/1-DP.png"></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>在每一行，可偷的商品都为当前行的商品以及之前各行的商品。</td>
+<td></td>
+<td></td>
+</tr>
+</tbody></table>
+<h3 id="逻辑实现"><a href="#逻辑实现" class="headerlink" title="逻辑实现"></a>逻辑实现</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">knapsack_dynamic</span>(<span class="params">weight, price, num, mweight, x</span>):</span></span><br><span class="line">    optp = [[<span class="number">0</span> <span class="keyword">for</span> col <span class="keyword">in</span> range(mweight + <span class="number">1</span>)] <span class="keyword">for</span> raw <span class="keyword">in</span> range(num + <span class="number">1</span>)]</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">1</span>, num + <span class="number">1</span>):  <span class="comment"># 物品一件件来</span></span><br><span class="line">        <span class="keyword">for</span> j <span class="keyword">in</span> range(<span class="number">1</span>, mweight + <span class="number">1</span>):  <span class="comment"># j为子背包的载重量，寻找能够承载物品的子背包</span></span><br><span class="line">            <span class="keyword">if</span> j &gt;= weight[i]:  <span class="comment"># 当物品的重量小于背包能够承受的载重量的时候，才考虑能不能放进去</span></span><br><span class="line">                <span class="comment"># optp[i - 1][j]是上一个单元的值， optp[i - 1][j - w[i]]为剩余空间的价值</span></span><br><span class="line">                <span class="comment"># weight[i] 1 4 3  j 1 2 3 4  相减后剩余空间可放入的价值,得出最后价值</span></span><br><span class="line">                optp[i][j] = max(optp[i - <span class="number">1</span>][j],</span><br><span class="line">                                 optp[i - <span class="number">1</span>][j - weight[i]] + price[i])</span><br><span class="line">            <span class="keyword">else</span>:</span><br><span class="line">                <span class="comment"># 如果当前子背包不能放入则价值为上一个单元</span></span><br><span class="line">                optp[i][j] = optp[i - <span class="number">1</span>][j]</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 递推装入背包的物体,寻找跳变的地方，从最后结果开始逆推</span></span><br><span class="line">    j = mweight</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(num, <span class="number">0</span>, <span class="number">-1</span>):</span><br><span class="line">        <span class="keyword">if</span> optp[i][j] &gt; optp[i - <span class="number">1</span>][j]:</span><br><span class="line">            x.append(i)</span><br><span class="line">            j = j - weight[i]</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 返回最大价值，即表格中最后一行最后一列的值</span></span><br><span class="line">    v = optp[num][mweight]</span><br><span class="line">    <span class="keyword">return</span> v</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">&#x27;__main__&#x27;</span>:</span><br><span class="line">    <span class="comment"># 这里使用了图解中的吉他，音箱，电脑，手机做的测试，数据保持一致</span></span><br><span class="line">    weight = [<span class="number">0</span>, <span class="number">1</span>, <span class="number">4</span>, <span class="number">3</span>]  <span class="comment"># n个物体的重量(w[0]无用)</span></span><br><span class="line">    price = [<span class="number">0</span>, <span class="number">1500</span>, <span class="number">3000</span>, <span class="number">2000</span>]  <span class="comment"># n个物体的价值(p[0]无用)</span></span><br><span class="line">    num = len(weight) - <span class="number">1</span>  <span class="comment"># 计算n的个数</span></span><br><span class="line">    mweight = <span class="number">4</span>  <span class="comment"># 背包的载重量</span></span><br><span class="line"></span><br><span class="line">    x = []  <span class="comment"># 装入背包的物体，元素为True时，对应物体被装入(x[0]无用)</span></span><br><span class="line">    v = <span class="number">0</span></span><br><span class="line">    <span class="comment"># optp[i][j]表示在前i个物体中，能够装入载重量为j的背包中的物体的最大价值</span></span><br><span class="line">    <span class="comment"># optp 相当于做了一个n*m的全零矩阵的赶脚，n行为物件，m列为自背包载重量</span></span><br><span class="line">    <span class="comment"># [[0, 0, 0, 0, 0], [0, 0, 0, 0, 0], [0, 0, 0, 0, 0], [0, 0, 0, 0, 0], [0, 0, 0, 0, 0]]</span></span><br><span class="line">    <span class="comment"># optp = [[0 for col in range(mweight + 1)] for raw in range(num + 1)]</span></span><br><span class="line"></span><br><span class="line">    print(<span class="string">&#x27;最大值为：&#x27;</span> + str(knapsack_dynamic(weight, price, num, mweight, x)))</span><br><span class="line">    print(<span class="string">&#x27;物品的索引：&#x27;</span>, x)</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2019/11/02/Python%20list%20tuple%20dict%20str/" rel="prev" title="Python list tuple dict str">
+      <i class="fa fa-chevron-left"></i> Python list tuple dict str
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2019/11/02/Python%20%E5%BC%82%E5%B8%B8%E5%A4%84%E7%90%86%20%E5%87%BD%E6%95%B0%E5%BC%8F%E7%BC%96%E7%A8%8B%E4%B8%8EZIP%E5%87%BD%E6%95%B0/" rel="next" title="Python 异常处理 函数式编程与ZIP函数">
+      Python 异常处理 函数式编程与ZIP函数 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%80%92%E5%BD%92"><span class="nav-number">1.</span> <span class="nav-text">递归</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%A9%E7%94%A8%E9%80%92%E5%BD%92%E8%8E%B7%E5%8F%96%E6%96%90%E6%B3%A2%E9%82%A3%E5%A5%91%E6%95%B0%E5%88%97%E4%B8%AD%E7%9A%84%E7%AC%AC-10-%E4%B8%AA%E6%95%B0"><span class="nav-number">1.1.</span> <span class="nav-text">利用递归获取斐波那契数列中的第 10 个数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B1%89%E8%AF%BA%E5%A1%94"><span class="nav-number">1.2.</span> <span class="nav-text">汉诺塔</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92"><span class="nav-number">2.</span> <span class="nav-text">动态规划</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A1%88%E4%BE%8B%E8%A7%A3%E6%9E%90"><span class="nav-number">2.1.</span> <span class="nav-text">案例解析</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%80%BB%E8%BE%91%E5%AE%9E%E7%8E%B0"><span class="nav-number">2.2.</span> <span class="nav-text">逻辑实现</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Leo Lin"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Leo Lin</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">104</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">11</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Leo Lin</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+
+    <script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"model":{"jsonPath":"/live2dw/assets/hijiki.model.json"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":false},"log":false});</script></body>
+</html>

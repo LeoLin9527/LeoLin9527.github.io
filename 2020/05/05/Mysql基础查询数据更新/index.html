@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.1.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"yoursite.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="前言1、约束类型： 123451、primary key：主键约束，主键这一行的数据不能重复且不能为空2、not null：非空约束，表示不可空3、unique：唯一约束，此字段的值不允许重复4、default：默认值约束，设置默认值5、foreign key：当为关系字段填写值时，会关联到表中查询值是否存在，若存在则填写成功。  2、外键：是另一表的主键，外键可以有重复，可以是空值，用来和其他表">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Mysql基础查询数据更新">
+<meta property="og:url" content="http://yoursite.com/2020/05/05/Mysql%E5%9F%BA%E7%A1%80%E6%9F%A5%E8%AF%A2%E6%95%B0%E6%8D%AE%E6%9B%B4%E6%96%B0/index.html">
+<meta property="og:site_name" content="江湖の林九">
+<meta property="og:description" content="前言1、约束类型： 123451、primary key：主键约束，主键这一行的数据不能重复且不能为空2、not null：非空约束，表示不可空3、unique：唯一约束，此字段的值不允许重复4、default：默认值约束，设置默认值5、foreign key：当为关系字段填写值时，会关联到表中查询值是否存在，若存在则填写成功。  2、外键：是另一表的主键，外键可以有重复，可以是空值，用来和其他表">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://yoursite.com/images/20-databse/03-sql-key.png">
+<meta property="og:image" content="http://yoursite.com/images/20-databse/02-sql-table.png">
+<meta property="og:image" content="http://yoursite.com/images/20-databse/01-sql-join.png">
+<meta property="article:published_time" content="2020-05-05T02:00:00.000Z">
+<meta property="article:modified_time" content="2020-05-28T05:29:39.912Z">
+<meta property="article:author" content="Leo Lin">
+<meta property="article:tag" content="数据库">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://yoursite.com/images/20-databse/03-sql-key.png">
+
+<link rel="canonical" href="http://yoursite.com/2020/05/05/Mysql%E5%9F%BA%E7%A1%80%E6%9F%A5%E8%AF%A2%E6%95%B0%E6%8D%AE%E6%9B%B4%E6%96%B0/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>Mysql基础查询数据更新 | 江湖の林九</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">江湖の林九</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">相逢何必曾相识！</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/05/05/Mysql%E5%9F%BA%E7%A1%80%E6%9F%A5%E8%AF%A2%E6%95%B0%E6%8D%AE%E6%9B%B4%E6%96%B0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Leo Lin">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="江湖の林九">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Mysql基础查询数据更新
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-05-05 10:00:00" itemprop="dateCreated datePublished" datetime="2020-05-05T10:00:00+08:00">2020-05-05</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-05-28 13:29:39" itemprop="dateModified" datetime="2020-05-28T13:29:39+08:00">2020-05-28</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E8%BF%90%E7%BB%B4%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">运维笔记</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>1、约束类型：</p>
+<figure class="highlight lsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">1</span>、primary <span class="type">key</span>：主键约束，主键这一行的数据不能重复且不能为空</span><br><span class="line"><span class="number">2</span>、not null：非空约束，表示不可空</span><br><span class="line"><span class="number">3</span>、unique：唯一约束，此字段的值不允许重复</span><br><span class="line"><span class="number">4</span>、<span class="section">default</span>：默认值约束，设置默认值</span><br><span class="line"><span class="number">5</span>、foreign <span class="type">key</span>：当为关系字段填写值时，会关联到表中查询值是否存在，若存在则填写成功。</span><br></pre></td></tr></table></figure>
+
+<p>2、外键：是另一表的主键，外键可以有重复，可以是空值，用来和其他表建立联系。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 获取外键名</span></span><br><span class="line"><span class="keyword">show</span> <span class="keyword">create</span> <span class="keyword">table</span> employee;</span><br><span class="line"><span class="comment">-- 添加外键</span></span><br><span class="line"><span class="keyword">ALTER</span> <span class="keyword">TABLE</span> employee <span class="keyword">ADD</span> <span class="keyword">FOREIGN</span> <span class="keyword">KEY</span>(dept_id) <span class="keyword">REFERENCES</span> department(<span class="keyword">id</span>); </span><br></pre></td></tr></table></figure>
+<p>on delete/on update默认规则是RESTRICT。</p>
+<figure class="highlight pgsql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CASCADE</span>(级联)：父表<span class="keyword">delete</span>、<span class="keyword">update</span>的时候，子表会<span class="keyword">delete</span>、<span class="keyword">update</span>掉关联记录；</span><br><span class="line"><span class="keyword">SET</span> <span class="keyword">NULL</span>：父表<span class="keyword">delete</span>、<span class="keyword">update</span>的时候，子表会将关联记录的外键字段所在列设为<span class="keyword">null</span>，所以注意在设计子表时外键不能设为<span class="keyword">not</span> <span class="keyword">null</span>；</span><br><span class="line"><span class="keyword">RESTRICT</span>(约束)：如果想要删除父表的记录时，而在子表中有关联该父表的记录，则不允许删除父表中的记录；</span><br><span class="line"><span class="keyword">NO ACTION</span>：同 <span class="keyword">RESTRICT</span>，但<span class="keyword">NO ACTION</span>是在其他约束的动作之后执行</span><br></pre></td></tr></table></figure>
+<p><img src="/images/20-databse/03-sql-key.png"></p>
+<p>3、写法顺序：select–from–where–group by–having–order by </p>
+<p>4、执行顺序：其中每一个操作都会产生一张虚拟表，作为一个处理的输入，这些虚拟表对用户来说是透明的，只有最后一个虚拟表会被作为结果返回。</p>
+<figure class="highlight pgsql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">FORM：对<span class="keyword">FROM</span>的左边的表和右边的表计算笛卡尔积。产生虚表VT1</span><br><span class="line"><span class="keyword">ON</span>：对虚表VT1进行<span class="keyword">ON</span>筛选，只有那些符合&lt;<span class="keyword">join</span>-condition&gt;的行才会被记录在虚表VT2中。</span><br><span class="line"><span class="keyword">JOIN</span>：如果指定了<span class="keyword">OUTER</span> <span class="keyword">JOIN</span>（比如<span class="keyword">left join</span>、 <span class="keyword">right join</span>），那么保留表中未匹配的行就会作为外部行添加到虚拟表VT2中产生虚拟表VT3,rug <span class="keyword">from</span>子句中包含两个以上的表的话，那么就会对上一个<span class="keyword">join</span>连接产生的结果VT3和下一个表重复执行步骤<span class="number">1</span>~<span class="number">3</span>这三个步骤，一直到处理完所有的表为止。</span><br><span class="line"><span class="keyword">WHERE</span>：对虚拟表VT3进行<span class="keyword">WHERE</span>条件过滤，只有符合&lt;<span class="keyword">where</span>-condition&gt;的记录才会被插入到虚拟表VT4中。</span><br><span class="line"><span class="keyword">GROUP</span> <span class="keyword">BY</span>：根据<span class="keyword">group</span> <span class="keyword">by</span>子句中的列，对VT4中的记录进行分组操作，产生VT5。</span><br><span class="line"><span class="keyword">HAVING</span>：对虚拟表VT5应用<span class="keyword">having</span>过滤，只有符合&lt;havingcondition&gt;的记录才会被插入到虚拟表VT6中。</span><br><span class="line"><span class="keyword">SELECT</span>：执行操作，选择指定的列，插入到虚拟表中。</span><br><span class="line"><span class="keyword">DISTINCT</span>： 对中的记录进行去重。产生虚拟表VT8。</span><br><span class="line"><span class="keyword">ORDER</span> <span class="keyword">BY</span>： VT8中的记录按照&lt;order_by_list&gt;进行排序操作，产生虚拟表VT9。</span><br><span class="line"><span class="keyword">LIMIT</span>：取出指定行的记录，产生虚拟表，并将结果返回。</span><br></pre></td></tr></table></figure>
+
+<p>5、数据库引擎<br>MyISAM：不支持外键约束。不支持事务。对数据大批量导入时，它会边插入数据边建索引，所以为了提高执行效率，应该先禁用索引，在完全导入后再开启索引。<br>InnoDB：支持外键约束，支持事务。对索引都是单独处理的，无需引用索引。</p>
+<p>6、下列查询语句所用表结构示意图：<br><img src="/images/20-databse/02-sql-table.png"></p>
+<h2 id="单表查询"><a href="#单表查询" class="headerlink" title="单表查询"></a>单表查询</h2><p>一个子句通常由一个关键字加上所提供的数据组成。<br>1、 带in关键字的查询<br>in操作符用来查询满足指定范围内的条件记录</p>
+<figure class="highlight n1ql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> s_id,f_name <span class="keyword">FROM</span> fruits <span class="keyword">WHERE</span> s_id(<span class="number">101</span>,<span class="number">102</span>)</span><br></pre></td></tr></table></figure>
+<p>2、带between…and的范围查询<br>between and用来查询某个范围内的值</p>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">SELECT</span> f_name,f_price FROM fruits WHERE f_price between <span class="number">2</span>.<span class="number">00</span> and <span class="number">10</span>.<span class="number">20</span>ss</span><br></pre></td></tr></table></figure>
+<p>3、带like字符匹配(模糊查询)<br>SQL中可以和like一起使用的通配符有%和_，%可代表任意长度的字符(包括零字符)，下划线只匹配任意单个字符。</p>
+<figure class="highlight pgsql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 查询以b开头y结尾的选项</span></span><br><span class="line"><span class="keyword">SELECT</span> f_name <span class="keyword">FROM</span> fruits <span class="keyword">WHERE</span> f_name <span class="keyword">like</span> <span class="string">&#x27;b%y&#x27;</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">SELECT</span> * <span class="keyword">FROM</span> suppliers <span class="keyword">WHERE</span> s_city <span class="keyword">like</span> <span class="string">&#x27;__市&#x27;</span></span><br></pre></td></tr></table></figure>
+<p>4、空值：is null<br>null不同于空字符串。</p>
+<figure class="highlight n1ql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> * <span class="keyword">FROM</span> suppliers <span class="keyword">WHERE</span> s_city <span class="keyword">is</span> <span class="literal">null</span></span><br></pre></td></tr></table></figure>
+<p>5、多条件查询<br>and，or连接多个查询条件，and优先级高于or。</p>
+<figure class="highlight n1ql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> f_name,f_price <span class="keyword">FROM</span> fruits <span class="keyword">WHERE</span> s_id=<span class="number">101</span> <span class="keyword">and</span> f_price &gt;= <span class="number">5</span></span><br></pre></td></tr></table></figure>
+<p>6、查询结果不重复<br>关键字distinct，放在去重的字段前</p>
+<figure class="highlight pgsql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 查询s_id字段的值，返回s_id字段值且不重复</span></span><br><span class="line"><span class="keyword">SELECT</span> count(<span class="keyword">distinct</span> s_id) <span class="keyword">from</span> fruits</span><br></pre></td></tr></table></figure>
+<p>7、查询结果排序<br>order by子句对查询结果排序，永远是最后一个子句。</p>
+<figure class="highlight oxygene"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> * <span class="keyword">FROM</span> fruits <span class="keyword">ORDER</span> <span class="keyword">BY</span> s_id <span class="keyword">desc</span> <span class="comment">// 降序</span></span><br></pre></td></tr></table></figure>
+
+<p>8、分组查询<br>按照某个或多个字段进行分组，group by关键字常和聚合函数（AVG、COUNT、MAX、MIN、SUM）一起使用。<br>过滤：group by可以和having一起限定显示记录所需满足的条件。<br>with rollup：在查询出的分组后增加一条统计记录，与order by互斥。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span></span><br><span class="line">	s_id,</span><br><span class="line">	<span class="keyword">count</span>( * ) <span class="string">&#x27;商品种类&#x27;</span>,</span><br><span class="line">	<span class="keyword">GROUP_CONCAT</span>( f_name ) <span class="string">&#x27;商品名称&#x27;</span> </span><br><span class="line"><span class="keyword">FROM</span></span><br><span class="line">	fruits </span><br><span class="line"><span class="keyword">GROUP</span> <span class="keyword">BY</span></span><br><span class="line">	s_id </span><br><span class="line"><span class="keyword">WITH</span> <span class="keyword">ROLLUP</span></span><br><span class="line"><span class="keyword">HAVING</span></span><br><span class="line">	商品种类 &gt; <span class="number">1</span></span><br><span class="line"><span class="keyword">ORDER</span> <span class="keyword">BY</span></span><br><span class="line">	<span class="keyword">count</span>( * )</span><br></pre></td></tr></table></figure>
+
+<p><strong>小提示：</strong><br>count(*) 计算表中总行数，不管某列是非空值还是空值（NULL）。<br>count(字段名) 计算指定列的总行数，计算时将忽略指定列的值为NULL的行。<br>WHERE 不能放在GROUP BY 后，且条件中不能有聚集函数如SUM()，AVG()等。</p>
+<p>9、限制查询结果数量</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 使用limit实现top n问题，limit 偏移量，行数量</span></span><br><span class="line"><span class="keyword">SELECT</span> * <span class="keyword">FROM</span> fruits <span class="keyword">ORDER</span> <span class="keyword">BY</span> f_price <span class="keyword">desc</span> <span class="keyword">limit</span> <span class="number">4</span>;</span><br></pre></td></tr></table></figure>
+
+<p>10、limit实现分页</p>
+<figure class="highlight pgsql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- page：请求的第几页，pageSize：每页条数</span></span><br><span class="line"><span class="keyword">SELECT</span> * <span class="keyword">FROM</span> fruits limits (page<span class="number">-1</span>)*pagesize，pagesize</span><br></pre></td></tr></table></figure>
+
+<p>11、DISTINCT<br>指示数据库只返回不同的值，若DISTINCT后跟多个字段，则作用于多个字段。</p>
+<figure class="highlight n1ql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> <span class="keyword">distinct</span> f_name <span class="keyword">from</span> fruits</span><br></pre></td></tr></table></figure>
+
+<h2 id="多表查询"><a href="#多表查询" class="headerlink" title="多表查询"></a>多表查询</h2><h3 id="表连接"><a href="#表连接" class="headerlink" title="表连接"></a>表连接</h3><p>1、内连接([inner] join)<br>只列出连接表中与连接条件相匹配的数据行</p>
+<figure class="highlight pgsql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> f_name,f_price,fruits.s_id,s_name,s_city</span><br><span class="line"><span class="keyword">from</span> fruits <span class="keyword">inner</span> <span class="keyword">join</span> suppliers</span><br><span class="line"><span class="keyword">on</span> fruits.s_id = suppliers.s_id</span><br><span class="line"><span class="keyword">where</span> f_name = <span class="string">&#x27;apple&#x27;</span></span><br></pre></td></tr></table></figure>
+<p>等价于</p>
+<figure class="highlight oxygene"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> f_name,f_price,f.s_id,s_name,s_city</span><br><span class="line"><span class="keyword">FROM</span> fruits <span class="keyword">as</span> f,suppliers <span class="keyword">as</span> s</span><br><span class="line"><span class="keyword">WHERE</span> f_name=<span class="string">&#x27;apple&#x27;</span> <span class="keyword">and</span> f.s_id = s.s_id</span><br></pre></td></tr></table></figure>
+<p>2、左/右外连接(LEFT/RIGHT [OUTER] JOIN)<br>不仅列出与连接条件（on）相匹配的行，还列出左表table1(左外连接)、或右表table2(右外连接)所有符合WHERE过滤条件的数据行。<br>左外连接：左表列出全部，右表只列出匹配的记录。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 查询所有商品及其供应商，包括为供应商品的供应商信息</span></span><br><span class="line"><span class="keyword">SELECT</span></span><br><span class="line">	f_name,</span><br><span class="line">	f_price,</span><br><span class="line">	f.s_id,</span><br><span class="line">	s_name,</span><br><span class="line">	s_city </span><br><span class="line"><span class="keyword">FROM</span></span><br><span class="line">	fruits <span class="keyword">AS</span> f</span><br><span class="line">	<span class="keyword">JOIN</span> suppliers <span class="keyword">AS</span> s <span class="keyword">ON</span> f.s_id = s.s_id</span><br></pre></td></tr></table></figure>
+<p>3、全连接(FULL [OUTER] JOIN)<br>在内连接的基础上增加，左右两边没有显示的数据。<br>注意: mysql并不支持全连接 full JOIN 关键字，但是mysql 提供了 UNION 关键字 可以间接实现 full JOIN 功能。<br>UNION 用于合并多张表的查询结果，字段名以第一个为准，字段数量必须相同，union all 用于结果不去重的场景。</p>
+<figure class="highlight n1ql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> tname <span class="keyword">FROM</span> person <span class="keyword">LEFT</span> <span class="keyword">JOIN</span> dept <span class="keyword">ON</span> person.did = dept.did</span><br><span class="line"><span class="keyword">UNION</span></span><br><span class="line"><span class="keyword">SELECT</span> tname <span class="keyword">FROM</span> person <span class="keyword">RIGHT</span> <span class="keyword">JOIN</span> dept <span class="keyword">ON</span> person.did = dept.did;</span><br></pre></td></tr></table></figure>
+<p><img src="/images/20-databse/01-sql-join.png"></p>
+<h3 id="子查询"><a href="#子查询" class="headerlink" title="子查询"></a>子查询</h3><p>作用：某些情况下，当进行查询的时候，需要的条件是另外一个select 语句的结果，这个时候，就要用到子查询。<br>定义：为了给主查询（外部查询）提供数据而首先执行的查询（内部查询）被叫做子查询。也就是说，先执行子查询，根据子查询的结果，再执行主查询。<br>关键字：用于子查询的关键字主要包括 IN、NOT IN、EXIST、NOT EXIST、=、&lt;&gt;等（符号“&lt;&gt;”的意思是：不等于）。</p>
+<figure class="highlight pgsql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 查询fruits表中最贵的水果</span></span><br><span class="line"><span class="keyword">SELECT</span></span><br><span class="line">	f_name </span><br><span class="line"><span class="keyword">FROM</span></span><br><span class="line">	fruits </span><br><span class="line"><span class="keyword">WHERE</span></span><br><span class="line">	f_price = ( <span class="keyword">SELECT</span> MAX( f_price ) <span class="keyword">FROM</span> fruits )</span><br></pre></td></tr></table></figure>
+
+<h3 id="正则表达式查询"><a href="#正则表达式查询" class="headerlink" title="正则表达式查询"></a>正则表达式查询</h3><p>使用正则关键字regexp，正则语法与Python中类似，示例如下</p>
+<figure class="highlight pgsql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 在fruits表中查询以x开头y结尾，中间至少包含一次ab</span></span><br><span class="line"><span class="keyword">SELECT</span> * <span class="keyword">FROM</span> fruits <span class="keyword">WHERE</span> f_name <span class="string">&#x27;^x(ab)+y$&#x27;</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="条件语句"><a href="#条件语句" class="headerlink" title="条件语句"></a>条件语句</h2><p>1、简单case函数<br>在 SELECT 语句中，简单 CASE 函数仅检查是否相等，而不进行其它比较。<br>格式：CASE [col_name] WHEN [value1] THEN [result1]…ELSE [default] END</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span></span><br><span class="line">	f_name,</span><br><span class="line">	f_price,</span><br><span class="line"><span class="keyword">CASE</span> f_price		</span><br><span class="line">		<span class="keyword">WHEN</span> <span class="number">1000</span> <span class="keyword">THEN</span> <span class="string">&#x27;贵&#x27;</span></span><br><span class="line">		<span class="keyword">ELSE</span> <span class="string">&#x27;正常&#x27;</span> </span><br><span class="line">	<span class="keyword">END</span> <span class="keyword">AS</span> <span class="string">&#x27;info&#x27;</span>	</span><br><span class="line"><span class="keyword">FROM</span></span><br><span class="line">	fruits;</span><br></pre></td></tr></table></figure>
+<p>2、case搜索函数<br>在 SELECT 语句中，CASE 搜索函数允许根据比较值在结果集内对值进行替换。<br>格式：CASE WHEN [expr] THEN [result1]…ELSE [default] END</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span></span><br><span class="line">	f_name,</span><br><span class="line">	f_price,</span><br><span class="line"><span class="keyword">CASE</span>		</span><br><span class="line">		<span class="keyword">WHEN</span> f_price &lt; <span class="number">10</span> <span class="keyword">THEN</span> <span class="string">&#x27;便宜&#x27;</span> <span class="keyword">WHEN</span> f_price &gt; <span class="number">20</span> <span class="keyword">THEN</span></span><br><span class="line">		<span class="string">&#x27;贵&#x27;</span> <span class="keyword">ELSE</span> <span class="string">&#x27;正常&#x27;</span> </span><br><span class="line">	<span class="keyword">END</span> <span class="keyword">AS</span> <span class="string">&#x27;info&#x27;</span>	</span><br><span class="line"><span class="keyword">FROM</span></span><br><span class="line">	fruits;</span><br></pre></td></tr></table></figure>
+<p>3、IF函数</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span></span><br><span class="line">	f_name,</span><br><span class="line"><span class="keyword">IF</span></span><br><span class="line">	( f_price &gt; <span class="number">10</span>, <span class="keyword">IF</span>(f_price&lt;<span class="number">20</span>,<span class="string">&#x27;正常&#x27;</span>,<span class="string">&#x27;贵&#x27;</span>), <span class="string">&#x27;便宜&#x27;</span> ) <span class="keyword">as</span> info</span><br><span class="line"><span class="keyword">FROM</span></span><br><span class="line">	fruits</span><br></pre></td></tr></table></figure>
+
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/" rel="tag"># 数据库</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/05/02/Linux%20%E7%B3%BB%E7%BB%9F%E7%94%A8%E6%88%B7%E3%80%81%E7%BB%84%E4%BB%A5%E5%8F%8A%E6%96%87%E4%BB%B6%E6%9D%83%E9%99%90%E7%AE%80%E4%BB%8B/" rel="prev" title="Linux 系统用户、组以及文件权限简介">
+      <i class="fa fa-chevron-left"></i> Linux 系统用户、组以及文件权限简介
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/05/10/Mysql%20%E8%A7%86%E5%9B%BE%E3%80%81%E4%BA%8B%E5%8A%A1%E3%80%81%E7%B4%A2%E5%BC%95/" rel="next" title="Mysql 视图、事务、索引">
+      Mysql 视图、事务、索引 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%89%8D%E8%A8%80"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8D%95%E8%A1%A8%E6%9F%A5%E8%AF%A2"><span class="nav-number">2.</span> <span class="nav-text">单表查询</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A4%9A%E8%A1%A8%E6%9F%A5%E8%AF%A2"><span class="nav-number">3.</span> <span class="nav-text">多表查询</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%A1%A8%E8%BF%9E%E6%8E%A5"><span class="nav-number">3.1.</span> <span class="nav-text">表连接</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AD%90%E6%9F%A5%E8%AF%A2"><span class="nav-number">3.2.</span> <span class="nav-text">子查询</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F%E6%9F%A5%E8%AF%A2"><span class="nav-number">3.3.</span> <span class="nav-text">正则表达式查询</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9D%A1%E4%BB%B6%E8%AF%AD%E5%8F%A5"><span class="nav-number">4.</span> <span class="nav-text">条件语句</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Leo Lin"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Leo Lin</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">104</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">11</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Leo Lin</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+
+    <script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"model":{"jsonPath":"/live2dw/assets/hijiki.model.json"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":false},"log":false});</script></body>
+</html>

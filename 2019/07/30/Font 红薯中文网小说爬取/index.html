@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.1.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"yoursite.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="WebStorm破解小记:1、补丁与版本号  版本：WebStorm&#x2F;Idea 2018.3.1： 破解补丁：JetbrainsIdesCrack-3.4-release-enc.jar2、将“0.0.0.0 account.jetbrains.com”添加到hosts文件中,再将补丁复制到安装目录的bin目录下。3、修改同目录下的 WebStorm.exe.vmoptions 和WebStorm">
+<meta property="og:type" content="article">
+<meta property="og:title" content="红薯中文网小说">
+<meta property="og:url" content="http://yoursite.com/2019/07/30/Font%20%E7%BA%A2%E8%96%AF%E4%B8%AD%E6%96%87%E7%BD%91%E5%B0%8F%E8%AF%B4%E7%88%AC%E5%8F%96/index.html">
+<meta property="og:site_name" content="江湖の林九">
+<meta property="og:description" content="WebStorm破解小记:1、补丁与版本号  版本：WebStorm&#x2F;Idea 2018.3.1： 破解补丁：JetbrainsIdesCrack-3.4-release-enc.jar2、将“0.0.0.0 account.jetbrains.com”添加到hosts文件中,再将补丁复制到安装目录的bin目录下。3、修改同目录下的 WebStorm.exe.vmoptions 和WebStorm">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://yoursite.com/images/14-hsnovel/hsone.png">
+<meta property="og:image" content="http://yoursite.com/images/14-hsnovel/hstwo.png">
+<meta property="og:image" content="http://yoursite.com/images/14-hsnovel/hsthree.png">
+<meta property="og:image" content="http://yoursite.com/images/14-hsnovel/hsfour.png">
+<meta property="og:image" content="http://yoursite.com/images/14-hsnovel/hsfive.png">
+<meta property="og:image" content="http://yoursite.com/images/14-hsnovel/hssix.png">
+<meta property="og:image" content="http://yoursite.com/images/14-hsnovel/hsseven.png">
+<meta property="og:image" content="http://yoursite.com/images/14-hsnovel/hseight.png">
+<meta property="og:image" content="http://yoursite.com/images/14-hsnovel/hsnine.png">
+<meta property="article:published_time" content="2019-07-30T14:25:07.000Z">
+<meta property="article:modified_time" content="2020-04-24T04:13:52.239Z">
+<meta property="article:author" content="Leo Lin">
+<meta property="article:tag" content="字体反爬">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://yoursite.com/images/14-hsnovel/hsone.png">
+
+<link rel="canonical" href="http://yoursite.com/2019/07/30/Font%20%E7%BA%A2%E8%96%AF%E4%B8%AD%E6%96%87%E7%BD%91%E5%B0%8F%E8%AF%B4%E7%88%AC%E5%8F%96/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>红薯中文网小说 | 江湖の林九</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">江湖の林九</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">相逢何必曾相识！</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/07/30/Font%20%E7%BA%A2%E8%96%AF%E4%B8%AD%E6%96%87%E7%BD%91%E5%B0%8F%E8%AF%B4%E7%88%AC%E5%8F%96/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Leo Lin">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="江湖の林九">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          红薯中文网小说
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-07-30 22:25:07" itemprop="dateCreated datePublished" datetime="2019-07-30T22:25:07+08:00">2019-07-30</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-04-24 12:13:52" itemprop="dateModified" datetime="2020-04-24T12:13:52+08:00">2020-04-24</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%BD%91%E7%BB%9C%E7%88%AC%E8%99%AB/" itemprop="url" rel="index"><span itemprop="name">网络爬虫</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h3 id="WebStorm破解小记"><a href="#WebStorm破解小记" class="headerlink" title="WebStorm破解小记:"></a>WebStorm破解小记:</h3><p>1、补丁与版本号</p>
+<ul>
+<li>版本：WebStorm/Idea 2018.3.1：</li>
+<li>破解补丁：JetbrainsIdesCrack-3.4-release-enc.jar<br>2、将“0.0.0.0 account.jetbrains.com”添加到hosts文件中,再将补丁复制到安装目录的bin目录下。<br>3、修改同目录下的 WebStorm.exe.vmoptions 和WebStorm64.exe.vmoptions，这两个文件一个是32位的，一个是64位的，建议同步修改。<br>4、用文本编辑器打开之后，在文件最上面加一行代码 ：-javaagent:你的webstorm bin目录\JetbrainsCrack-3.1-release-enc.jar<br>5、配置好之后，保存文件。在此再次启动WebStorm，选择activation code，并将-javaagent:你的WebStorm路径前缀/WebStorm/bin/破解补丁名字.jar。<br>6、破解补丁加我微信好友获取。</li>
+</ul>
+<h3 id="网页分析"><a href="#网页分析" class="headerlink" title="网页分析"></a>网页分析</h3><p>目标网址：<a target="_blank" rel="noopener" href="https://g.hongshu.com/nan.html">https://g.hongshu.com/nan.html</a></p>
+<ol>
+<li>首先发现伪元素且style中的样式应该是异步加载的。</li>
+</ol>
+<p><img src="/images/14-hsnovel/hsone.png"></p>
+<ol start="2">
+<li>在XHR和CSS中没找到有用的请求和文件，考虑是否为源代码source中的JS代码生成style，全局搜索<code>.context_kw</code>找到如下位置：</li>
+</ol>
+<p><img src="/images/14-hsnovel/hstwo.png"></p>
+<ol start="3">
+<li>验证猜想,在console中键入words得到所需的字符</li>
+</ol>
+<p><img src="/images/14-hsnovel/hsthree.png"></p>
+<ol start="4">
+<li>为调试方便把包含上图代码的JS复制到Webstorm调试输出。</li>
+</ol>
+<p><img src="/images/14-hsnovel/hsfour.png"></p>
+<ol start="5">
+<li>发现控制台输出与实际words不符，那么查找words是怎么生成的？<br>再次搜索words，找到如下的代码片段：</li>
+</ol>
+<p><img src="/images/14-hsnovel/hsfive.png"></p>
+<ol start="6">
+<li><p>secwords和decrypted又存在关联，decrypted则跟iv有关系，打印iv验证猜想：<br><img src="/images/14-hsnovel/hssix.png"></p>
+</li>
+<li><p>最后找到生成iv的相关代码，由于node环境模拟的window不存在location，导致执行了异常处理部分的代码。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//1 top.window.location.href=”url”  在顶层页面打开url</span></span><br><span class="line"><span class="comment">//2 window.location.href  在本页面打开url地址</span></span><br><span class="line"><span class="comment">//例如 a.html里面嵌着b.html; 1是在a处跳转2则是b部分跳转</span></span><br><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (top[_0xea12(<span class="string">&#x27;0x10&#x27;</span>)][_0xea12(<span class="string">&#x27;0x11&#x27;</span>)][_0xea12(<span class="string">&#x27;0x12&#x27;</span>)] != <span class="built_in">window</span>[_0xea12(<span class="string">&#x27;0x11&#x27;</span>)][<span class="string">&#x27;href&#x27;</span>]) &#123;</span><br><span class="line">        top[<span class="string">&#x27;window&#x27;</span>][_0xea12(<span class="string">&#x27;0x11&#x27;</span>)][<span class="string">&#x27;href&#x27;</span>] = <span class="built_in">window</span>[_0xea12(<span class="string">&#x27;0x11&#x27;</span>)][_0xea12(<span class="string">&#x27;0x12&#x27;</span>)];</span><br><span class="line">    &#125;</span><br><span class="line">    iv = CryptoJS[<span class="string">&#x27;enc&#x27;</span>][_0xea12(<span class="string">&#x27;0xe&#x27;</span>)][<span class="string">&#x27;parse&#x27;</span>](<span class="string">&#x27;6B0600CA9BCE5B24&#x27;</span>);</span><br><span class="line">&#125; <span class="keyword">catch</span> (_0x3f6f9e) &#123;</span><br><span class="line">    iv = CryptoJS[_0xea12(<span class="string">&#x27;0xd&#x27;</span>)][_0xea12(<span class="string">&#x27;0xe&#x27;</span>)][<span class="string">&#x27;parse&#x27;</span>](_0xea12(<span class="string">&#x27;0x13&#x27;</span>));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+</ol>
+<p><strong>应对策略</strong>:将上述代码直接替换为：<code>iv = CryptoJS[&#39;enc&#39;][_0xea12(&#39;0xe&#39;)][&#39;parse&#39;](&#39;6B0600CA9BCE5B24&#39;);</code><br><strong>重要混淆</strong>:</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> decrypted = CryptoJS[<span class="string">&#x27;AES&#x27;</span>][_0xea12(<span class="string">&#x27;0x14&#x27;</span>)](data, keywords, &#123;</span><br><span class="line">    <span class="string">&#x27;iv&#x27;</span>: iv,</span><br><span class="line">    <span class="string">&#x27;padding&#x27;</span>: CryptoJS[_0xea12(<span class="string">&#x27;0x0&#x27;</span>)][_0xea12(<span class="string">&#x27;0x15&#x27;</span>)]</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">toString: <span class="function"><span class="keyword">function</span> (<span class="params">a</span>) </span>&#123;</span><br><span class="line">                <span class="keyword">return</span> (a || v).stringify(<span class="built_in">this</span>)</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">b = w.Latin1 = &#123;</span><br><span class="line">            stringify: <span class="function"><span class="keyword">function</span> (<span class="params">a</span>) </span>&#123;</span><br><span class="line">                <span class="keyword">var</span> c = a.words;</span><br><span class="line">                a = a.sigBytes;</span><br><span class="line">                <span class="keyword">for</span> (<span class="keyword">var</span> e = [], j = <span class="number">0</span>; j &lt; a; j++) &#123;</span><br><span class="line">                    e.push(<span class="built_in">String</span>.fromCharCode(c[j &gt;&gt;&gt; <span class="number">2</span>] &gt;&gt;&gt; <span class="number">24</span> - <span class="number">8</span> * (j % <span class="number">4</span>) &amp; <span class="number">255</span>));</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">return</span> e.join(<span class="string">&quot;&quot;</span>)</span><br><span class="line">            &#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="代码实现"><a href="#代码实现" class="headerlink" title="代码实现"></a>代码实现</h3><p>字体解析部分已经实现了，那么来梳理下爬取流程。<br>以爬取“汉天子”为例：详情页URL由书籍id和章节id构成如<a target="_blank" rel="noopener" href="https://g.hongshu.com/content/93416/13877912.html">https://g.hongshu.com/content/93416/13877912.html</a></p>
+<p><img src="/images/14-hsnovel/hsseven.png"></p>
+<p><img src="/images/14-hsnovel/hseight.png" alt="代码流程图"></p>
+<p><img src="/images/14-hsnovel/hsnine.png" alt="成果展示"></p>
+<h3 id="注意"><a href="#注意" class="headerlink" title="注意"></a>注意</h3><p>网络爬虫在未登录状态下肯定只能采集免费章节，运行后在付费章节(比如汉天子60章节及以后)跳转登录界面导致采集异常。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E5%AD%97%E4%BD%93%E5%8F%8D%E7%88%AC/" rel="tag"># 字体反爬</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2019/07/01/HEXO%E5%BF%AB%E9%80%9F%E6%90%AD%E5%BB%BA%E4%BC%98%E5%8C%96/" rel="prev" title="HEXO快速搭建优化">
+      <i class="fa fa-chevron-left"></i> HEXO快速搭建优化
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2019/08/01/Scrapy%20get%E8%AF%B7%E6%B1%82%E5%92%8Cpost%E8%AF%B7%E6%B1%82/" rel="next" title="Scrapy get请求和post请求">
+      Scrapy get请求和post请求 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#WebStorm%E7%A0%B4%E8%A7%A3%E5%B0%8F%E8%AE%B0"><span class="nav-number">1.</span> <span class="nav-text">WebStorm破解小记:</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BD%91%E9%A1%B5%E5%88%86%E6%9E%90"><span class="nav-number">2.</span> <span class="nav-text">网页分析</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%A3%E7%A0%81%E5%AE%9E%E7%8E%B0"><span class="nav-number">3.</span> <span class="nav-text">代码实现</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B3%A8%E6%84%8F"><span class="nav-number">4.</span> <span class="nav-text">注意</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Leo Lin"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Leo Lin</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">104</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">11</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Leo Lin</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+
+    <script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"model":{"jsonPath":"/live2dw/assets/hijiki.model.json"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":false},"log":false});</script></body>
+</html>

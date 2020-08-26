@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.1.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"yoursite.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="基础内容演示网址：http:&#x2F;&#x2F;www.pythontutor.com&#x2F;visualize.html#mode&#x3D;edit1、可变对象：list、dict、set2、不可变对象：tuple、string、int、float、bool、bytes、frozen set 123456789101112131415161718192021222324In [1]: a &#x3D; 7In [2]: b &#x3D; 7In">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Python 生成器与装饰器">
+<meta property="og:url" content="http://yoursite.com/2019/11/08/Python%20%E7%94%9F%E6%88%90%E5%99%A8%E4%B8%8E%E8%A3%85%E9%A5%B0%E5%99%A8/index.html">
+<meta property="og:site_name" content="江湖の林九">
+<meta property="og:description" content="基础内容演示网址：http:&#x2F;&#x2F;www.pythontutor.com&#x2F;visualize.html#mode&#x3D;edit1、可变对象：list、dict、set2、不可变对象：tuple、string、int、float、bool、bytes、frozen set 123456789101112131415161718192021222324In [1]: a &#x3D; 7In [2]: b &#x3D; 7In">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://yoursite.com/images/12-PythonOther/3-basic.png">
+<meta property="article:published_time" content="2019-11-08T04:00:00.000Z">
+<meta property="article:modified_time" content="2020-04-24T02:15:02.844Z">
+<meta property="article:author" content="Leo Lin">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://yoursite.com/images/12-PythonOther/3-basic.png">
+
+<link rel="canonical" href="http://yoursite.com/2019/11/08/Python%20%E7%94%9F%E6%88%90%E5%99%A8%E4%B8%8E%E8%A3%85%E9%A5%B0%E5%99%A8/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>Python 生成器与装饰器 | 江湖の林九</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">江湖の林九</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">相逢何必曾相识！</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/11/08/Python%20%E7%94%9F%E6%88%90%E5%99%A8%E4%B8%8E%E8%A3%85%E9%A5%B0%E5%99%A8/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Leo Lin">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="江湖の林九">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Python 生成器与装饰器
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-11-08 12:00:00" itemprop="dateCreated datePublished" datetime="2019-11-08T12:00:00+08:00">2019-11-08</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-04-24 10:15:02" itemprop="dateModified" datetime="2020-04-24T10:15:02+08:00">2020-04-24</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%BC%96%E7%A8%8B%E8%B6%B3%E8%BF%B9/" itemprop="url" rel="index"><span itemprop="name">编程足迹</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="基础内容"><a href="#基础内容" class="headerlink" title="基础内容"></a>基础内容</h2><p>演示网址：<a target="_blank" rel="noopener" href="http://www.pythontutor.com/visualize.html#mode=edit">http://www.pythontutor.com/visualize.html#mode=edit</a><br>1、可变对象：list、dict、set<br>2、不可变对象：tuple、string、int、float、bool、bytes、frozen set</p>
+<figure class="highlight angelscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">In [<span class="number">1</span>]: a = <span class="number">7</span></span><br><span class="line"></span><br><span class="line">In [<span class="number">2</span>]: b = <span class="number">7</span></span><br><span class="line"></span><br><span class="line">In [<span class="number">3</span>]: id(a)</span><br><span class="line">Out[<span class="number">3</span>]: <span class="number">1641525664</span></span><br><span class="line"></span><br><span class="line">In [<span class="number">4</span>]: id(b)</span><br><span class="line">Out[<span class="number">4</span>]: <span class="number">1641525664</span></span><br><span class="line"></span><br><span class="line">In [<span class="number">5</span>]: a = <span class="number">8</span></span><br><span class="line"></span><br><span class="line">In [<span class="number">6</span>]: id(a)</span><br><span class="line">Out[<span class="number">6</span>]: <span class="number">1641525696</span></span><br><span class="line"></span><br><span class="line">In [<span class="number">7</span>]: a = [<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>]</span><br><span class="line"></span><br><span class="line">In [<span class="number">8</span>]: id(a)</span><br><span class="line">Out[<span class="number">8</span>]: <span class="number">1474053257352</span></span><br><span class="line"></span><br><span class="line">In [<span class="number">9</span>]: a[<span class="number">0</span>] = <span class="number">4</span></span><br><span class="line"></span><br><span class="line">In [<span class="number">10</span>]: id(a)</span><br><span class="line">Out[<span class="number">10</span>]: <span class="number">1474053257352</span></span><br></pre></td></tr></table></figure>
+<p>特点：</p>
+<ul>
+<li>显然可以看到可变对象修改后，地址是没有改变的，而不可变对象每一次操作就重建新对象。</li>
+<li>全局可变对象，操作不会重建对象,可以通过dict[‘x’]=y或list.append()之类的来修改跟创建变量不冲突，所以都不用显式global声明。</li>
+<li>不可变对象指的是元素指向永远不变，因此形如data=(1,2,[3,4])可修改列表内的元素。</li>
+</ul>
+<h2 id="深浅拷贝"><a href="#深浅拷贝" class="headerlink" title="深浅拷贝"></a>深浅拷贝</h2><p>1、浅拷贝：拷贝父对象，但内部子对象还是引用<br>2、深拷贝：完全拷贝了父对象及其子对象</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> copy</span><br><span class="line"></span><br><span class="line">Anndy = [<span class="number">1</span>, <span class="string">&#x27;Anndy&#x27;</span>, [<span class="string">&#x27;age&#x27;</span>, <span class="number">24</span>, [<span class="number">1</span>, <span class="number">2</span>]], (<span class="number">3</span>, <span class="number">4</span>)]</span><br><span class="line">Tom = copy.deepcopy(Anndy)</span><br><span class="line">Bob = copy.copy(Anndy)</span><br></pre></td></tr></table></figure>
+<p><img src="/images/12-PythonOther/3-basic.png"></p>
+<p>1、dis简单分析<br>指令结构：源码行号 | 指令在函数中的偏移 | 指令符号 | 指令参数 | 实际参数值<br><code>load_const</code>: Pushes co_consts[consti] onto the stack.<br><code>store_name</code>: 参数，co_names[0]=TOS，出栈同时将栈顶赋值给i<br><code>setup_loop</code>: 循环代码块入栈,(to 26)可理解为当前指令到26索引前的为循环块<br><code>RETURN_VALUE</code>: Returns with TOS to the caller of the function</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">5           4 LOAD_CONST               1 (0)</span><br><span class="line">            6 LOAD_CONST               2 (None)</span><br><span class="line">            8 IMPORT_NAME              1 (copy)</span><br><span class="line">           10 STORE_NAME               1 (copy)</span><br><span class="line"></span><br><span class="line">7          12 LOAD_CONST               3 (1)</span><br><span class="line">           14 LOAD_CONST               4 (&#x27;Anndy&#x27;)</span><br><span class="line">           16 LOAD_CONST               5 (&#x27;age&#x27;)</span><br><span class="line">           18 LOAD_CONST               6 (24)</span><br><span class="line">           20 LOAD_CONST               3 (1)</span><br><span class="line">           22 LOAD_CONST               7 (2)</span><br><span class="line">           24 BUILD_LIST               2</span><br><span class="line">           26 BUILD_LIST               3</span><br><span class="line">           28 LOAD_CONST              10 ((3, 4))</span><br><span class="line">           30 BUILD_LIST               4</span><br><span class="line">           32 STORE_NAME               2 (Anndy)</span><br><span class="line"></span><br><span class="line">8          34 LOAD_NAME                1 (copy)</span><br><span class="line">           36 LOAD_ATTR                3 (deepcopy)</span><br><span class="line">           38 LOAD_NAME                2 (Anndy)</span><br><span class="line">           40 CALL_FUNCTION            1</span><br><span class="line">           42 STORE_NAME               4 (Tom)</span><br><span class="line"></span><br><span class="line">9          44 LOAD_NAME                1 (copy)</span><br><span class="line">           46 LOAD_ATTR                1 (copy)</span><br><span class="line">           48 LOAD_NAME                2 (Anndy)</span><br><span class="line">           50 CALL_FUNCTION            1</span><br><span class="line">           52 STORE_NAME               5 (Bob)</span><br><span class="line">           54 LOAD_CONST               2 (None)</span><br><span class="line">           56 RETURN_VALUE</span><br></pre></td></tr></table></figure>
+
+<h2 id="迭代器"><a href="#迭代器" class="headerlink" title="迭代器"></a>迭代器</h2><h3 id="判断可迭代对象"><a href="#判断可迭代对象" class="headerlink" title="判断可迭代对象"></a>判断可迭代对象</h3><ul>
+<li>isinstance(l,Iterable)</li>
+<li>assert ‘<em>iter</em>‘ in dir([])</li>
+</ul>
+<h3 id="自定义-iter-和-next-实现迭代器"><a href="#自定义-iter-和-next-实现迭代器" class="headerlink" title="自定义__iter__和__next__实现迭代器"></a>自定义__iter__和__next__实现迭代器</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">IterA</span>:</span></span><br><span class="line">	<span class="function"><span class="keyword">def</span> <span class="title">__init__</span>(<span class="params">self,num</span>):</span></span><br><span class="line">		self.num = num</span><br><span class="line">	<span class="function"><span class="keyword">def</span> <span class="title">__iter__</span>(<span class="params">self</span>):</span></span><br><span class="line">		<span class="keyword">return</span> self</span><br><span class="line">	<span class="function"><span class="keyword">def</span> <span class="title">__next__</span>(<span class="params">self</span>):</span></span><br><span class="line">		self.num += <span class="number">1</span></span><br><span class="line">		<span class="keyword">return</span> self.num</span><br></pre></td></tr></table></figure>
+
+<h3 id="模拟实现for循环行为"><a href="#模拟实现for循环行为" class="headerlink" title="模拟实现for循环行为"></a>模拟实现for循环行为</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">mylist = [<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>]</span><br><span class="line">mylist_iter = mylist.__iter__()</span><br><span class="line"><span class="keyword">while</span> <span class="literal">True</span>:</span><br><span class="line">	<span class="keyword">try</span>:</span><br><span class="line">		item = mylist_iter.__next__()</span><br><span class="line">		print(item)</span><br><span class="line">	<span class="keyword">except</span> StopIteration:</span><br><span class="line">		<span class="keyword">break</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="生成器"><a href="#生成器" class="headerlink" title="生成器"></a>生成器</h2><h3 id="生成器函数"><a href="#生成器函数" class="headerlink" title="生成器函数"></a>生成器函数</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">fib</span>(<span class="params">end = <span class="number">1000</span></span>):</span></span><br><span class="line">    prev,curr=<span class="number">0</span>,<span class="number">1</span></span><br><span class="line">    <span class="keyword">while</span> curr &lt; end:</span><br><span class="line">        <span class="keyword">yield</span> curr</span><br><span class="line">        prev,curr=curr,curr+prev</span><br></pre></td></tr></table></figure>
+
+<h3 id="生成器表达式"><a href="#生成器表达式" class="headerlink" title="生成器表达式"></a>生成器表达式</h3><figure class="highlight lisp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">g = (<span class="name">x*2</span> for x in range(<span class="number">10</span>))</span><br></pre></td></tr></table></figure>
+
+<h2 id="闭包"><a href="#闭包" class="headerlink" title="闭包"></a>闭包</h2><p>闭包是由函数和与其相关的引用环境组合而成的实体，将函数与其所操作的某些数据关联起来。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">outer</span>(<span class="params">n</span>):</span></span><br><span class="line">	count = <span class="number">0</span></span><br><span class="line">	<span class="function"><span class="keyword">def</span> <span class="title">inner</span>():</span></span><br><span class="line">	<span class="comment"># 需要改写外部变量时,声明nonlocal会优先寻找层级关系与闭包作用域最近的外部变量</span></span><br><span class="line">		<span class="keyword">nonlocal</span> count</span><br><span class="line">		count  = <span class="number">2</span></span><br><span class="line">		print(n+count)</span><br><span class="line">	print(inner.__closure__)</span><br><span class="line">	<span class="comment"># 自由变量存储在闭包的 cell_contents中</span></span><br><span class="line">	print(inner.__closure__[<span class="number">0</span>].cell_contents)</span><br><span class="line">	<span class="keyword">return</span> inner</span><br></pre></td></tr></table></figure>
+
+<h3 id="用生成器实现协程"><a href="#用生成器实现协程" class="headerlink" title="用生成器实现协程"></a>用生成器实现协程</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> inspect <span class="keyword">import</span> getgeneratorstate</span><br><span class="line"></span><br><span class="line"><span class="comment"># 子生成器</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">average_gen</span>():</span></span><br><span class="line">    total = <span class="number">0</span></span><br><span class="line">    count = <span class="number">0</span></span><br><span class="line">    average = <span class="number">0</span></span><br><span class="line">    <span class="keyword">while</span> <span class="literal">True</span>:</span><br><span class="line">        new_num = <span class="keyword">yield</span> average</span><br><span class="line">        <span class="keyword">if</span> new_num <span class="keyword">is</span> <span class="literal">None</span>:</span><br><span class="line">            <span class="keyword">break</span></span><br><span class="line">        count += <span class="number">1</span></span><br><span class="line">        total += new_num</span><br><span class="line">        average = total / count</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 每一次return，都意味着当前协程结束。</span></span><br><span class="line">    <span class="keyword">return</span> total, count, average</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># 委托生成器负责委托子生成器完成具体任务,借助yield from传递给子生成器中yield</span></span><br><span class="line"><span class="comment"># 第一次对委派生成器调用next()或.send(None)时，会执行到第一个yield from表达式并暂停。</span></span><br><span class="line"><span class="comment"># 当继续调用委派生成器的.send()，.throw()和.close()等方法时，会“直接”作用到最内层的子生成器上，而不是让委派生成器的代码继续向前执行。</span></span><br><span class="line"><span class="comment"># 只有当子生成器抛出StopIteration异常后，委派生成器中的代码才继续执行，并将StopIteration.value的值作为yield from表达式的返回值。</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">proxy_gen</span>():</span></span><br><span class="line">    <span class="keyword">while</span> <span class="literal">True</span>:</span><br><span class="line">        <span class="comment"># 只有子生成器要结束（return）了，yield from左边的变量才会被赋值，后面的代码才会执行。</span></span><br><span class="line">        total, count, average = <span class="keyword">yield</span> <span class="keyword">from</span> average_gen()</span><br><span class="line">        print(<span class="string">&quot;计算完毕！！\n总共传入 &#123;&#125; 个数值， 总和：&#123;&#125;，平均数：&#123;&#125;&quot;</span>.format(count, total, average))</span><br><span class="line"></span><br><span class="line"><span class="comment"># 调用方</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">main</span>():</span></span><br><span class="line">    calc_average = proxy_gen()</span><br><span class="line">    next(calc_average)  <span class="comment"># 预激协程</span></span><br><span class="line">    print(calc_average.send(<span class="number">10</span>))  <span class="comment"># 打印：10.0,即子生成器yield的值</span></span><br><span class="line">    print(calc_average.send(<span class="number">20</span>))  <span class="comment"># 打印：15.0</span></span><br><span class="line">    print(getgeneratorstate(calc_average))  <span class="comment"># 打印协程所处的状态</span></span><br><span class="line">    print(calc_average.send(<span class="number">30</span>))  <span class="comment"># 打印：20.0</span></span><br><span class="line">    calc_average.send(<span class="literal">None</span>)  <span class="comment"># 结束协程</span></span><br><span class="line">    <span class="comment"># 如果此处再调用calc_average.send(10)，由于上一协程已经结束，将重开一协程</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">&#x27;__main__&#x27;</span>:</span><br><span class="line">    main()</span><br></pre></td></tr></table></figure>
+
+<h2 id="装饰器"><a href="#装饰器" class="headerlink" title="装饰器"></a>装饰器</h2><p>作用：不破坏原有结构的前提下,为已经存在的对象添加额外的功能,提高程序可重复利用性，增加程序可读性。<br>场景：用于有切面需求的场景，比如：插入日志、性能测试、事务处理、缓存、权限校验等。<br>特性：通常装饰器定义在一个模块中，然后应用到其他模块中的函数上，装饰函数通常在加载模块时立即运行，被装饰的函数只在明确调用时运行。</p>
+<h3 id="带参装饰器"><a href="#带参装饰器" class="headerlink" title="带参装饰器"></a>带参装饰器</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> functools <span class="keyword">import</span> wraps</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">add_param</span>(<span class="params">paragram</span>):</span></span><br><span class="line">    print(<span class="string">&quot;start...&quot;</span>)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">wrapper</span>(<span class="params">func</span>):</span></span><br><span class="line"><span class="meta">        @wraps(func)</span></span><br><span class="line">        <span class="function"><span class="keyword">def</span> <span class="title">inner</span>(<span class="params">*args, **kwargs</span>):</span></span><br><span class="line">            <span class="keyword">if</span> paragram == <span class="number">1</span>:</span><br><span class="line">                print(<span class="string">&#x27;在被装饰的函数执行之前做的事&#x27;</span>)</span><br><span class="line">            ret = func(*args, **kwargs)</span><br><span class="line">            print(<span class="string">&#x27;在被装饰的函数执行之后做的事&#x27;</span>)</span><br><span class="line">            <span class="keyword">return</span> ret</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> inner</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> wrapper</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># 对原有装饰器封装返回一个装饰器，调用时能把参数传递到装饰器的环境中。</span></span><br><span class="line"><span class="comment"># 实际上先执行了add_param(123)，返回了绑定paragram的wrapper装饰器,再装饰目标函数</span></span><br><span class="line"><span class="meta">@add_param(123)</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">destination</span>():</span></span><br><span class="line">    <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">    学习装饰器</span></span><br><span class="line"><span class="string">    :return:</span></span><br><span class="line"><span class="string">    &quot;&quot;&quot;</span></span><br><span class="line">    print(<span class="string">&quot;目标函数！&quot;</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">destination()</span><br><span class="line">print(destination.__doc__)</span><br></pre></td></tr></table></figure>
+
+<h3 id="多层装饰器"><a href="#多层装饰器" class="headerlink" title="多层装饰器"></a>多层装饰器</h3><p>即外层装饰器会对内层装饰器装饰的结果进行再装饰，等价于test = set_fun2(set_fun1(test))。</p>
+<h3 id="类装饰器"><a href="#类装饰器" class="headerlink" title="类装饰器"></a>类装饰器</h3><p>类装饰器可以依靠类内部的 __call__方法，当使用 @ 形式将装饰器附加到函数上时就会调用此方法。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Foo</span>(<span class="params">object</span>):</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span>(<span class="params">self, func</span>):</span></span><br><span class="line">        self._func = func</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__call__</span>(<span class="params">self</span>):</span></span><br><span class="line">        <span class="keyword">print</span> (<span class="string">&#x27;class decorator runing&#x27;</span>)</span><br><span class="line">        self._func()</span><br><span class="line">        <span class="keyword">print</span> (<span class="string">&#x27;class decorator ending&#x27;</span>)</span><br><span class="line"><span class="meta">@Foo</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">bar</span>():</span></span><br><span class="line">    <span class="keyword">print</span> (<span class="string">&#x27;bar&#x27;</span>)</span><br><span class="line">bar()</span><br></pre></td></tr></table></figure>
+
+<h3 id="第三方包写装饰器"><a href="#第三方包写装饰器" class="headerlink" title="第三方包写装饰器"></a>第三方包写装饰器</h3><p>1、函数签名是固定的，必须是(wrapped, instance, args, kwargs)，注意第二个参数instance是必须的。<br>2、args和kwargs也是固定的，注意前面没有星号，<strong>在装饰器内部调用原函数时才带星号</strong>。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> wrapt</span><br><span class="line"><span class="keyword">import</span> time</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">@wrapt.decorator</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">pass_through</span>(<span class="params">wrapped, instance, args, kwargs</span>):</span></span><br><span class="line">    start = time.time()</span><br><span class="line">    time.sleep(<span class="number">2</span>)</span><br><span class="line">    wrapped(*args, **kwargs)</span><br><span class="line">    print(time.time() - start)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">@pass_through</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">function</span>():</span></span><br><span class="line">    print(<span class="string">&quot;Hello World!&quot;</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">function()</span><br></pre></td></tr></table></figure>
+
+<h2 id="默认参数陷阱"><a href="#默认参数陷阱" class="headerlink" title="默认参数陷阱"></a>默认参数陷阱</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="function"><span class="keyword">def</span> <span class="title">func</span>(<span class="params">numbers=[], num=<span class="number">1</span></span>):</span></span><br><span class="line"><span class="meta">... </span>    numbers.append(num)</span><br><span class="line"><span class="meta">... </span>    <span class="keyword">return</span> numbers</span><br><span class="line"></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>func()</span><br><span class="line">[<span class="number">1</span>]</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>func()</span><br><span class="line">[<span class="number">1</span>, <span class="number">1</span>]</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>func()</span><br><span class="line">[<span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>]</span><br></pre></td></tr></table></figure>
+<p>解释：在 Python 中，函数是第一类对象(function is the first class object)，初始化完成时，属性 <strong>default</strong> 中的第一个默认参数 numbers 指向一个空列表。<br>如何避免前面那种情况发生呢？就是不要用可变对象作为参数的默认值。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2019/11/08/Python%20%E5%AD%97%E7%AC%A6%E7%BC%96%E7%A0%81%20%E5%8F%82%E6%95%B0%20%E6%96%AD%E8%A8%80/" rel="prev" title="Python 字符编码 参数 断言">
+      <i class="fa fa-chevron-left"></i> Python 字符编码 参数 断言
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2019/11/09/Python%20%E5%A4%9A%E8%BF%9B%E7%A8%8B%E4%B8%8E%E5%A4%9A%E7%BA%BF%E7%A8%8B/" rel="next" title="Python 多进程与多线程">
+      Python 多进程与多线程 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9F%BA%E7%A1%80%E5%86%85%E5%AE%B9"><span class="nav-number">1.</span> <span class="nav-text">基础内容</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B7%B1%E6%B5%85%E6%8B%B7%E8%B4%9D"><span class="nav-number">2.</span> <span class="nav-text">深浅拷贝</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%BF%AD%E4%BB%A3%E5%99%A8"><span class="nav-number">3.</span> <span class="nav-text">迭代器</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%A4%E6%96%AD%E5%8F%AF%E8%BF%AD%E4%BB%A3%E5%AF%B9%E8%B1%A1"><span class="nav-number">3.1.</span> <span class="nav-text">判断可迭代对象</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%87%AA%E5%AE%9A%E4%B9%89-iter-%E5%92%8C-next-%E5%AE%9E%E7%8E%B0%E8%BF%AD%E4%BB%A3%E5%99%A8"><span class="nav-number">3.2.</span> <span class="nav-text">自定义__iter__和__next__实现迭代器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A8%A1%E6%8B%9F%E5%AE%9E%E7%8E%B0for%E5%BE%AA%E7%8E%AF%E8%A1%8C%E4%B8%BA"><span class="nav-number">3.3.</span> <span class="nav-text">模拟实现for循环行为</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%94%9F%E6%88%90%E5%99%A8"><span class="nav-number">4.</span> <span class="nav-text">生成器</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%94%9F%E6%88%90%E5%99%A8%E5%87%BD%E6%95%B0"><span class="nav-number">4.1.</span> <span class="nav-text">生成器函数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%94%9F%E6%88%90%E5%99%A8%E8%A1%A8%E8%BE%BE%E5%BC%8F"><span class="nav-number">4.2.</span> <span class="nav-text">生成器表达式</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%97%AD%E5%8C%85"><span class="nav-number">5.</span> <span class="nav-text">闭包</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%94%A8%E7%94%9F%E6%88%90%E5%99%A8%E5%AE%9E%E7%8E%B0%E5%8D%8F%E7%A8%8B"><span class="nav-number">5.1.</span> <span class="nav-text">用生成器实现协程</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%A3%85%E9%A5%B0%E5%99%A8"><span class="nav-number">6.</span> <span class="nav-text">装饰器</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B8%A6%E5%8F%82%E8%A3%85%E9%A5%B0%E5%99%A8"><span class="nav-number">6.1.</span> <span class="nav-text">带参装饰器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%A4%9A%E5%B1%82%E8%A3%85%E9%A5%B0%E5%99%A8"><span class="nav-number">6.2.</span> <span class="nav-text">多层装饰器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%B1%BB%E8%A3%85%E9%A5%B0%E5%99%A8"><span class="nav-number">6.3.</span> <span class="nav-text">类装饰器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AC%AC%E4%B8%89%E6%96%B9%E5%8C%85%E5%86%99%E8%A3%85%E9%A5%B0%E5%99%A8"><span class="nav-number">6.4.</span> <span class="nav-text">第三方包写装饰器</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%BB%98%E8%AE%A4%E5%8F%82%E6%95%B0%E9%99%B7%E9%98%B1"><span class="nav-number">7.</span> <span class="nav-text">默认参数陷阱</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Leo Lin"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Leo Lin</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">104</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">11</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Leo Lin</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+
+    <script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"model":{"jsonPath":"/live2dw/assets/hijiki.model.json"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":false},"log":false});</script></body>
+</html>

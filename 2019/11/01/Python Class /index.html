@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.1.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"yoursite.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="前言isinstance() 用于检查实例类型是否为一个已知的类型，会认为子类是一种父类类型，考虑继承关系；issubclass() 用于检查类继承 _getitem_ 与 _dict_1、类中定义_getitem_方法可支持索引访问元素。2、每层的_dict_只存储该层新增的属性，子类不需要重复存储父类中的属性。 1234567891011121314151617181920class Demo">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Python Class">
+<meta property="og:url" content="http://yoursite.com/2019/11/01/Python%20Class%20/index.html">
+<meta property="og:site_name" content="江湖の林九">
+<meta property="og:description" content="前言isinstance() 用于检查实例类型是否为一个已知的类型，会认为子类是一种父类类型，考虑继承关系；issubclass() 用于检查类继承 _getitem_ 与 _dict_1、类中定义_getitem_方法可支持索引访问元素。2、每层的_dict_只存储该层新增的属性，子类不需要重复存储父类中的属性。 1234567891011121314151617181920class Demo">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2019-11-01T09:20:00.000Z">
+<meta property="article:modified_time" content="2020-04-24T01:48:28.440Z">
+<meta property="article:author" content="Leo Lin">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://yoursite.com/2019/11/01/Python%20Class%20/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>Python Class | 江湖の林九</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">江湖の林九</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">相逢何必曾相识！</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/11/01/Python%20Class%20/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Leo Lin">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="江湖の林九">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Python Class
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-11-01 17:20:00" itemprop="dateCreated datePublished" datetime="2019-11-01T17:20:00+08:00">2019-11-01</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-04-24 09:48:28" itemprop="dateModified" datetime="2020-04-24T09:48:28+08:00">2020-04-24</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%BC%96%E7%A8%8B%E8%B6%B3%E8%BF%B9/" itemprop="url" rel="index"><span itemprop="name">编程足迹</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>isinstance() 用于检查实例类型是否为一个已知的类型，会认为子类是一种父类类型，考虑继承关系；<br>issubclass() 用于检查类继承</p>
+<h2 id="getitem-与-dict"><a href="#getitem-与-dict" class="headerlink" title="_getitem_ 与 _dict_"></a><code>_getitem_</code> 与 <code>_dict_</code></h2><p>1、类中定义<code>_getitem_</code>方法可支持索引访问元素。<br>2、每层的<code>_dict_</code>只存储该层新增的属性，子类不需要重复存储父类中的属性。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Demo</span>:</span></span><br><span class="line">    <span class="keyword">pass</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Data</span>(<span class="params">Demo</span>):</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span>(<span class="params">self, key, value</span>):</span></span><br><span class="line">		self.value = value</span><br><span class="line">        self.mydict = &#123;key: value&#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__getitem__</span>(<span class="params">self, key</span>):</span></span><br><span class="line">        <span class="keyword">return</span> self.mydict.get(key, <span class="number">10</span>)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__setitem__</span>(<span class="params">self, key, value</span>):</span></span><br><span class="line">        self.mydict[key] = value</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">&#x27;__main__&#x27;</span>:</span><br><span class="line">    data = Data(<span class="string">&#x27;age&#x27;</span>, <span class="string">&#x27;12&#x27;</span>)</span><br><span class="line">    data[<span class="string">&quot;age&quot;</span>] = <span class="number">22</span></span><br><span class="line">    print(data[<span class="string">&quot;age&quot;</span>], data[<span class="string">&quot;name&quot;</span>])</span><br><span class="line">    print(data.__dict__)</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>3、运行结果</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">22</span> <span class="number">10</span></span><br><span class="line">&#123;<span class="string">&#x27;mydict&#x27;</span>: &#123;<span class="string">&#x27;age&#x27;</span>: <span class="number">22</span>&#125;&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="str-与-repr"><a href="#str-与-repr" class="headerlink" title="_str_ 与 _repr_"></a><code>_str_</code> 与 <code>_repr_</code></h2><p>1、在上述的类中添加以下语句:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">__str__</span>(<span class="params">self</span>):</span></span><br><span class="line">	<span class="keyword">return</span> <span class="string">&#x27;Data object (value:%s)&#x27;</span> % self.value</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">__repr__</span>(<span class="params">self</span>):</span></span><br><span class="line">	<span class="keyword">return</span> <span class="string">&#x27;Data object &lt;value:%s&gt;&#x27;</span> % self.value</span><br><span class="line">	</span><br></pre></td></tr></table></figure>
+<p>2、运行结果</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">print(data)</span><br><span class="line"><span class="comment"># 不添加语句运行</span></span><br><span class="line">&lt;__main__.Data object at <span class="number">0x000001D5DA766358</span>&gt;</span><br><span class="line"><span class="comment"># 添加运行</span></span><br><span class="line">Data object (value:<span class="number">12</span>)</span><br></pre></td></tr></table></figure>
+
+<h2 id="init-与-new"><a href="#init-与-new" class="headerlink" title="_init_与_new_"></a><code>_init_</code>与<code>_new_</code></h2><p>1、如果<code>_new_</code>返回一个对象的实例，会隐式调用<code>_init_</code>，如果<code>_new_</code>不返回一个对象的实例，<code>_init_</code>不会被调用。<br>2、<code>_init_</code>：创建完对象后调用此函数，用于初始化对象实例返回None。</p>
+<h2 id="slots"><a href="#slots" class="headerlink" title="_slots_"></a><code>_slots_</code></h2><p><code>_slots_</code>用于规定当前类可对外访问的属性，并为每个实例预留恰好足够的空间来保存每个变量，节省空间。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> memory_profiler <span class="keyword">import</span> profile</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">A</span>(<span class="params">object</span>):</span>  </span><br><span class="line">	<span class="comment"># 非字符串的迭代器可以赋值给__slots__,如元组、列表</span></span><br><span class="line">	__slots__=(<span class="string">&#x27;x&#x27;</span>,) </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span>(<span class="params">self, x</span>):</span></span><br><span class="line">        self.x = x</span><br><span class="line"></span><br><span class="line"><span class="meta">@profile</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">main</span>():</span></span><br><span class="line">    f = [A(<span class="number">1</span>) <span class="keyword">for</span> _ <span class="keyword">in</span> range(<span class="number">10000</span>)]</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">&#x27;__main__&#x27;</span>:</span><br><span class="line">    main()</span><br></pre></td></tr></table></figure>
+
+<h2 id="call"><a href="#call" class="headerlink" title="_call_"></a><code>_call_</code></h2><p>在该类创建时实现<code>_call_</code>方法，实例名+()就是调用该方法。</p>
+<h2 id="is与"><a href="#is与" class="headerlink" title="is与=="></a>is与==</h2><p>is 用于判断两个变量引用对象是否为同一个， == 用于判断引用变量的值是否相等。<br>驻留值：对比较小的整数对象[-5, 256]进行缓存即小整数池。</p>
+<h2 id="staticmethod与classmethod"><a href="#staticmethod与classmethod" class="headerlink" title="staticmethod与classmethod"></a>staticmethod与classmethod</h2><ul>
+<li>静态函数(@staticmethod): 即静态方法,主要处理与这个类的逻辑关联, 如验证数据;</li>
+<li>类函数(@classmethod):即类方法, 更关注于从类中调用方法, 而不是在实例中调用方法, 如构造重载;</li>
+<li>成员函数: 实例的方法, 只能通过实例进行调用;</li>
+</ul>
+<h2 id="property-fget-fset-fdel-doc"><a href="#property-fget-fset-fdel-doc" class="headerlink" title="property([fget[, fset[, fdel[, doc]]]])"></a>property([fget[, fset[, fdel[, doc]]]])</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Student</span>(<span class="params">object</span>):</span></span><br><span class="line"></span><br><span class="line"><span class="meta">    @property</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">score</span>(<span class="params">self</span>):</span></span><br><span class="line">        <span class="keyword">return</span> self._score</span><br><span class="line"></span><br><span class="line"><span class="meta">    @score.setter</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">score</span>(<span class="params">self, value</span>):</span></span><br><span class="line">        <span class="keyword">if</span> <span class="keyword">not</span> isinstance(value, int):</span><br><span class="line">            <span class="keyword">raise</span> ValueError(<span class="string">&#x27;score must be an integer!&#x27;</span>)</span><br><span class="line">        <span class="keyword">if</span> value &lt; <span class="number">0</span> <span class="keyword">or</span> value &gt; <span class="number">100</span>:</span><br><span class="line">            <span class="keyword">raise</span> ValueError(<span class="string">&#x27;score must between 0 ~ 100!&#x27;</span>)</span><br><span class="line">        self._score = value</span><br><span class="line"></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>s = Student()</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>s.score = <span class="number">60</span> <span class="comment"># OK，实际转化为s.set_score(60)</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>s.score <span class="comment"># OK，实际转化为s.get_score()</span></span><br><span class="line"><span class="number">60</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>s.score = <span class="number">9999</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="反射机制"><a href="#反射机制" class="headerlink" title="反射机制"></a>反射机制</h2><p>利用字符串的形式操作对象(模块)的方法/属性(成员)，是一种基于字符串的事件驱动实现了动态的函数调用功能。<br>1、hasattr(obj,name):判断一个对象obj里面是否有name属性或者name方法<br>2、getattr(obj,name[,default]):获取对象obj的属性或者方法<br>3、setattr(obj,name,values):给对象obj的属性赋值，若属性不存在，先创建再赋值<br>4、delattr(obj,name):删除对象属性<br><strong>注：</strong> getattr,hasattr,setattr,delattr对模块的修改都在内存中进行，并不会影响文件中真实内容。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">test</span>():</span></span><br><span class="line">    name=<span class="string">&quot;xiaohua&quot;</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">run</span>(<span class="params">self</span>):</span></span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;HelloWord&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>t=test()</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>getattr(t, <span class="string">&quot;name&quot;</span>)     <span class="comment">#获取name属性，存在就打印出来。</span></span><br><span class="line"><span class="string">&#x27;xiaohua&#x27;</span></span><br><span class="line"></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>getattr(t, <span class="string">&quot;run&quot;</span>)      <span class="comment">#获取run方法，存在就打印出方法的内存地址。</span></span><br><span class="line">&lt;bound method test.run of &lt;__main__.test instance at <span class="number">0x0269C878</span>&gt;&gt;</span><br><span class="line"></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>getattr(t, <span class="string">&quot;run&quot;</span>)()      <span class="comment">#获取run方法，后面加&quot;()&quot;可以将这个方法运行。</span></span><br><span class="line"><span class="string">&#x27;HelloWord&#x27;</span></span><br><span class="line"></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>getattr(t, <span class="string">&quot;age&quot;</span>)      <span class="comment">#获取一个不存在的属性。</span></span><br><span class="line">Traceback (most recent call last):</span><br><span class="line">  File <span class="string">&quot;&lt;stdin&gt;&quot;</span>, line <span class="number">1</span>, <span class="keyword">in</span> &lt;module&gt;</span><br><span class="line">AttributeError: test instance has no attribute <span class="string">&#x27;age&#x27;</span></span><br><span class="line"></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>getattr(t, <span class="string">&quot;age&quot;</span>,<span class="string">&quot;18&quot;</span>)  <span class="comment">#若属性不存在，返回一个默认值。</span></span><br><span class="line"><span class="string">&#x27;18&#x27;</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="实例"><a href="#实例" class="headerlink" title="实例"></a>实例</h2><p>每个对象都是某个类(class)的一个实例(instance)。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Data</span>:</span></span><br><span class="line">    <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">    类成员修饰符:</span></span><br><span class="line"><span class="string">    xx：公有变量</span></span><br><span class="line"><span class="string">    _xx：单前置下划线，保护变量，类对象和子类可以访问，from somemodule import *禁止导入</span></span><br><span class="line"><span class="string">    __xx：双前置下划线，私有化属性或方法，只有类对象自己能访问，无法在外部直接访问（名字重整所以访问不到）</span></span><br><span class="line"><span class="string">    __xx__：双前后下划线，系统定义名字（不要自己发明这样的名字）</span></span><br><span class="line"><span class="string">    xx_：单后置下划线，用于避免与Python关键词的冲突</span></span><br><span class="line"><span class="string">    在使用 from somemodule import * 导入模块的情况下，不能导入或使用私有属性和方法</span></span><br><span class="line"><span class="string">    在使用 import somemodule 导入模块的情况下，能导入并使用私有属性和方法</span></span><br><span class="line"><span class="string">    &quot;&quot;&quot;</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span>(<span class="params">self, x</span>):</span></span><br><span class="line">        print(<span class="string">&quot;父类初始化...&quot;</span>)</span><br><span class="line">        self.x = x</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">get</span>(<span class="params">self</span>):</span></span><br><span class="line">        print(<span class="string">f&quot;I am <span class="subst">&#123;self.x&#125;</span>&quot;</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">BigData</span>(<span class="params">Data</span>):</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span>(<span class="params">self, x, y</span>):</span></span><br><span class="line">        <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">        实例化对象 --&gt;  调用子类__init__()  --&gt; 子类__init__()继承父类__init__()  --&gt; 调用父类 __init__()</span></span><br><span class="line"><span class="string">        super(子类，self).__init__(参数1，参数2，....)</span></span><br><span class="line"><span class="string">        :param x:</span></span><br><span class="line"><span class="string">        :param y:</span></span><br><span class="line"><span class="string">        &quot;&quot;&quot;</span></span><br><span class="line">        super().__init__(x)  <span class="comment"># 继承父类的构造方法</span></span><br><span class="line">        self.__y = y*<span class="number">2</span>  <span class="comment"># 定义子类的本身属性</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">get</span>(<span class="params">self</span>):</span></span><br><span class="line">        <span class="comment"># 主动去执行父类的get方法</span></span><br><span class="line">        super().get()</span><br><span class="line">        print(self.__y)</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">&#x27;__main__&#x27;</span>:</span><br><span class="line">    bd = BigData(<span class="number">1</span>,<span class="number">2</span>)</span><br><span class="line">    bd.get()</span><br></pre></td></tr></table></figure>
+<p>2、运行结果</p>
+<figure class="highlight angelscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">父类初始化...</span><br><span class="line">I am <span class="number">1</span></span><br><span class="line"><span class="number">4</span></span><br></pre></td></tr></table></figure>
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2019/11/01/Python%20urlparse%E5%92%8C%E5%AE%9E%E4%BD%93%E7%BC%96%E7%A0%81/" rel="prev" title="Python urlparse及实体编码">
+      <i class="fa fa-chevron-left"></i> Python urlparse及实体编码
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2019/11/01/Python%20Collection/" rel="next" title="Python Collection">
+      Python Collection <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%89%8D%E8%A8%80"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#getitem-%E4%B8%8E-dict"><span class="nav-number">2.</span> <span class="nav-text">_getitem_ 与 _dict_</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#str-%E4%B8%8E-repr"><span class="nav-number">3.</span> <span class="nav-text">_str_ 与 _repr_</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#init-%E4%B8%8E-new"><span class="nav-number">4.</span> <span class="nav-text">_init_与_new_</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#slots"><span class="nav-number">5.</span> <span class="nav-text">_slots_</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#call"><span class="nav-number">6.</span> <span class="nav-text">_call_</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#is%E4%B8%8E"><span class="nav-number">7.</span> <span class="nav-text">is与&#x3D;&#x3D;</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#staticmethod%E4%B8%8Eclassmethod"><span class="nav-number">8.</span> <span class="nav-text">staticmethod与classmethod</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#property-fget-fset-fdel-doc"><span class="nav-number">9.</span> <span class="nav-text">property([fget[, fset[, fdel[, doc]]]])</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%8D%E5%B0%84%E6%9C%BA%E5%88%B6"><span class="nav-number">10.</span> <span class="nav-text">反射机制</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%9E%E4%BE%8B"><span class="nav-number">11.</span> <span class="nav-text">实例</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Leo Lin"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Leo Lin</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">104</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">11</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Leo Lin</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+
+    <script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"model":{"jsonPath":"/live2dw/assets/hijiki.model.json"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":false},"log":false});</script></body>
+</html>

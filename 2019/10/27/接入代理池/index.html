@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.1.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"yoursite.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="代理辨析1、HTTP代理  透明代理:也叫普通代理，它不但改变了我们的请求信息，还会传送真实的IP地址。从：HTTP_X_FORWARDED_FOR 等代理信息可以查到我们IP地址！  匿名代理:普通匿名代理，它能隐藏客户机的真实IP，但会改变我们的请求信息。它不传送正式ip，但是可能会发送HTTP_VIA、 HTTP_PROXY_CONNECTION 信息，还是可以通过这些判断出使用了代理！">
+<meta property="og:type" content="article">
+<meta property="og:title" content="接入代理池">
+<meta property="og:url" content="http://yoursite.com/2019/10/27/%E6%8E%A5%E5%85%A5%E4%BB%A3%E7%90%86%E6%B1%A0/index.html">
+<meta property="og:site_name" content="江湖の林九">
+<meta property="og:description" content="代理辨析1、HTTP代理  透明代理:也叫普通代理，它不但改变了我们的请求信息，还会传送真实的IP地址。从：HTTP_X_FORWARDED_FOR 等代理信息可以查到我们IP地址！  匿名代理:普通匿名代理，它能隐藏客户机的真实IP，但会改变我们的请求信息。它不传送正式ip，但是可能会发送HTTP_VIA、 HTTP_PROXY_CONNECTION 信息，还是可以通过这些判断出使用了代理！">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2019-10-27T14:25:07.000Z">
+<meta property="article:modified_time" content="2020-04-24T06:59:21.397Z">
+<meta property="article:author" content="Leo Lin">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://yoursite.com/2019/10/27/%E6%8E%A5%E5%85%A5%E4%BB%A3%E7%90%86%E6%B1%A0/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>接入代理池 | 江湖の林九</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">江湖の林九</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">相逢何必曾相识！</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/10/27/%E6%8E%A5%E5%85%A5%E4%BB%A3%E7%90%86%E6%B1%A0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Leo Lin">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="江湖の林九">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          接入代理池
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-10-27 22:25:07" itemprop="dateCreated datePublished" datetime="2019-10-27T22:25:07+08:00">2019-10-27</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-04-24 14:59:21" itemprop="dateModified" datetime="2020-04-24T14:59:21+08:00">2020-04-24</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%BD%91%E7%BB%9C%E7%88%AC%E8%99%AB/" itemprop="url" rel="index"><span itemprop="name">网络爬虫</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h3 id="代理辨析"><a href="#代理辨析" class="headerlink" title="代理辨析"></a>代理辨析</h3><p>1、HTTP代理</p>
+<ul>
+<li><p>透明代理:也叫普通代理，它不但改变了我们的请求信息，还会传送真实的IP地址。从：HTTP_X_FORWARDED_FOR 等代理信息可以查到我们IP地址！</p>
+</li>
+<li><p>匿名代理:普通匿名代理，它能隐藏客户机的真实IP，但会改变我们的请求信息。它不传送正式ip，但是可能会发送HTTP_VIA、 HTTP_PROXY_CONNECTION 信息，还是可以通过这些判断出使用了代理！</p>
+</li>
+<li><p>高级匿名代理:不改变客户机的请求，这样在服务器看来就像有个真正的客户浏览器在访问它，这时客户的真实IP是隐藏的，服务器端不会认为我们使用了代理！</p>
+</li>
+<li><p>HTTP通道:http代理服务器支持Connect请求，这类代理服务器基本可以代理所有软件，如：QQ,FoxMail,FTP等等，不支持通道的HTTP代理，基本上只支持简单的Http GET,POST等请求服务！</p>
+</li>
+</ul>
+<p>2、socks代理</p>
+<ul>
+<li>SOCKS5:常见SOCKS代理有socks4,socks5，不过目前基本上以socks5代理为主，它基本支持所有客户端请求协议，Http,Ftp,Smtp等，可以具备高级匿名代理隐藏功能！</li>
+</ul>
+<h3 id="付费代理池搭建"><a href="#付费代理池搭建" class="headerlink" title="付费代理池搭建"></a>付费代理池搭建</h3><p>免费代理池的搭建套路一般采用Flask+Redis架构，先爬取再验证去除失效代理，但是免费代理质量极低往往会因此会花费大量精力，以22元一天的猿人云隧道代理为例，做个简易版代理池，涵盖代理增加，代理检测，定时执行等功能。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> datetime</span><br><span class="line"><span class="keyword">import</span> json</span><br><span class="line"><span class="keyword">import</span> re</span><br><span class="line"><span class="keyword">import</span> time</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> redis</span><br><span class="line"><span class="keyword">import</span> requests</span><br><span class="line"><span class="keyword">from</span> apscheduler.schedulers.blocking <span class="keyword">import</span> BlockingScheduler</span><br><span class="line"></span><br><span class="line">headers = &#123;</span><br><span class="line">    <span class="string">&#x27;User-Agent&#x27;</span>: <span class="string">&#x27;Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/76.0.3809.132 Safari/537.36&#x27;</span>,</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">YuanRen</span>:</span></span><br><span class="line">    <span class="string">&quot;&quot;&quot;redis数据库配置区&quot;&quot;&quot;</span></span><br><span class="line">    pool = redis.ConnectionPool(db=<span class="number">1</span>, decode_responses=<span class="literal">True</span>)</span><br><span class="line">    r = redis.Redis(connection_pool=pool)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span>(<span class="params">self, yid, ysecret</span>):</span></span><br><span class="line">        self.yid = yid</span><br><span class="line">        self.ysecret = ysecret</span><br><span class="line">        self.count = <span class="number">5</span></span><br><span class="line">        self.ttl = <span class="number">1000</span></span><br><span class="line">        <span class="comment"># self._init_proxy()</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">_init_proxy</span>(<span class="params">self</span>):</span></span><br><span class="line">        <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">        添加白名单:需要模拟登录或携带登录后的Cookie（非必要步骤）</span></span><br><span class="line"><span class="string">        :return:</span></span><br><span class="line"><span class="string">        &quot;&quot;&quot;</span></span><br><span class="line">        print(<span class="string">&#x27;\033[1;35m初始化中...\033[0m&#x27;</span>)</span><br><span class="line">        <span class="comment"># 取出当前IP地址</span></span><br><span class="line">        response = requests.get(<span class="string">&#x27;http://pv.sohu.com/cityjson?ie=utf-8&#x27;</span>)</span><br><span class="line">        IPaddress = re.search(<span class="string">r&#x27;&quot;cip&quot;: &quot;(.*?)&quot;, &quot;cid&#x27;</span>, response.text).group(<span class="number">1</span>)</span><br><span class="line">        data = &#123;</span><br><span class="line">            <span class="string">&quot;ip&quot;</span>: IPaddress,</span><br><span class="line">            <span class="string">&quot;order_id&quot;</span>: self.yid</span><br><span class="line">        &#125;</span><br><span class="line">        print(data)</span><br><span class="line">        whiteUrl = <span class="string">&quot;https://www.apeyun.com/user/whitelist/add&quot;</span></span><br><span class="line">        resp = requests.post(url=whiteUrl, data=data, headers=headers)</span><br><span class="line">        <span class="keyword">if</span> resp.status_code == <span class="number">200</span>:</span><br><span class="line">            print(<span class="string">&#x27;\033[1;35m初始化成功,启动中稍等..\033[0m&#x27;</span>)</span><br><span class="line">            time.sleep(<span class="number">2</span>)</span><br><span class="line">            print(<span class="string">&#x27;监控已开启&#x27;</span>)</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            print(<span class="string">&#x27;初始化白名单失败&#x27;</span>)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">check_ip</span>(<span class="params">self</span>):</span></span><br><span class="line">        <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">        监控 IP 分数、个数，对其进行增删</span></span><br><span class="line"><span class="string">        &quot;&quot;&quot;</span></span><br><span class="line">        <span class="comment"># 检查分数</span></span><br><span class="line">        nodes = self.r.zrevrange(<span class="string">&#x27;YRYProxy&#x27;</span>, <span class="number">0</span>, <span class="number">-1</span>, withscores=<span class="literal">True</span>)</span><br><span class="line">        print(<span class="string">&quot;node:&quot;</span>, nodes)</span><br><span class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> nodes:</span><br><span class="line">            node = list(i)</span><br><span class="line">            score = int(node[<span class="number">1</span>])</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> score &lt;= <span class="number">0</span>:</span><br><span class="line">                print(<span class="string">&#x27;\033[1;33m分数过低剔除\033[0m&#x27;</span>)</span><br><span class="line">                self.r.zrem(<span class="string">&#x27;YRYProxy&#x27;</span>, node[<span class="number">0</span>])</span><br><span class="line">        <span class="comment"># 检查个数</span></span><br><span class="line">        _sum = self.r.zcard(<span class="string">&#x27;YRYProxy&#x27;</span>)</span><br><span class="line">        print(<span class="string">&quot;sum:&quot;</span>, _sum)</span><br><span class="line">        <span class="keyword">if</span> _sum &lt; self.count:</span><br><span class="line">            self.add_ip()</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">add_ip</span>(<span class="params">self, count=<span class="number">3</span></span>):</span></span><br><span class="line">        <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">        提取IP</span></span><br><span class="line"><span class="string">        &quot;&quot;&quot;</span></span><br><span class="line">        get_url = <span class="string">f&quot;http://tunnel-api.apeyun.com/q?id=<span class="subst">&#123;self.yid&#125;</span>&amp;secret=<span class="subst">&#123;self.ysecret&#125;</span>&amp;limit=<span class="subst">&#123;count&#125;</span>&amp;format=json&amp;auth_mode=auto&quot;</span></span><br><span class="line">        <span class="comment"># 返回的文本进行解析</span></span><br><span class="line">        response = requests.get(get_url)</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> response.status_code == <span class="number">200</span>:</span><br><span class="line">            ret = response.json()</span><br><span class="line">            print(ret)</span><br><span class="line">            <span class="keyword">if</span> ret.get(<span class="string">&#x27;code&#x27;</span>) == <span class="number">200</span>:</span><br><span class="line">                self.parse(ret)</span><br><span class="line">            <span class="keyword">elif</span> ret.get(<span class="string">&#x27;code&#x27;</span>) == <span class="string">&#x27;11020012&#x27;</span>:</span><br><span class="line">                print(<span class="string">&#x27;十秒内可提取IP数已用完&#x27;</span>)</span><br><span class="line">            <span class="keyword">elif</span> ret.get(<span class="string">&#x27;code&#x27;</span>) == <span class="string">&quot;11020001&quot;</span>:</span><br><span class="line">                print(<span class="string">&quot;订单已过期...&quot;</span>)</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            print(<span class="string">&#x27;提取失败&#x27;</span>)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">parse</span>(<span class="params">self, data</span>):</span></span><br><span class="line">        <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">        解析返回数据</span></span><br><span class="line"><span class="string">        &quot;&quot;&quot;</span></span><br><span class="line">        proxy_list = data.get(<span class="string">&#x27;data&#x27;</span>)</span><br><span class="line">        <span class="keyword">for</span> node <span class="keyword">in</span> proxy_list:</span><br><span class="line">            proxy = <span class="string">f&quot;<span class="subst">&#123;node.get(<span class="string">&#x27;ip&#x27;</span>)&#125;</span>:<span class="subst">&#123;node.get(<span class="string">&#x27;port&#x27;</span>)&#125;</span>&quot;</span></span><br><span class="line">            self.save_to_redis(proxy, <span class="number">5</span>)  <span class="comment"># 默认10分</span></span><br><span class="line">        print(<span class="string">&quot;save success&quot;</span>)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">save_to_redis</span>(<span class="params">self, proxy, expire</span>):</span></span><br><span class="line">        <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">        推送到redis集合中</span></span><br><span class="line"><span class="string">        &quot;&quot;&quot;</span></span><br><span class="line">        print(<span class="string">&#x27;代理 %s 推入redis集合&#x27;</span> % proxy)</span><br><span class="line">        self.r.zadd(<span class="string">&#x27;YRYProxy&#x27;</span>, &#123;proxy: expire&#125;)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">aps_run</span>(<span class="params">yry</span>):</span></span><br><span class="line">    <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">    监控IP有效性</span></span><br><span class="line"><span class="string">    &quot;&quot;&quot;</span></span><br><span class="line">    yry.check_ip()</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">&#x27;__main__&#x27;</span>:</span><br><span class="line">    ID = <span class="string">&quot;&quot;</span></span><br><span class="line">    SECRET = <span class="string">&quot;&quot;</span></span><br><span class="line">    yry = YuanRen(ID, SECRET)</span><br><span class="line">    <span class="comment"># 定时监控</span></span><br><span class="line">    scheduler = BlockingScheduler()</span><br><span class="line">    scheduler.add_job(aps_run, <span class="string">&#x27;cron&#x27;</span>, second=<span class="string">&#x27;*/2&#x27;</span>, args=[yry],max_instances=<span class="number">10</span>)  <span class="comment"># 设置检测，推荐2s一次(默认)</span></span><br><span class="line">    scheduler.start()</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2019/10/24/ADSL%E6%8B%A8%E5%8F%B7%E4%BB%A3%E7%90%86/" rel="prev" title="ADSL拨号代理">
+      <i class="fa fa-chevron-left"></i> ADSL拨号代理
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2019/11/01/Python%20with%E4%B8%8A%E4%B8%8B%E6%96%87%E7%AE%A1%E7%90%86/" rel="next" title="Python with上下文管理">
+      Python with上下文管理 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%A3%E7%90%86%E8%BE%A8%E6%9E%90"><span class="nav-number">1.</span> <span class="nav-text">代理辨析</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%98%E8%B4%B9%E4%BB%A3%E7%90%86%E6%B1%A0%E6%90%AD%E5%BB%BA"><span class="nav-number">2.</span> <span class="nav-text">付费代理池搭建</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Leo Lin"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Leo Lin</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">104</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">11</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Leo Lin</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+
+    <script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"model":{"jsonPath":"/live2dw/assets/hijiki.model.json"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":false},"log":false});</script></body>
+</html>
